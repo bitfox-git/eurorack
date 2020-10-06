@@ -1,0 +1,1107 @@
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.Jump,"ax",%progbits
+  18              		.align	1
+  19              		.global	Jump
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	Jump:
+  26              	.LFB126:
+  27              		.file 1 "main.c"
+   1:main.c        **** /* USER CODE BEGIN Header */
+   2:main.c        **** /**
+   3:main.c        ****   ******************************************************************************
+   4:main.c        ****   * @file           : main.c
+   5:main.c        ****   * @brief          : Main program body
+   6:main.c        ****   ******************************************************************************
+   7:main.c        ****   * This notice applies to any and all portions of this file
+   8:main.c        ****   * that are not between comment pairs USER CODE BEGIN and
+   9:main.c        ****   * USER CODE END. Other portions of this file, whether 
+  10:main.c        ****   * inserted by the user or by software development tools
+  11:main.c        ****   * are owned by their respective copyright owners.
+  12:main.c        ****   *
+  13:main.c        ****   * Copyright (c) 2020 STMicroelectronics International N.V. 
+  14:main.c        ****   * All rights reserved.
+  15:main.c        ****   *
+  16:main.c        ****   * Redistribution and use in source and binary forms, with or without 
+  17:main.c        ****   * modification, are permitted, provided that the following conditions are met:
+  18:main.c        ****   *
+  19:main.c        ****   * 1. Redistribution of source code must retain the above copyright notice, 
+  20:main.c        ****   *    this list of conditions and the following disclaimer.
+  21:main.c        ****   * 2. Redistributions in binary form must reproduce the above copyright notice,
+  22:main.c        ****   *    this list of conditions and the following disclaimer in the documentation
+  23:main.c        ****   *    and/or other materials provided with the distribution.
+  24:main.c        ****   * 3. Neither the name of STMicroelectronics nor the names of other 
+  25:main.c        ****   *    contributors to this software may be used to endorse or promote products 
+  26:main.c        ****   *    derived from this software without specific written permission.
+  27:main.c        ****   * 4. This software, including modifications and/or derivative works of this 
+  28:main.c        ****   *    software, must execute solely and exclusively on microcontroller or
+  29:main.c        ****   *    microprocessor devices manufactured by or for STMicroelectronics.
+  30:main.c        ****   * 5. Redistribution and use of this software other than as permitted under 
+  31:main.c        ****   *    this license is void and will automatically terminate your rights under 
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 2
+
+
+  32:main.c        ****   *    this license. 
+  33:main.c        ****   *
+  34:main.c        ****   * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
+  35:main.c        ****   * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
+  36:main.c        ****   * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+  37:main.c        ****   * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  38:main.c        ****   * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
+  39:main.c        ****   * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  40:main.c        ****   * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  41:main.c        ****   * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+  42:main.c        ****   * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  43:main.c        ****   * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+  44:main.c        ****   * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  45:main.c        ****   * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  46:main.c        ****   *
+  47:main.c        ****   ******************************************************************************
+  48:main.c        ****   */
+  49:main.c        **** /* USER CODE END Header */
+  50:main.c        **** 
+  51:main.c        **** /* Includes ------------------------------------------------------------------*/
+  52:main.c        **** #include "main.h"
+  53:main.c        **** #include "stdbool.h"
+  54:main.c        **** #include "stm32f3xx_hal_flash.h"
+  55:main.c        **** #include "led.h" 
+  56:main.c        **** #include "tim.h" 
+  57:main.c        **** 
+  58:main.c        **** /* Private includes ----------------------------------------------------------*/
+  59:main.c        **** /* USER CODE BEGIN Includes */
+  60:main.c        **** /* USER CODE END Includes */
+  61:main.c        **** 
+  62:main.c        **** /* Private typedef -----------------------------------------------------------*/
+  63:main.c        **** /* USER CODE BEGIN PTD */
+  64:main.c        **** 
+  65:main.c        **** /* USER CODE END PTD */
+  66:main.c        **** 
+  67:main.c        **** /* Private define ------------------------------------------------------------*/
+  68:main.c        **** /* USER CODE BEGIN PD */
+  69:main.c        **** #define kBIT_ADDRESS 0x08002800
+  70:main.c        **** #define kAPP_ADDRESS 0x08004000
+  71:main.c        **** #define kUPDATE_ADDRESS 0x08022000
+  72:main.c        **** /* USER CODE END PD */
+  73:main.c        **** 
+  74:main.c        **** /* Private macro -------------------------------------------------------------*/
+  75:main.c        **** /* USER CODE BEGIN PM */
+  76:main.c        **** 
+  77:main.c        **** /* USER CODE END PM */
+  78:main.c        **** 
+  79:main.c        **** /* Private variables ---------------------------------------------------------*/
+  80:main.c        **** 
+  81:main.c        **** /* USER CODE BEGIN PV */
+  82:main.c        **** 
+  83:main.c        **** /* Application start address */
+  84:main.c        **** typedef void (*pFunction)(void);
+  85:main.c        **** 
+  86:main.c        **** void Jump() {
+  28              		.loc 1 86 0
+  29              		.cfi_startproc
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 3
+
+
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32 0000 80B5     		push	{r7, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 7, -8
+  36              		.cfi_offset 14, -4
+  37 0002 00AF     		add	r7, sp, #0
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_register 7
+  87:main.c        **** 
+  88:main.c        **** 	pFunction appEntry;
+  89:main.c        **** 	uint32_t appStack;
+  90:main.c        **** 	/* Get the application stack pointer (First entry in the application vector table) */
+  91:main.c        **** 	appStack = (uint32_t) *((__IO uint32_t*)kAPP_ADDRESS);
+  40              		.loc 1 91 0
+  41 0004 044B     		ldr	r3, .L4
+  42 0006 1968     		ldr	r1, [r3]
+  43              	.LVL0:
+  92:main.c        **** 
+  93:main.c        **** 	/* Get the application entry point (Second entry in the application vector table) */
+  94:main.c        **** 	appEntry = (pFunction) *(__IO uint32_t*) (kAPP_ADDRESS + 4);
+  44              		.loc 1 94 0
+  45 0008 044A     		ldr	r2, .L4+4
+  46 000a 1268     		ldr	r2, [r2]
+  47              	.LVL1:
+  95:main.c        **** 	/* Reconfigure vector table offset register to match the application location */
+  96:main.c        **** 	SCB->VTOR = kAPP_ADDRESS;
+  48              		.loc 1 96 0
+  49 000c 0448     		ldr	r0, .L4+8
+  50 000e 8360     		str	r3, [r0, #8]
+  51              	.LVL2:
+  52              	.LBB4:
+  53              	.LBB5:
+  54              		.file 2 "../Drivers/CMSIS/Include/cmsis_gcc.h"
+   1:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**************************************************************************//**
+   2:../Drivers/CMSIS/Include/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:../Drivers/CMSIS/Include/cmsis_gcc.h ****  * @brief    CMSIS Cortex-M Core Function/Instruction Header File
+   4:../Drivers/CMSIS/Include/cmsis_gcc.h ****  * @version  V4.30
+   5:../Drivers/CMSIS/Include/cmsis_gcc.h ****  * @date     20. October 2015
+   6:../Drivers/CMSIS/Include/cmsis_gcc.h ****  ******************************************************************************/
+   7:../Drivers/CMSIS/Include/cmsis_gcc.h **** /* Copyright (c) 2009 - 2015 ARM LIMITED
+   8:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+   9:../Drivers/CMSIS/Include/cmsis_gcc.h ****    All rights reserved.
+  10:../Drivers/CMSIS/Include/cmsis_gcc.h ****    Redistribution and use in source and binary forms, with or without
+  11:../Drivers/CMSIS/Include/cmsis_gcc.h ****    modification, are permitted provided that the following conditions are met:
+  12:../Drivers/CMSIS/Include/cmsis_gcc.h ****    - Redistributions of source code must retain the above copyright
+  13:../Drivers/CMSIS/Include/cmsis_gcc.h ****      notice, this list of conditions and the following disclaimer.
+  14:../Drivers/CMSIS/Include/cmsis_gcc.h ****    - Redistributions in binary form must reproduce the above copyright
+  15:../Drivers/CMSIS/Include/cmsis_gcc.h ****      notice, this list of conditions and the following disclaimer in the
+  16:../Drivers/CMSIS/Include/cmsis_gcc.h ****      documentation and/or other materials provided with the distribution.
+  17:../Drivers/CMSIS/Include/cmsis_gcc.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  18:../Drivers/CMSIS/Include/cmsis_gcc.h ****      to endorse or promote products derived from this software without
+  19:../Drivers/CMSIS/Include/cmsis_gcc.h ****      specific prior written permission.
+  20:../Drivers/CMSIS/Include/cmsis_gcc.h ****    *
+  21:../Drivers/CMSIS/Include/cmsis_gcc.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:../Drivers/CMSIS/Include/cmsis_gcc.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 4
+
+
+  23:../Drivers/CMSIS/Include/cmsis_gcc.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:../Drivers/CMSIS/Include/cmsis_gcc.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  25:../Drivers/CMSIS/Include/cmsis_gcc.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:../Drivers/CMSIS/Include/cmsis_gcc.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:../Drivers/CMSIS/Include/cmsis_gcc.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:../Drivers/CMSIS/Include/cmsis_gcc.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:../Drivers/CMSIS/Include/cmsis_gcc.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:../Drivers/CMSIS/Include/cmsis_gcc.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:../Drivers/CMSIS/Include/cmsis_gcc.h ****    POSSIBILITY OF SUCH DAMAGE.
+  32:../Drivers/CMSIS/Include/cmsis_gcc.h ****    ---------------------------------------------------------------------------*/
+  33:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  34:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  35:../Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+  36:../Drivers/CMSIS/Include/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  37:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  38:../Drivers/CMSIS/Include/cmsis_gcc.h **** /* ignore some GCC warnings */
+  39:../Drivers/CMSIS/Include/cmsis_gcc.h **** #if defined ( __GNUC__ )
+  40:../Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic push
+  41:../Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  42:../Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  43:../Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  44:../Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  45:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  46:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  47:../Drivers/CMSIS/Include/cmsis_gcc.h **** /* ###########################  Core Function Access  ########################### */
+  48:../Drivers/CMSIS/Include/cmsis_gcc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+  49:../Drivers/CMSIS/Include/cmsis_gcc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+  50:../Drivers/CMSIS/Include/cmsis_gcc.h ****   @{
+  51:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  52:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  53:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+  54:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Enable IRQ Interrupts
+  55:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Enables IRQ interrupts by clearing the I-bit in the CPSR.
+  56:../Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+  57:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  58:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_irq(void)
+  59:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+  60:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+  61:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+  62:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  63:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  64:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+  65:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Disable IRQ Interrupts
+  66:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+  67:../Drivers/CMSIS/Include/cmsis_gcc.h ****   Can only be executed in Privileged modes.
+  68:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  69:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_irq(void)
+  70:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+  71:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+  72:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+  73:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  74:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  75:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+  76:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get Control Register
+  77:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the content of the Control Register.
+  78:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \return               Control Register value
+  79:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 5
+
+
+  80:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_CONTROL(void)
+  81:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+  82:../Drivers/CMSIS/Include/cmsis_gcc.h ****   uint32_t result;
+  83:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  84:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, control" : "=r" (result) );
+  85:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+  86:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+  87:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  88:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  89:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+  90:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Set Control Register
+  91:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Writes the given value to the Control Register.
+  92:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \param [in]    control  Control Register value to set
+  93:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  94:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_CONTROL(uint32_t control)
+  95:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+  96:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MSR control, %0" : : "r" (control) : "memory");
+  97:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+  98:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  99:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 100:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 101:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get IPSR Register
+ 102:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the content of the IPSR Register.
+ 103:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \return               IPSR Register value
+ 104:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 105:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_IPSR(void)
+ 106:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 107:../Drivers/CMSIS/Include/cmsis_gcc.h ****   uint32_t result;
+ 108:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 109:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, ipsr" : "=r" (result) );
+ 110:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+ 111:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 112:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 113:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 114:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 115:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get APSR Register
+ 116:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the content of the APSR Register.
+ 117:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \return               APSR Register value
+ 118:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 119:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_APSR(void)
+ 120:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 121:../Drivers/CMSIS/Include/cmsis_gcc.h ****   uint32_t result;
+ 122:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 123:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, apsr" : "=r" (result) );
+ 124:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+ 125:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 126:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 127:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 128:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 129:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get xPSR Register
+ 130:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the content of the xPSR Register.
+ 131:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 132:../Drivers/CMSIS/Include/cmsis_gcc.h ****     \return               xPSR Register value
+ 133:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 134:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_xPSR(void)
+ 135:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 136:../Drivers/CMSIS/Include/cmsis_gcc.h ****   uint32_t result;
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 6
+
+
+ 137:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 138:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, xpsr" : "=r" (result) );
+ 139:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+ 140:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 141:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 142:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 143:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 144:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get Process Stack Pointer
+ 145:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the current value of the Process Stack Pointer (PSP).
+ 146:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \return               PSP Register value
+ 147:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 148:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PSP(void)
+ 149:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 150:../Drivers/CMSIS/Include/cmsis_gcc.h ****   register uint32_t result;
+ 151:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 152:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, psp\n"  : "=r" (result) );
+ 153:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+ 154:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 155:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 156:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 157:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 158:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Set Process Stack Pointer
+ 159:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Assigns the given value to the Process Stack Pointer (PSP).
+ 160:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \param [in]    topOfProcStack  Process Stack Pointer value to set
+ 161:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 162:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
+ 163:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 164:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MSR psp, %0\n" : : "r" (topOfProcStack) : "sp");
+ 165:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 166:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 167:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 168:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 169:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Get Main Stack Pointer
+ 170:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Returns the current value of the Main Stack Pointer (MSP).
+ 171:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \return               MSP Register value
+ 172:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 173:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_MSP(void)
+ 174:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 175:../Drivers/CMSIS/Include/cmsis_gcc.h ****   register uint32_t result;
+ 176:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 177:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MRS %0, msp\n" : "=r" (result) );
+ 178:../Drivers/CMSIS/Include/cmsis_gcc.h ****   return(result);
+ 179:../Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 180:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 181:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 182:../Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 183:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Set Main Stack Pointer
+ 184:../Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Assigns the given value to the Main Stack Pointer (MSP).
+ 185:../Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 186:../Drivers/CMSIS/Include/cmsis_gcc.h ****     \param [in]    topOfMainStack  Main Stack Pointer value to set
+ 187:../Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 188:../Drivers/CMSIS/Include/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_MSP(uint32_t topOfMainStack)
+ 189:../Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 190:../Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("MSR msp, %0\n" : : "r" (topOfMainStack) : "sp");
+  55              		.loc 2 190 0
+  56              		.syntax unified
+  57              	@ 190 "../Drivers/CMSIS/Include/cmsis_gcc.h" 1
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 7
+
+
+  58 0010 81F30888 		MSR msp, r1
+  59              	
+  60              	@ 0 "" 2
+  61              	.LVL3:
+  62              		.thumb
+  63              		.syntax unified
+  64              	.LBE5:
+  65              	.LBE4:
+  97:main.c        **** 	/* Set the application stack pointer */
+  98:main.c        **** 	__set_MSP(appStack);
+  99:main.c        **** 	/* Start the application */
+ 100:main.c        **** 	appEntry();
+  66              		.loc 1 100 0
+  67 0014 9047     		blx	r2
+  68              	.LVL4:
+  69              	.L2:
+  70 0016 FEE7     		b	.L2
+  71              	.L5:
+  72              		.align	2
+  73              	.L4:
+  74 0018 00400008 		.word	134234112
+  75 001c 04400008 		.word	134234116
+  76 0020 00ED00E0 		.word	-536810240
+  77              		.cfi_endproc
+  78              	.LFE126:
+  80              		.section	.text.EraseAppPage,"ax",%progbits
+  81              		.align	1
+  82              		.global	EraseAppPage
+  83              		.syntax unified
+  84              		.thumb
+  85              		.thumb_func
+  86              		.fpu fpv4-sp-d16
+  88              	EraseAppPage:
+  89              	.LFB127:
+ 101:main.c        **** 
+ 102:main.c        **** 	while(1);
+ 103:main.c        **** }
+ 104:main.c        **** 
+ 105:main.c        **** /* USER CODE END PV */
+ 106:main.c        **** 
+ 107:main.c        **** /* Private function prototypes -----------------------------------------------*/
+ 108:main.c        **** void SystemClock_Config(void);
+ 109:main.c        **** /* USER CODE BEGIN PFP */
+ 110:main.c        **** /* USER CODE END PFP */
+ 111:main.c        **** 
+ 112:main.c        **** /* Private user code ---------------------------------------------------------*/
+ 113:main.c        **** /* USER CODE BEGIN 0 */
+ 114:main.c        **** void EraseAppPage(uint8_t currentpage) {
+  90              		.loc 1 114 0
+  91              		.cfi_startproc
+  92              		@ args = 0, pretend = 0, frame = 16
+  93              		@ frame_needed = 0, uses_anonymous_args = 0
+  94              	.LVL5:
+  95 0000 10B5     		push	{r4, lr}
+  96              	.LCFI2:
+  97              		.cfi_def_cfa_offset 8
+  98              		.cfi_offset 4, -8
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 8
+
+
+  99              		.cfi_offset 14, -4
+ 100 0002 84B0     		sub	sp, sp, #16
+ 101              	.LCFI3:
+ 102              		.cfi_def_cfa_offset 24
+ 103 0004 0446     		mov	r4, r0
+ 115:main.c        ****   HAL_FLASH_Unlock();
+ 104              		.loc 1 115 0
+ 105 0006 FFF7FEFF 		bl	HAL_FLASH_Unlock
+ 106              	.LVL6:
+ 116:main.c        **** 
+ 117:main.c        ****   FLASH_EraseInitTypeDef ferase;
+ 118:main.c        ****   ferase.TypeErase = FLASH_TYPEERASE_PAGES;
+ 107              		.loc 1 118 0
+ 108 000a 0022     		movs	r2, #0
+ 109 000c 0192     		str	r2, [sp, #4]
+ 119:main.c        ****   ferase.PageAddress = kAPP_ADDRESS+(currentpage*0x500);
+ 110              		.loc 1 119 0
+ 111 000e 04EB8404 		add	r4, r4, r4, lsl #2
+ 112 0012 2302     		lsls	r3, r4, #8
+ 113 0014 03F10063 		add	r3, r3, #134217728
+ 114 0018 03F58043 		add	r3, r3, #16384
+ 115 001c 0293     		str	r3, [sp, #8]
+ 120:main.c        ****   ferase.NbPages = 1;
+ 116              		.loc 1 120 0
+ 117 001e 0123     		movs	r3, #1
+ 118 0020 0393     		str	r3, [sp, #12]
+ 121:main.c        **** 
+ 122:main.c        ****   uint32_t pageerror = 0;
+ 119              		.loc 1 122 0
+ 120 0022 04A9     		add	r1, sp, #16
+ 121 0024 41F8102D 		str	r2, [r1, #-16]!
+ 123:main.c        **** 
+ 124:main.c        ****   HAL_FLASHEx_Erase(&ferase,&pageerror);
+ 122              		.loc 1 124 0
+ 123 0028 01A8     		add	r0, sp, #4
+ 124 002a FFF7FEFF 		bl	HAL_FLASHEx_Erase
+ 125              	.LVL7:
+ 125:main.c        **** 
+ 126:main.c        ****   HAL_FLASH_Lock();
+ 126              		.loc 1 126 0
+ 127 002e FFF7FEFF 		bl	HAL_FLASH_Lock
+ 128              	.LVL8:
+ 127:main.c        **** }
+ 129              		.loc 1 127 0
+ 130 0032 04B0     		add	sp, sp, #16
+ 131              	.LCFI4:
+ 132              		.cfi_def_cfa_offset 8
+ 133              		@ sp needed
+ 134 0034 10BD     		pop	{r4, pc}
+ 135              		.cfi_endproc
+ 136              	.LFE127:
+ 138              		.section	.text.ReadWord,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	ReadWord
+ 141              		.syntax unified
+ 142              		.thumb
+ 143              		.thumb_func
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 9
+
+
+ 144              		.fpu fpv4-sp-d16
+ 146              	ReadWord:
+ 147              	.LFB128:
+ 128:main.c        **** 
+ 129:main.c        **** 
+ 130:main.c        **** uint32_t ReadWord(uint32_t *flashaddress) {
+ 148              		.loc 1 130 0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 0
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152              		@ link register save eliminated.
+ 153              	.LVL9:
+ 154 0000 0246     		mov	r2, r0
+ 131:main.c        ****   uint32_t data = *(__IO uint32_t*)(*flashaddress);
+ 155              		.loc 1 131 0
+ 156 0002 0368     		ldr	r3, [r0]
+ 157 0004 53F8040B 		ldr	r0, [r3], #4
+ 158              	.LVL10:
+ 132:main.c        ****   *flashaddress += 4;
+ 159              		.loc 1 132 0
+ 160 0008 1360     		str	r3, [r2]
+ 133:main.c        ****   return data;
+ 134:main.c        **** }
+ 161              		.loc 1 134 0
+ 162 000a 7047     		bx	lr
+ 163              		.cfi_endproc
+ 164              	.LFE128:
+ 166              		.section	.text.FlashWord,"ax",%progbits
+ 167              		.align	1
+ 168              		.global	FlashWord
+ 169              		.syntax unified
+ 170              		.thumb
+ 171              		.thumb_func
+ 172              		.fpu fpv4-sp-d16
+ 174              	FlashWord:
+ 175              	.LFB129:
+ 135:main.c        **** 
+ 136:main.c        **** void FlashWord(uint32_t *Address, uint32_t Data) {
+ 176              		.loc 1 136 0
+ 177              		.cfi_startproc
+ 178              		@ args = 0, pretend = 0, frame = 0
+ 179              		@ frame_needed = 0, uses_anonymous_args = 0
+ 180              	.LVL11:
+ 181 0000 10B5     		push	{r4, lr}
+ 182              	.LCFI5:
+ 183              		.cfi_def_cfa_offset 8
+ 184              		.cfi_offset 4, -8
+ 185              		.cfi_offset 14, -4
+ 186 0002 0446     		mov	r4, r0
+ 137:main.c        ****   HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, *Address, Data);
+ 187              		.loc 1 137 0
+ 188 0004 0A46     		mov	r2, r1
+ 189 0006 0023     		movs	r3, #0
+ 190 0008 0168     		ldr	r1, [r0]
+ 191              	.LVL12:
+ 192 000a 0220     		movs	r0, #2
+ 193              	.LVL13:
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 10
+
+
+ 194 000c FFF7FEFF 		bl	HAL_FLASH_Program
+ 195              	.LVL14:
+ 138:main.c        ****   *Address += 4;
+ 196              		.loc 1 138 0
+ 197 0010 2368     		ldr	r3, [r4]
+ 198 0012 0433     		adds	r3, r3, #4
+ 199 0014 2360     		str	r3, [r4]
+ 139:main.c        **** }
+ 200              		.loc 1 139 0
+ 201 0016 10BD     		pop	{r4, pc}
+ 202              		.cfi_endproc
+ 203              	.LFE129:
+ 205              		.section	.text.CheckUpdate,"ax",%progbits
+ 206              		.align	1
+ 207              		.global	CheckUpdate
+ 208              		.syntax unified
+ 209              		.thumb
+ 210              		.thumb_func
+ 211              		.fpu fpv4-sp-d16
+ 213              	CheckUpdate:
+ 214              	.LFB130:
+ 140:main.c        **** 
+ 141:main.c        **** bool CheckUpdate() {
+ 215              		.loc 1 141 0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 8
+ 218              		@ frame_needed = 0, uses_anonymous_args = 0
+ 219 0000 10B5     		push	{r4, lr}
+ 220              	.LCFI6:
+ 221              		.cfi_def_cfa_offset 8
+ 222              		.cfi_offset 4, -8
+ 223              		.cfi_offset 14, -4
+ 224 0002 82B0     		sub	sp, sp, #8
+ 225              	.LCFI7:
+ 226              		.cfi_def_cfa_offset 16
+ 142:main.c        ****   uint32_t appbit = kBIT_ADDRESS;
+ 227              		.loc 1 142 0
+ 228 0004 064C     		ldr	r4, .L16
+ 229 0006 02A8     		add	r0, sp, #8
+ 230 0008 40F8044D 		str	r4, [r0, #-4]!
+ 143:main.c        ****   if(ReadWord(&appbit) == kBIT_ADDRESS) {
+ 231              		.loc 1 143 0
+ 232 000c FFF7FEFF 		bl	ReadWord
+ 233              	.LVL15:
+ 234 0010 A042     		cmp	r0, r4
+ 235 0012 02D0     		beq	.L15
+ 144:main.c        ****     return true;
+ 145:main.c        ****   }
+ 146:main.c        ****   return false;
+ 236              		.loc 1 146 0
+ 237 0014 0020     		movs	r0, #0
+ 238              	.L12:
+ 147:main.c        **** }
+ 239              		.loc 1 147 0
+ 240 0016 02B0     		add	sp, sp, #8
+ 241              	.LCFI8:
+ 242              		.cfi_remember_state
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 11
+
+
+ 243              		.cfi_def_cfa_offset 8
+ 244              		@ sp needed
+ 245 0018 10BD     		pop	{r4, pc}
+ 246              	.L15:
+ 247              	.LCFI9:
+ 248              		.cfi_restore_state
+ 144:main.c        ****     return true;
+ 249              		.loc 1 144 0
+ 250 001a 0120     		movs	r0, #1
+ 251 001c FBE7     		b	.L12
+ 252              	.L17:
+ 253 001e 00BF     		.align	2
+ 254              	.L16:
+ 255 0020 00280008 		.word	134227968
+ 256              		.cfi_endproc
+ 257              	.LFE130:
+ 259              		.section	.text.UpdateApp,"ax",%progbits
+ 260              		.align	1
+ 261              		.global	UpdateApp
+ 262              		.syntax unified
+ 263              		.thumb
+ 264              		.thumb_func
+ 265              		.fpu fpv4-sp-d16
+ 267              	UpdateApp:
+ 268              	.LFB131:
+ 148:main.c        **** 
+ 149:main.c        **** void UpdateApp() {
+ 269              		.loc 1 149 0
+ 270              		.cfi_startproc
+ 271              		@ args = 0, pretend = 0, frame = 8
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+ 273 0000 10B5     		push	{r4, lr}
+ 274              	.LCFI10:
+ 275              		.cfi_def_cfa_offset 8
+ 276              		.cfi_offset 4, -8
+ 277              		.cfi_offset 14, -4
+ 278 0002 82B0     		sub	sp, sp, #8
+ 279              	.LCFI11:
+ 280              		.cfi_def_cfa_offset 16
+ 150:main.c        ****   HAL_FLASH_Unlock();
+ 281              		.loc 1 150 0
+ 282 0004 FFF7FEFF 		bl	HAL_FLASH_Unlock
+ 283              	.LVL16:
+ 151:main.c        ****   uint32_t readaddress = kUPDATE_ADDRESS;
+ 284              		.loc 1 151 0
+ 285 0008 0A4B     		ldr	r3, .L22
+ 286 000a 0193     		str	r3, [sp, #4]
+ 152:main.c        ****   uint32_t writeaddress = kAPP_ADDRESS;
+ 287              		.loc 1 152 0
+ 288 000c A3F5F033 		sub	r3, r3, #122880
+ 289 0010 0093     		str	r3, [sp]
+ 290              	.LVL17:
+ 291              	.LBB6:
+ 153:main.c        ****   for (uint32_t i = 0; i < 30720; i++) // 0x40000 - 0x22000 = Amount of bytes / 4 amount of uint32
+ 292              		.loc 1 153 0
+ 293 0012 0024     		movs	r4, #0
+ 294 0014 07E0     		b	.L19
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 12
+
+
+ 295              	.LVL18:
+ 296              	.L20:
+ 154:main.c        ****   {
+ 155:main.c        ****     FlashWord(&writeaddress, ReadWord(&readaddress));
+ 297              		.loc 1 155 0 discriminator 3
+ 298 0016 01A8     		add	r0, sp, #4
+ 299 0018 FFF7FEFF 		bl	ReadWord
+ 300              	.LVL19:
+ 301 001c 0146     		mov	r1, r0
+ 302 001e 6846     		mov	r0, sp
+ 303 0020 FFF7FEFF 		bl	FlashWord
+ 304              	.LVL20:
+ 153:main.c        ****   for (uint32_t i = 0; i < 30720; i++) // 0x40000 - 0x22000 = Amount of bytes / 4 amount of uint32
+ 305              		.loc 1 153 0 discriminator 3
+ 306 0024 0134     		adds	r4, r4, #1
+ 307              	.LVL21:
+ 308              	.L19:
+ 153:main.c        ****   for (uint32_t i = 0; i < 30720; i++) // 0x40000 - 0x22000 = Amount of bytes / 4 amount of uint32
+ 309              		.loc 1 153 0 is_stmt 0 discriminator 1
+ 310 0026 B4F5F04F 		cmp	r4, #30720
+ 311 002a F4D3     		bcc	.L20
+ 312              	.LBE6:
+ 156:main.c        ****   }
+ 157:main.c        ****   HAL_FLASH_Lock();
+ 313              		.loc 1 157 0 is_stmt 1
+ 314 002c FFF7FEFF 		bl	HAL_FLASH_Lock
+ 315              	.LVL22:
+ 158:main.c        **** }
+ 316              		.loc 1 158 0
+ 317 0030 02B0     		add	sp, sp, #8
+ 318              	.LCFI12:
+ 319              		.cfi_def_cfa_offset 8
+ 320              		@ sp needed
+ 321 0032 10BD     		pop	{r4, pc}
+ 322              	.LVL23:
+ 323              	.L23:
+ 324              		.align	2
+ 325              	.L22:
+ 326 0034 00200208 		.word	134356992
+ 327              		.cfi_endproc
+ 328              	.LFE131:
+ 330              		.section	.text.SystemClock_Config,"ax",%progbits
+ 331              		.align	1
+ 332              		.global	SystemClock_Config
+ 333              		.syntax unified
+ 334              		.thumb
+ 335              		.thumb_func
+ 336              		.fpu fpv4-sp-d16
+ 338              	SystemClock_Config:
+ 339              	.LFB133:
+ 159:main.c        **** 
+ 160:main.c        **** /* USER CODE END 0 */
+ 161:main.c        **** 
+ 162:main.c        **** /**
+ 163:main.c        ****   * @brief  The application entry point.
+ 164:main.c        ****   * @retval int
+ 165:main.c        ****   */
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 13
+
+
+ 166:main.c        **** int main(void)
+ 167:main.c        **** {
+ 168:main.c        ****   HAL_Init();
+ 169:main.c        ****   SystemClock_Config();
+ 170:main.c        **** 
+ 171:main.c        ****   HAL_Delay(10);
+ 172:main.c        **** 
+ 173:main.c        ****   MX_TIM3_Init();
+ 174:main.c        ****   MX_TIM4_Init();
+ 175:main.c        ****   LED_Init();
+ 176:main.c        **** 
+ 177:main.c        ****   if(CheckUpdate()) {
+ 178:main.c        ****     LED_SetGreen();
+ 179:main.c        **** 
+ 180:main.c        ****     for (size_t i = 0; i < 60; i++)
+ 181:main.c        ****     {
+ 182:main.c        ****       EraseAppPage(i);
+ 183:main.c        ****       HAL_Delay(100);
+ 184:main.c        ****     }
+ 185:main.c        **** 
+ 186:main.c        ****     LED_SetOrange();
+ 187:main.c        ****     UpdateApp();
+ 188:main.c        ****     LED_SetRed();
+ 189:main.c        ****   }
+ 190:main.c        **** 
+ 191:main.c        ****   HAL_DeInit();
+ 192:main.c        ****   Jump();
+ 193:main.c        **** 
+ 194:main.c        ****   /* USER CODE END 3 */
+ 195:main.c        **** }
+ 196:main.c        **** 
+ 197:main.c        **** /**
+ 198:main.c        ****   * @brief System Clock Configuration
+ 199:main.c        ****   * @retval None
+ 200:main.c        ****   */
+ 201:main.c        **** void SystemClock_Config(void)
+ 202:main.c        **** {
+ 340              		.loc 1 202 0
+ 341              		.cfi_startproc
+ 342              		@ args = 0, pretend = 0, frame = 104
+ 343              		@ frame_needed = 0, uses_anonymous_args = 0
+ 344 0000 30B5     		push	{r4, r5, lr}
+ 345              	.LCFI13:
+ 346              		.cfi_def_cfa_offset 12
+ 347              		.cfi_offset 4, -12
+ 348              		.cfi_offset 5, -8
+ 349              		.cfi_offset 14, -4
+ 350 0002 9BB0     		sub	sp, sp, #108
+ 351              	.LCFI14:
+ 352              		.cfi_def_cfa_offset 120
+ 203:main.c        ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 353              		.loc 1 203 0
+ 354 0004 0024     		movs	r4, #0
+ 355 0006 1294     		str	r4, [sp, #72]
+ 356 0008 1394     		str	r4, [sp, #76]
+ 357 000a 1594     		str	r4, [sp, #84]
+ 358 000c 1694     		str	r4, [sp, #88]
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 14
+
+
+ 204:main.c        ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 359              		.loc 1 204 0
+ 360 000e 0B94     		str	r4, [sp, #44]
+ 361 0010 0C94     		str	r4, [sp, #48]
+ 362 0012 0D94     		str	r4, [sp, #52]
+ 363 0014 0E94     		str	r4, [sp, #56]
+ 364 0016 0F94     		str	r4, [sp, #60]
+ 205:main.c        ****   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+ 365              		.loc 1 205 0
+ 366 0018 2C22     		movs	r2, #44
+ 367 001a 2146     		mov	r1, r4
+ 368 001c 6846     		mov	r0, sp
+ 369 001e FFF7FEFF 		bl	memset
+ 370              	.LVL24:
+ 206:main.c        **** 
+ 207:main.c        ****   /**Initializes the CPU, AHB and APB busses clocks 
+ 208:main.c        ****   */
+ 209:main.c        ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+ 371              		.loc 1 209 0
+ 372 0022 0122     		movs	r2, #1
+ 373 0024 1092     		str	r2, [sp, #64]
+ 210:main.c        ****   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+ 374              		.loc 1 210 0
+ 375 0026 4FF48033 		mov	r3, #65536
+ 376 002a 1193     		str	r3, [sp, #68]
+ 211:main.c        ****   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+ 212:main.c        ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 377              		.loc 1 212 0
+ 378 002c 1492     		str	r2, [sp, #80]
+ 213:main.c        ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 379              		.loc 1 213 0
+ 380 002e 0225     		movs	r5, #2
+ 381 0030 1795     		str	r5, [sp, #92]
+ 214:main.c        ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+ 382              		.loc 1 214 0
+ 383 0032 1893     		str	r3, [sp, #96]
+ 215:main.c        ****   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+ 384              		.loc 1 215 0
+ 385 0034 4FF4E013 		mov	r3, #1835008
+ 386 0038 1993     		str	r3, [sp, #100]
+ 216:main.c        ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 387              		.loc 1 216 0
+ 388 003a 10A8     		add	r0, sp, #64
+ 389 003c FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 390              	.LVL25:
+ 217:main.c        ****   {
+ 218:main.c        ****     Error_Handler();
+ 219:main.c        ****   }
+ 220:main.c        ****   /**Initializes the CPU, AHB and APB busses clocks 
+ 221:main.c        ****   */
+ 222:main.c        ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 391              		.loc 1 222 0
+ 392 0040 0F23     		movs	r3, #15
+ 393 0042 0B93     		str	r3, [sp, #44]
+ 223:main.c        ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 224:main.c        ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+ 394              		.loc 1 224 0
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 15
+
+
+ 395 0044 0C95     		str	r5, [sp, #48]
+ 225:main.c        ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 396              		.loc 1 225 0
+ 397 0046 0D94     		str	r4, [sp, #52]
+ 226:main.c        ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 398              		.loc 1 226 0
+ 399 0048 4FF48063 		mov	r3, #1024
+ 400 004c 0E93     		str	r3, [sp, #56]
+ 227:main.c        ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 401              		.loc 1 227 0
+ 402 004e 0F94     		str	r4, [sp, #60]
+ 228:main.c        **** 
+ 229:main.c        ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+ 403              		.loc 1 229 0
+ 404 0050 2946     		mov	r1, r5
+ 405 0052 0BA8     		add	r0, sp, #44
+ 406 0054 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 407              	.LVL26:
+ 230:main.c        ****   {
+ 231:main.c        ****     Error_Handler();
+ 232:main.c        ****   }
+ 233:main.c        ****   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+ 408              		.loc 1 233 0
+ 409 0058 4FF40033 		mov	r3, #131072
+ 410 005c 0093     		str	r3, [sp]
+ 234:main.c        ****   PeriphClkInit.USBClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+ 411              		.loc 1 234 0
+ 412 005e 0A94     		str	r4, [sp, #40]
+ 235:main.c        ****   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+ 413              		.loc 1 235 0
+ 414 0060 6846     		mov	r0, sp
+ 415 0062 FFF7FEFF 		bl	HAL_RCCEx_PeriphCLKConfig
+ 416              	.LVL27:
+ 236:main.c        ****   {
+ 237:main.c        ****     Error_Handler();
+ 238:main.c        ****   }
+ 239:main.c        **** }
+ 417              		.loc 1 239 0
+ 418 0066 1BB0     		add	sp, sp, #108
+ 419              	.LCFI15:
+ 420              		.cfi_def_cfa_offset 12
+ 421              		@ sp needed
+ 422 0068 30BD     		pop	{r4, r5, pc}
+ 423              		.cfi_endproc
+ 424              	.LFE133:
+ 426              		.section	.text.main,"ax",%progbits
+ 427              		.align	1
+ 428              		.global	main
+ 429              		.syntax unified
+ 430              		.thumb
+ 431              		.thumb_func
+ 432              		.fpu fpv4-sp-d16
+ 434              	main:
+ 435              	.LFB132:
+ 167:main.c        ****   HAL_Init();
+ 436              		.loc 1 167 0
+ 437              		.cfi_startproc
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 16
+
+
+ 438              		@ args = 0, pretend = 0, frame = 0
+ 439              		@ frame_needed = 0, uses_anonymous_args = 0
+ 440 0000 10B5     		push	{r4, lr}
+ 441              	.LCFI16:
+ 442              		.cfi_def_cfa_offset 8
+ 443              		.cfi_offset 4, -8
+ 444              		.cfi_offset 14, -4
+ 168:main.c        ****   SystemClock_Config();
+ 445              		.loc 1 168 0
+ 446 0002 FFF7FEFF 		bl	HAL_Init
+ 447              	.LVL28:
+ 169:main.c        **** 
+ 448              		.loc 1 169 0
+ 449 0006 FFF7FEFF 		bl	SystemClock_Config
+ 450              	.LVL29:
+ 171:main.c        **** 
+ 451              		.loc 1 171 0
+ 452 000a 0A20     		movs	r0, #10
+ 453 000c FFF7FEFF 		bl	HAL_Delay
+ 454              	.LVL30:
+ 173:main.c        ****   MX_TIM4_Init();
+ 455              		.loc 1 173 0
+ 456 0010 FFF7FEFF 		bl	MX_TIM3_Init
+ 457              	.LVL31:
+ 174:main.c        ****   LED_Init();
+ 458              		.loc 1 174 0
+ 459 0014 FFF7FEFF 		bl	MX_TIM4_Init
+ 460              	.LVL32:
+ 175:main.c        **** 
+ 461              		.loc 1 175 0
+ 462 0018 FFF7FEFF 		bl	LED_Init
+ 463              	.LVL33:
+ 177:main.c        ****     LED_SetGreen();
+ 464              		.loc 1 177 0
+ 465 001c FFF7FEFF 		bl	CheckUpdate
+ 466              	.LVL34:
+ 467 0020 18B9     		cbnz	r0, .L31
+ 468              	.L27:
+ 191:main.c        ****   Jump();
+ 469              		.loc 1 191 0
+ 470 0022 FFF7FEFF 		bl	HAL_DeInit
+ 471              	.LVL35:
+ 192:main.c        **** 
+ 472              		.loc 1 192 0
+ 473 0026 FFF7FEFF 		bl	Jump
+ 474              	.LVL36:
+ 475              	.L31:
+ 178:main.c        **** 
+ 476              		.loc 1 178 0
+ 477 002a FFF7FEFF 		bl	LED_SetGreen
+ 478              	.LVL37:
+ 479              	.LBB7:
+ 180:main.c        ****     {
+ 480              		.loc 1 180 0
+ 481 002e 0024     		movs	r4, #0
+ 482 0030 06E0     		b	.L28
+ 483              	.LVL38:
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 17
+
+
+ 484              	.L29:
+ 182:main.c        ****       HAL_Delay(100);
+ 485              		.loc 1 182 0 discriminator 3
+ 486 0032 E0B2     		uxtb	r0, r4
+ 487 0034 FFF7FEFF 		bl	EraseAppPage
+ 488              	.LVL39:
+ 183:main.c        ****     }
+ 489              		.loc 1 183 0 discriminator 3
+ 490 0038 6420     		movs	r0, #100
+ 491 003a FFF7FEFF 		bl	HAL_Delay
+ 492              	.LVL40:
+ 180:main.c        ****     {
+ 493              		.loc 1 180 0 discriminator 3
+ 494 003e 0134     		adds	r4, r4, #1
+ 495              	.LVL41:
+ 496              	.L28:
+ 180:main.c        ****     {
+ 497              		.loc 1 180 0 is_stmt 0 discriminator 1
+ 498 0040 3B2C     		cmp	r4, #59
+ 499 0042 F6D9     		bls	.L29
+ 500              	.LBE7:
+ 186:main.c        ****     UpdateApp();
+ 501              		.loc 1 186 0 is_stmt 1
+ 502 0044 FFF7FEFF 		bl	LED_SetOrange
+ 503              	.LVL42:
+ 187:main.c        ****     LED_SetRed();
+ 504              		.loc 1 187 0
+ 505 0048 FFF7FEFF 		bl	UpdateApp
+ 506              	.LVL43:
+ 188:main.c        ****   }
+ 507              		.loc 1 188 0
+ 508 004c FFF7FEFF 		bl	LED_SetRed
+ 509              	.LVL44:
+ 510 0050 E7E7     		b	.L27
+ 511              		.cfi_endproc
+ 512              	.LFE132:
+ 514              		.section	.text.Error_Handler,"ax",%progbits
+ 515              		.align	1
+ 516              		.global	Error_Handler
+ 517              		.syntax unified
+ 518              		.thumb
+ 519              		.thumb_func
+ 520              		.fpu fpv4-sp-d16
+ 522              	Error_Handler:
+ 523              	.LFB134:
+ 240:main.c        **** 
+ 241:main.c        **** /* USER CODE BEGIN 4 */
+ 242:main.c        **** 
+ 243:main.c        **** /* USER CODE END 4 */
+ 244:main.c        **** 
+ 245:main.c        **** /**
+ 246:main.c        ****   * @brief  This function is executed in case of error occurrence.
+ 247:main.c        ****   * @retval None
+ 248:main.c        ****   */
+ 249:main.c        **** void Error_Handler(void)
+ 250:main.c        **** {
+ 524              		.loc 1 250 0
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 18
+
+
+ 525              		.cfi_startproc
+ 526              		@ args = 0, pretend = 0, frame = 0
+ 527              		@ frame_needed = 0, uses_anonymous_args = 0
+ 528              		@ link register save eliminated.
+ 251:main.c        ****   /* USER CODE BEGIN Error_Handler_Debug */
+ 252:main.c        ****   /* User can add his own implementation to report the HAL error return state */
+ 253:main.c        **** 
+ 254:main.c        ****   /* USER CODE END Error_Handler_Debug */
+ 255:main.c        **** }
+ 529              		.loc 1 255 0
+ 530 0000 7047     		bx	lr
+ 531              		.cfi_endproc
+ 532              	.LFE134:
+ 534              		.comm	leds,12,4
+ 535              		.comm	ledupdate,1,1
+ 536              		.text
+ 537              	.Letext0:
+ 538              		.file 3 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/machine/_d
+ 539              		.file 4 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_stdin
+ 540              		.file 5 "../Drivers/CMSIS/Include/core_cm4.h"
+ 541              		.file 6 "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
+ 542              		.file 7 "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 543              		.file 8 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/lib/gcc/arm-none-eabi/7.3.1/incl
+ 544              		.file 9 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/lock.h
+ 545              		.file 10 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_type
+ 546              		.file 11 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/reent
+ 547              		.file 12 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 548              		.file 13 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h"
+ 549              		.file 14 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc_ex.h"
+ 550              		.file 15 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 551              		.file 16 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_flash_ex.h"
+ 552              		.file 17 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
+ 553              		.file 18 "led.h"
+ 554              		.file 19 "tim.h"
+ 555              		.file 20 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ 556              		.file 21 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_flash.h"
+ 557              		.file 22 "<built-in>"
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:18     .text.Jump:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:25     .text.Jump:0000000000000000 Jump
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:74     .text.Jump:0000000000000018 $d
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:81     .text.EraseAppPage:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:88     .text.EraseAppPage:0000000000000000 EraseAppPage
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:139    .text.ReadWord:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:146    .text.ReadWord:0000000000000000 ReadWord
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:167    .text.FlashWord:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:174    .text.FlashWord:0000000000000000 FlashWord
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:206    .text.CheckUpdate:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:213    .text.CheckUpdate:0000000000000000 CheckUpdate
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:255    .text.CheckUpdate:0000000000000020 $d
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:260    .text.UpdateApp:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:267    .text.UpdateApp:0000000000000000 UpdateApp
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:326    .text.UpdateApp:0000000000000034 $d
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:331    .text.SystemClock_Config:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:338    .text.SystemClock_Config:0000000000000000 SystemClock_Config
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:427    .text.main:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:434    .text.main:0000000000000000 main
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:515    .text.Error_Handler:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccqIWM3b.s:522    .text.Error_Handler:0000000000000000 Error_Handler
+                            *COM*:000000000000000c leds
+                            *COM*:0000000000000001 ledupdate
+
+UNDEFINED SYMBOLS
+HAL_FLASH_Unlock
+HAL_FLASHEx_Erase
+HAL_FLASH_Lock
+HAL_FLASH_Program
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_RCCEx_PeriphCLKConfig
+HAL_Init
+HAL_Delay
+MX_TIM3_Init
+MX_TIM4_Init
+LED_Init
+HAL_DeInit
+LED_SetGreen
+LED_SetOrange
+LED_SetRed

@@ -1,0 +1,1248 @@
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"tim.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.HAL_TIM_Base_MspInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	HAL_TIM_Base_MspInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	HAL_TIM_Base_MspInit:
+  26              	.LFB128:
+  27              		.file 1 "tim.c"
+   1:tim.c         **** /**
+   2:tim.c         ****   ******************************************************************************
+   3:tim.c         ****   * File Name          : TIM.c
+   4:tim.c         ****   * Description        : This file provides code for the configuration
+   5:tim.c         ****   *                      of the TIM instances.
+   6:tim.c         ****   ******************************************************************************
+   7:tim.c         ****   * This notice applies to any and all portions of this file
+   8:tim.c         ****   * that are not between comment pairs USER CODE BEGIN and
+   9:tim.c         ****   * USER CODE END. Other portions of this file, whether 
+  10:tim.c         ****   * inserted by the user or by software development tools
+  11:tim.c         ****   * are owned by their respective copyright owners.
+  12:tim.c         ****   *
+  13:tim.c         ****   * Copyright (c) 2020 STMicroelectronics International N.V. 
+  14:tim.c         ****   * All rights reserved.
+  15:tim.c         ****   *
+  16:tim.c         ****   * Redistribution and use in source and binary forms, with or without 
+  17:tim.c         ****   * modification, are permitted, provided that the following conditions are met:
+  18:tim.c         ****   *
+  19:tim.c         ****   * 1. Redistribution of source code must retain the above copyright notice, 
+  20:tim.c         ****   *    this list of conditions and the following disclaimer.
+  21:tim.c         ****   * 2. Redistributions in binary form must reproduce the above copyright notice,
+  22:tim.c         ****   *    this list of conditions and the following disclaimer in the documentation
+  23:tim.c         ****   *    and/or other materials provided with the distribution.
+  24:tim.c         ****   * 3. Neither the name of STMicroelectronics nor the names of other 
+  25:tim.c         ****   *    contributors to this software may be used to endorse or promote products 
+  26:tim.c         ****   *    derived from this software without specific written permission.
+  27:tim.c         ****   * 4. This software, including modifications and/or derivative works of this 
+  28:tim.c         ****   *    software, must execute solely and exclusively on microcontroller or
+  29:tim.c         ****   *    microprocessor devices manufactured by or for STMicroelectronics.
+  30:tim.c         ****   * 5. Redistribution and use of this software other than as permitted under 
+  31:tim.c         ****   *    this license is void and will automatically terminate your rights under 
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 2
+
+
+  32:tim.c         ****   *    this license. 
+  33:tim.c         ****   *
+  34:tim.c         ****   * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
+  35:tim.c         ****   * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
+  36:tim.c         ****   * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+  37:tim.c         ****   * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  38:tim.c         ****   * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
+  39:tim.c         ****   * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  40:tim.c         ****   * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  41:tim.c         ****   * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+  42:tim.c         ****   * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  43:tim.c         ****   * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+  44:tim.c         ****   * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  45:tim.c         ****   * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  46:tim.c         ****   *
+  47:tim.c         ****   ******************************************************************************
+  48:tim.c         ****   */
+  49:tim.c         **** 
+  50:tim.c         **** /* Includes ------------------------------------------------------------------*/
+  51:tim.c         **** #include "tim.h"
+  52:tim.c         **** 
+  53:tim.c         **** /* USER CODE BEGIN 0 */
+  54:tim.c         **** 
+  55:tim.c         **** /* USER CODE END 0 */
+  56:tim.c         **** 
+  57:tim.c         **** TIM_HandleTypeDef htim3;
+  58:tim.c         **** TIM_HandleTypeDef htim4;
+  59:tim.c         **** TIM_HandleTypeDef htim6;
+  60:tim.c         **** 
+  61:tim.c         **** /* TIM3 init function */
+  62:tim.c         **** void MX_TIM3_Init(void)
+  63:tim.c         **** {
+  64:tim.c         ****   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  65:tim.c         ****   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  66:tim.c         ****   TIM_OC_InitTypeDef sConfigOC = {0};
+  67:tim.c         **** 
+  68:tim.c         ****   htim3.Instance = TIM3;
+  69:tim.c         ****   htim3.Init.Prescaler = 6000;
+  70:tim.c         ****   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  71:tim.c         ****   htim3.Init.Period = 1000;
+  72:tim.c         ****   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  73:tim.c         ****   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  74:tim.c         ****   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  75:tim.c         ****   {
+  76:tim.c         ****     Error_Handler();
+  77:tim.c         ****   }
+  78:tim.c         ****   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  79:tim.c         ****   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  80:tim.c         ****   {
+  81:tim.c         ****     Error_Handler();
+  82:tim.c         ****   }
+  83:tim.c         ****   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  84:tim.c         ****   {
+  85:tim.c         ****     Error_Handler();
+  86:tim.c         ****   }
+  87:tim.c         ****   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  88:tim.c         ****   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 3
+
+
+  89:tim.c         ****   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  90:tim.c         ****   {
+  91:tim.c         ****     Error_Handler();
+  92:tim.c         ****   }
+  93:tim.c         ****   sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  94:tim.c         ****   sConfigOC.Pulse = 0;
+  95:tim.c         ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  96:tim.c         ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  97:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  98:tim.c         ****   {
+  99:tim.c         ****     Error_Handler();
+ 100:tim.c         ****   }
+ 101:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+ 102:tim.c         ****   {
+ 103:tim.c         ****     Error_Handler();
+ 104:tim.c         ****   }
+ 105:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+ 106:tim.c         ****   {
+ 107:tim.c         ****     Error_Handler();
+ 108:tim.c         ****   }
+ 109:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+ 110:tim.c         ****   {
+ 111:tim.c         ****     Error_Handler();
+ 112:tim.c         ****   }
+ 113:tim.c         ****   HAL_TIM_MspPostInit(&htim3);
+ 114:tim.c         **** 
+ 115:tim.c         **** }
+ 116:tim.c         **** /* TIM4 init function */
+ 117:tim.c         **** void MX_TIM4_Init(void)
+ 118:tim.c         **** {
+ 119:tim.c         ****   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+ 120:tim.c         ****   TIM_MasterConfigTypeDef sMasterConfig = {0};
+ 121:tim.c         ****   TIM_OC_InitTypeDef sConfigOC = {0};
+ 122:tim.c         **** 
+ 123:tim.c         ****   htim4.Instance = TIM4;
+ 124:tim.c         ****   htim4.Init.Prescaler = 6000;
+ 125:tim.c         ****   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+ 126:tim.c         ****   htim4.Init.Period = 1000;
+ 127:tim.c         ****   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+ 128:tim.c         ****   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+ 129:tim.c         ****   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+ 130:tim.c         ****   {
+ 131:tim.c         ****     Error_Handler();
+ 132:tim.c         ****   }
+ 133:tim.c         ****   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+ 134:tim.c         ****   if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+ 135:tim.c         ****   {
+ 136:tim.c         ****     Error_Handler();
+ 137:tim.c         ****   }
+ 138:tim.c         ****   if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+ 139:tim.c         ****   {
+ 140:tim.c         ****     Error_Handler();
+ 141:tim.c         ****   }
+ 142:tim.c         ****   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+ 143:tim.c         ****   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+ 144:tim.c         ****   if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+ 145:tim.c         ****   {
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 4
+
+
+ 146:tim.c         ****     Error_Handler();
+ 147:tim.c         ****   }
+ 148:tim.c         ****   sConfigOC.OCMode = TIM_OCMODE_PWM1;
+ 149:tim.c         ****   sConfigOC.Pulse = 0;
+ 150:tim.c         ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+ 151:tim.c         ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+ 152:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+ 153:tim.c         ****   {
+ 154:tim.c         ****     Error_Handler();
+ 155:tim.c         ****   }
+ 156:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+ 157:tim.c         ****   {
+ 158:tim.c         ****     Error_Handler();
+ 159:tim.c         ****   }
+ 160:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+ 161:tim.c         ****   {
+ 162:tim.c         ****     Error_Handler();
+ 163:tim.c         ****   }
+ 164:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+ 165:tim.c         ****   {
+ 166:tim.c         ****     Error_Handler();
+ 167:tim.c         ****   }
+ 168:tim.c         ****   HAL_TIM_MspPostInit(&htim4);
+ 169:tim.c         **** 
+ 170:tim.c         **** }
+ 171:tim.c         **** 
+ 172:tim.c         **** 
+ 173:tim.c         **** void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
+ 174:tim.c         **** {
+  28              		.loc 1 174 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 16
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 00B5     		push	{lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 4
+  36              		.cfi_offset 14, -4
+  37 0002 85B0     		sub	sp, sp, #20
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 24
+ 175:tim.c         **** 
+ 176:tim.c         ****   if(tim_baseHandle->Instance==TIM3)
+  40              		.loc 1 176 0
+  41 0004 0368     		ldr	r3, [r0]
+  42 0006 1A4A     		ldr	r2, .L9
+  43 0008 9342     		cmp	r3, r2
+  44 000a 08D0     		beq	.L6
+ 177:tim.c         ****   {
+ 178:tim.c         ****   /* USER CODE BEGIN TIM3_MspInit 0 */
+ 179:tim.c         **** 
+ 180:tim.c         ****   /* USER CODE END TIM3_MspInit 0 */
+ 181:tim.c         ****     /* TIM3 clock enable */
+ 182:tim.c         ****     __HAL_RCC_TIM3_CLK_ENABLE();
+ 183:tim.c         ****   /* USER CODE BEGIN TIM3_MspInit 1 */
+ 184:tim.c         **** 
+ 185:tim.c         ****   /* USER CODE END TIM3_MspInit 1 */
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 5
+
+
+ 186:tim.c         ****   }
+ 187:tim.c         ****   else if(tim_baseHandle->Instance==TIM4)
+  45              		.loc 1 187 0
+  46 000c 194A     		ldr	r2, .L9+4
+  47 000e 9342     		cmp	r3, r2
+  48 0010 10D0     		beq	.L7
+ 188:tim.c         ****   {
+ 189:tim.c         ****   /* USER CODE BEGIN TIM4_MspInit 0 */
+ 190:tim.c         **** 
+ 191:tim.c         ****   /* USER CODE END TIM4_MspInit 0 */
+ 192:tim.c         ****     /* TIM4 clock enable */
+ 193:tim.c         ****     __HAL_RCC_TIM4_CLK_ENABLE();
+ 194:tim.c         ****   /* USER CODE BEGIN TIM4_MspInit 1 */
+ 195:tim.c         **** 
+ 196:tim.c         ****   /* USER CODE END TIM4_MspInit 1 */
+ 197:tim.c         ****   }
+ 198:tim.c         ****   else if(tim_baseHandle->Instance==TIM6)
+  49              		.loc 1 198 0
+  50 0012 194A     		ldr	r2, .L9+8
+  51 0014 9342     		cmp	r3, r2
+  52 0016 18D0     		beq	.L8
+  53              	.LVL1:
+  54              	.L1:
+ 199:tim.c         ****   {
+ 200:tim.c         ****   /* USER CODE BEGIN TIM6_MspInit 0 */
+ 201:tim.c         **** 
+ 202:tim.c         ****   /* USER CODE END TIM6_MspInit 0 */
+ 203:tim.c         ****     /* TIM6 clock enable */
+ 204:tim.c         ****     __HAL_RCC_TIM6_CLK_ENABLE();
+ 205:tim.c         **** 
+ 206:tim.c         ****     /* TIM6 interrupt Init */
+ 207:tim.c         ****     HAL_NVIC_SetPriority(TIM6_DAC1_IRQn, 0, 0);
+ 208:tim.c         ****     HAL_NVIC_EnableIRQ(TIM6_DAC1_IRQn);
+ 209:tim.c         ****   /* USER CODE BEGIN TIM6_MspInit 1 */
+ 210:tim.c         **** 
+ 211:tim.c         ****   /* USER CODE END TIM6_MspInit 1 */
+ 212:tim.c         ****   }
+ 213:tim.c         **** }
+  55              		.loc 1 213 0
+  56 0018 05B0     		add	sp, sp, #20
+  57              	.LCFI2:
+  58              		.cfi_remember_state
+  59              		.cfi_def_cfa_offset 4
+  60              		@ sp needed
+  61 001a 5DF804FB 		ldr	pc, [sp], #4
+  62              	.LVL2:
+  63              	.L6:
+  64              	.LCFI3:
+  65              		.cfi_restore_state
+  66              	.LBB2:
+ 182:tim.c         ****   /* USER CODE BEGIN TIM3_MspInit 1 */
+  67              		.loc 1 182 0
+  68 001e 174B     		ldr	r3, .L9+12
+  69 0020 DA69     		ldr	r2, [r3, #28]
+  70 0022 42F00202 		orr	r2, r2, #2
+  71 0026 DA61     		str	r2, [r3, #28]
+  72 0028 DB69     		ldr	r3, [r3, #28]
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 6
+
+
+  73 002a 03F00203 		and	r3, r3, #2
+  74 002e 0193     		str	r3, [sp, #4]
+  75 0030 019B     		ldr	r3, [sp, #4]
+  76              	.LBE2:
+  77 0032 F1E7     		b	.L1
+  78              	.L7:
+  79              	.LBB3:
+ 193:tim.c         ****   /* USER CODE BEGIN TIM4_MspInit 1 */
+  80              		.loc 1 193 0
+  81 0034 114B     		ldr	r3, .L9+12
+  82 0036 DA69     		ldr	r2, [r3, #28]
+  83 0038 42F00402 		orr	r2, r2, #4
+  84 003c DA61     		str	r2, [r3, #28]
+  85 003e DB69     		ldr	r3, [r3, #28]
+  86 0040 03F00403 		and	r3, r3, #4
+  87 0044 0293     		str	r3, [sp, #8]
+  88 0046 029B     		ldr	r3, [sp, #8]
+  89              	.LBE3:
+  90 0048 E6E7     		b	.L1
+  91              	.L8:
+  92              	.LBB4:
+ 204:tim.c         **** 
+  93              		.loc 1 204 0
+  94 004a 0C4B     		ldr	r3, .L9+12
+  95 004c DA69     		ldr	r2, [r3, #28]
+  96 004e 42F01002 		orr	r2, r2, #16
+  97 0052 DA61     		str	r2, [r3, #28]
+  98 0054 DB69     		ldr	r3, [r3, #28]
+  99 0056 03F01003 		and	r3, r3, #16
+ 100 005a 0393     		str	r3, [sp, #12]
+ 101 005c 039B     		ldr	r3, [sp, #12]
+ 102              	.LBE4:
+ 207:tim.c         ****     HAL_NVIC_EnableIRQ(TIM6_DAC1_IRQn);
+ 103              		.loc 1 207 0
+ 104 005e 0022     		movs	r2, #0
+ 105 0060 1146     		mov	r1, r2
+ 106 0062 3620     		movs	r0, #54
+ 107              	.LVL3:
+ 108 0064 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 109              	.LVL4:
+ 208:tim.c         ****   /* USER CODE BEGIN TIM6_MspInit 1 */
+ 110              		.loc 1 208 0
+ 111 0068 3620     		movs	r0, #54
+ 112 006a FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 113              	.LVL5:
+ 114              		.loc 1 213 0
+ 115 006e D3E7     		b	.L1
+ 116              	.L10:
+ 117              		.align	2
+ 118              	.L9:
+ 119 0070 00040040 		.word	1073742848
+ 120 0074 00080040 		.word	1073743872
+ 121 0078 00100040 		.word	1073745920
+ 122 007c 00100240 		.word	1073876992
+ 123              		.cfi_endproc
+ 124              	.LFE128:
+ 126              		.section	.text.HAL_TIM_MspPostInit,"ax",%progbits
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 7
+
+
+ 127              		.align	1
+ 128              		.global	HAL_TIM_MspPostInit
+ 129              		.syntax unified
+ 130              		.thumb
+ 131              		.thumb_func
+ 132              		.fpu fpv4-sp-d16
+ 134              	HAL_TIM_MspPostInit:
+ 135              	.LFB129:
+ 214:tim.c         **** void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
+ 215:tim.c         **** {
+ 136              		.loc 1 215 0
+ 137              		.cfi_startproc
+ 138              		@ args = 0, pretend = 0, frame = 32
+ 139              		@ frame_needed = 0, uses_anonymous_args = 0
+ 140              	.LVL6:
+ 141 0000 10B5     		push	{r4, lr}
+ 142              	.LCFI4:
+ 143              		.cfi_def_cfa_offset 8
+ 144              		.cfi_offset 4, -8
+ 145              		.cfi_offset 14, -4
+ 146 0002 88B0     		sub	sp, sp, #32
+ 147              	.LCFI5:
+ 148              		.cfi_def_cfa_offset 40
+ 216:tim.c         **** 
+ 217:tim.c         ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 149              		.loc 1 217 0
+ 150 0004 0023     		movs	r3, #0
+ 151 0006 0393     		str	r3, [sp, #12]
+ 152 0008 0493     		str	r3, [sp, #16]
+ 153 000a 0593     		str	r3, [sp, #20]
+ 154 000c 0693     		str	r3, [sp, #24]
+ 155 000e 0793     		str	r3, [sp, #28]
+ 218:tim.c         ****   if(timHandle->Instance==TIM3)
+ 156              		.loc 1 218 0
+ 157 0010 0368     		ldr	r3, [r0]
+ 158 0012 234A     		ldr	r2, .L17
+ 159 0014 9342     		cmp	r3, r2
+ 160 0016 04D0     		beq	.L15
+ 219:tim.c         ****   {
+ 220:tim.c         ****   /* USER CODE BEGIN TIM3_MspPostInit 0 */
+ 221:tim.c         **** 
+ 222:tim.c         ****   /* USER CODE END TIM3_MspPostInit 0 */
+ 223:tim.c         ****     __HAL_RCC_GPIOA_CLK_ENABLE();
+ 224:tim.c         ****     __HAL_RCC_GPIOB_CLK_ENABLE();
+ 225:tim.c         ****     /**TIM3 GPIO Configuration    
+ 226:tim.c         ****     PA4     ------> TIM3_CH2
+ 227:tim.c         ****     PA6     ------> TIM3_CH1
+ 228:tim.c         ****     PB0     ------> TIM3_CH3
+ 229:tim.c         ****     PB1     ------> TIM3_CH4 
+ 230:tim.c         ****     */
+ 231:tim.c         ****     GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_6;
+ 232:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 233:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 234:tim.c         ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 235:tim.c         ****     GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+ 236:tim.c         ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 237:tim.c         **** 
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 8
+
+
+ 238:tim.c         ****     GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+ 239:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 240:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 241:tim.c         ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 242:tim.c         ****     GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+ 243:tim.c         ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 244:tim.c         **** 
+ 245:tim.c         ****   /* USER CODE BEGIN TIM3_MspPostInit 1 */
+ 246:tim.c         **** 
+ 247:tim.c         ****   /* USER CODE END TIM3_MspPostInit 1 */
+ 248:tim.c         ****   }
+ 249:tim.c         ****   else if(timHandle->Instance==TIM4)
+ 161              		.loc 1 249 0
+ 162 0018 224A     		ldr	r2, .L17+4
+ 163 001a 9342     		cmp	r3, r2
+ 164 001c 2AD0     		beq	.L16
+ 165              	.LVL7:
+ 166              	.L11:
+ 250:tim.c         ****   {
+ 251:tim.c         ****   /* USER CODE BEGIN TIM4_MspPostInit 0 */
+ 252:tim.c         **** 
+ 253:tim.c         ****   /* USER CODE END TIM4_MspPostInit 0 */
+ 254:tim.c         ****   
+ 255:tim.c         ****     __HAL_RCC_GPIOB_CLK_ENABLE();
+ 256:tim.c         ****     /**TIM4 GPIO Configuration    
+ 257:tim.c         ****     PB6     ------> TIM4_CH1
+ 258:tim.c         ****     PB7     ------> TIM4_CH2
+ 259:tim.c         ****     PB8     ------> TIM4_CH3
+ 260:tim.c         ****     PB9     ------> TIM4_CH4 
+ 261:tim.c         ****     */
+ 262:tim.c         ****     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
+ 263:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 264:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 265:tim.c         ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 266:tim.c         ****     GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
+ 267:tim.c         ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 268:tim.c         **** 
+ 269:tim.c         ****   /* USER CODE BEGIN TIM4_MspPostInit 1 */
+ 270:tim.c         **** 
+ 271:tim.c         ****   /* USER CODE END TIM4_MspPostInit 1 */
+ 272:tim.c         ****   }
+ 273:tim.c         **** 
+ 274:tim.c         **** }
+ 167              		.loc 1 274 0
+ 168 001e 08B0     		add	sp, sp, #32
+ 169              	.LCFI6:
+ 170              		.cfi_remember_state
+ 171              		.cfi_def_cfa_offset 8
+ 172              		@ sp needed
+ 173 0020 10BD     		pop	{r4, pc}
+ 174              	.LVL8:
+ 175              	.L15:
+ 176              	.LCFI7:
+ 177              		.cfi_restore_state
+ 178              	.LBB5:
+ 223:tim.c         ****     __HAL_RCC_GPIOB_CLK_ENABLE();
+ 179              		.loc 1 223 0
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 9
+
+
+ 180 0022 214B     		ldr	r3, .L17+8
+ 181 0024 5A69     		ldr	r2, [r3, #20]
+ 182 0026 42F40032 		orr	r2, r2, #131072
+ 183 002a 5A61     		str	r2, [r3, #20]
+ 184 002c 5A69     		ldr	r2, [r3, #20]
+ 185 002e 02F40032 		and	r2, r2, #131072
+ 186 0032 0092     		str	r2, [sp]
+ 187 0034 009A     		ldr	r2, [sp]
+ 188              	.LBE5:
+ 189              	.LBB6:
+ 224:tim.c         ****     /**TIM3 GPIO Configuration    
+ 190              		.loc 1 224 0
+ 191 0036 5A69     		ldr	r2, [r3, #20]
+ 192 0038 42F48022 		orr	r2, r2, #262144
+ 193 003c 5A61     		str	r2, [r3, #20]
+ 194 003e 5B69     		ldr	r3, [r3, #20]
+ 195 0040 03F48023 		and	r3, r3, #262144
+ 196 0044 0193     		str	r3, [sp, #4]
+ 197 0046 019B     		ldr	r3, [sp, #4]
+ 198              	.LBE6:
+ 231:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 199              		.loc 1 231 0
+ 200 0048 5023     		movs	r3, #80
+ 201 004a 0393     		str	r3, [sp, #12]
+ 232:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 202              		.loc 1 232 0
+ 203 004c 0224     		movs	r4, #2
+ 204 004e 0494     		str	r4, [sp, #16]
+ 235:tim.c         ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 205              		.loc 1 235 0
+ 206 0050 0794     		str	r4, [sp, #28]
+ 236:tim.c         **** 
+ 207              		.loc 1 236 0
+ 208 0052 03A9     		add	r1, sp, #12
+ 209 0054 4FF09040 		mov	r0, #1207959552
+ 210              	.LVL9:
+ 211 0058 FFF7FEFF 		bl	HAL_GPIO_Init
+ 212              	.LVL10:
+ 238:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 213              		.loc 1 238 0
+ 214 005c 0323     		movs	r3, #3
+ 215 005e 0393     		str	r3, [sp, #12]
+ 239:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 216              		.loc 1 239 0
+ 217 0060 0494     		str	r4, [sp, #16]
+ 240:tim.c         ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 218              		.loc 1 240 0
+ 219 0062 0023     		movs	r3, #0
+ 220 0064 0593     		str	r3, [sp, #20]
+ 241:tim.c         ****     GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+ 221              		.loc 1 241 0
+ 222 0066 0693     		str	r3, [sp, #24]
+ 242:tim.c         ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 223              		.loc 1 242 0
+ 224 0068 0794     		str	r4, [sp, #28]
+ 243:tim.c         **** 
+ 225              		.loc 1 243 0
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 10
+
+
+ 226 006a 03A9     		add	r1, sp, #12
+ 227 006c 0F48     		ldr	r0, .L17+12
+ 228 006e FFF7FEFF 		bl	HAL_GPIO_Init
+ 229              	.LVL11:
+ 230 0072 D4E7     		b	.L11
+ 231              	.LVL12:
+ 232              	.L16:
+ 233              	.LBB7:
+ 255:tim.c         ****     /**TIM4 GPIO Configuration    
+ 234              		.loc 1 255 0
+ 235 0074 0C4B     		ldr	r3, .L17+8
+ 236 0076 5A69     		ldr	r2, [r3, #20]
+ 237 0078 42F48022 		orr	r2, r2, #262144
+ 238 007c 5A61     		str	r2, [r3, #20]
+ 239 007e 5B69     		ldr	r3, [r3, #20]
+ 240 0080 03F48023 		and	r3, r3, #262144
+ 241 0084 0293     		str	r3, [sp, #8]
+ 242 0086 029B     		ldr	r3, [sp, #8]
+ 243              	.LBE7:
+ 262:tim.c         ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 244              		.loc 1 262 0
+ 245 0088 4FF47073 		mov	r3, #960
+ 246 008c 0393     		str	r3, [sp, #12]
+ 263:tim.c         ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 247              		.loc 1 263 0
+ 248 008e 0223     		movs	r3, #2
+ 249 0090 0493     		str	r3, [sp, #16]
+ 266:tim.c         ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 250              		.loc 1 266 0
+ 251 0092 0793     		str	r3, [sp, #28]
+ 267:tim.c         **** 
+ 252              		.loc 1 267 0
+ 253 0094 03A9     		add	r1, sp, #12
+ 254 0096 0548     		ldr	r0, .L17+12
+ 255              	.LVL13:
+ 256 0098 FFF7FEFF 		bl	HAL_GPIO_Init
+ 257              	.LVL14:
+ 258              		.loc 1 274 0
+ 259 009c BFE7     		b	.L11
+ 260              	.L18:
+ 261 009e 00BF     		.align	2
+ 262              	.L17:
+ 263 00a0 00040040 		.word	1073742848
+ 264 00a4 00080040 		.word	1073743872
+ 265 00a8 00100240 		.word	1073876992
+ 266 00ac 00040048 		.word	1207960576
+ 267              		.cfi_endproc
+ 268              	.LFE129:
+ 270              		.section	.text.MX_TIM3_Init,"ax",%progbits
+ 271              		.align	1
+ 272              		.global	MX_TIM3_Init
+ 273              		.syntax unified
+ 274              		.thumb
+ 275              		.thumb_func
+ 276              		.fpu fpv4-sp-d16
+ 278              	MX_TIM3_Init:
+ 279              	.LFB126:
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 11
+
+
+  63:tim.c         ****   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+ 280              		.loc 1 63 0
+ 281              		.cfi_startproc
+ 282              		@ args = 0, pretend = 0, frame = 56
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284 0000 00B5     		push	{lr}
+ 285              	.LCFI8:
+ 286              		.cfi_def_cfa_offset 4
+ 287              		.cfi_offset 14, -4
+ 288 0002 8FB0     		sub	sp, sp, #60
+ 289              	.LCFI9:
+ 290              		.cfi_def_cfa_offset 64
+  64:tim.c         ****   TIM_MasterConfigTypeDef sMasterConfig = {0};
+ 291              		.loc 1 64 0
+ 292 0004 0023     		movs	r3, #0
+ 293 0006 0A93     		str	r3, [sp, #40]
+ 294 0008 0B93     		str	r3, [sp, #44]
+ 295 000a 0C93     		str	r3, [sp, #48]
+ 296 000c 0D93     		str	r3, [sp, #52]
+  65:tim.c         ****   TIM_OC_InitTypeDef sConfigOC = {0};
+ 297              		.loc 1 65 0
+ 298 000e 0893     		str	r3, [sp, #32]
+ 299 0010 0993     		str	r3, [sp, #36]
+  66:tim.c         **** 
+ 300              		.loc 1 66 0
+ 301 0012 0193     		str	r3, [sp, #4]
+ 302 0014 0293     		str	r3, [sp, #8]
+ 303 0016 0393     		str	r3, [sp, #12]
+ 304 0018 0493     		str	r3, [sp, #16]
+ 305 001a 0593     		str	r3, [sp, #20]
+ 306 001c 0693     		str	r3, [sp, #24]
+ 307 001e 0793     		str	r3, [sp, #28]
+  68:tim.c         ****   htim3.Init.Prescaler = 6000;
+ 308              		.loc 1 68 0
+ 309 0020 3148     		ldr	r0, .L37
+ 310 0022 324A     		ldr	r2, .L37+4
+ 311 0024 0260     		str	r2, [r0]
+  69:tim.c         ****   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+ 312              		.loc 1 69 0
+ 313 0026 41F27072 		movw	r2, #6000
+ 314 002a 4260     		str	r2, [r0, #4]
+  70:tim.c         ****   htim3.Init.Period = 1000;
+ 315              		.loc 1 70 0
+ 316 002c 8360     		str	r3, [r0, #8]
+  71:tim.c         ****   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+ 317              		.loc 1 71 0
+ 318 002e 4FF47A72 		mov	r2, #1000
+ 319 0032 C260     		str	r2, [r0, #12]
+  72:tim.c         ****   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+ 320              		.loc 1 72 0
+ 321 0034 0361     		str	r3, [r0, #16]
+  73:tim.c         ****   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+ 322              		.loc 1 73 0
+ 323 0036 8361     		str	r3, [r0, #24]
+  74:tim.c         ****   {
+ 324              		.loc 1 74 0
+ 325 0038 FFF7FEFF 		bl	HAL_TIM_Base_Init
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 12
+
+
+ 326              	.LVL15:
+ 327 003c 0028     		cmp	r0, #0
+ 328 003e 3AD1     		bne	.L29
+ 329              	.L20:
+  78:tim.c         ****   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+ 330              		.loc 1 78 0
+ 331 0040 0EA9     		add	r1, sp, #56
+ 332 0042 4FF48053 		mov	r3, #4096
+ 333 0046 41F8103D 		str	r3, [r1, #-16]!
+  79:tim.c         ****   {
+ 334              		.loc 1 79 0
+ 335 004a 2748     		ldr	r0, .L37
+ 336 004c FFF7FEFF 		bl	HAL_TIM_ConfigClockSource
+ 337              	.LVL16:
+ 338 0050 0028     		cmp	r0, #0
+ 339 0052 33D1     		bne	.L30
+ 340              	.L21:
+  83:tim.c         ****   {
+ 341              		.loc 1 83 0
+ 342 0054 2448     		ldr	r0, .L37
+ 343 0056 FFF7FEFF 		bl	HAL_TIM_PWM_Init
+ 344              	.LVL17:
+ 345 005a 0028     		cmp	r0, #0
+ 346 005c 31D1     		bne	.L31
+ 347              	.L22:
+  87:tim.c         ****   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+ 348              		.loc 1 87 0
+ 349 005e 0023     		movs	r3, #0
+ 350 0060 0893     		str	r3, [sp, #32]
+  88:tim.c         ****   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+ 351              		.loc 1 88 0
+ 352 0062 0993     		str	r3, [sp, #36]
+  89:tim.c         ****   {
+ 353              		.loc 1 89 0
+ 354 0064 08A9     		add	r1, sp, #32
+ 355 0066 2048     		ldr	r0, .L37
+ 356 0068 FFF7FEFF 		bl	HAL_TIMEx_MasterConfigSynchronization
+ 357              	.LVL18:
+ 358 006c 60BB     		cbnz	r0, .L32
+ 359              	.L23:
+  93:tim.c         ****   sConfigOC.Pulse = 0;
+ 360              		.loc 1 93 0
+ 361 006e 6023     		movs	r3, #96
+ 362 0070 0193     		str	r3, [sp, #4]
+  94:tim.c         ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+ 363              		.loc 1 94 0
+ 364 0072 0022     		movs	r2, #0
+ 365 0074 0292     		str	r2, [sp, #8]
+  95:tim.c         ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+ 366              		.loc 1 95 0
+ 367 0076 0392     		str	r2, [sp, #12]
+  96:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+ 368              		.loc 1 96 0
+ 369 0078 0592     		str	r2, [sp, #20]
+  97:tim.c         ****   {
+ 370              		.loc 1 97 0
+ 371 007a 01A9     		add	r1, sp, #4
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 13
+
+
+ 372 007c 1A48     		ldr	r0, .L37
+ 373 007e FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 374              	.LVL19:
+ 375 0082 20BB     		cbnz	r0, .L33
+ 376              	.L24:
+ 101:tim.c         ****   {
+ 377              		.loc 1 101 0
+ 378 0084 0422     		movs	r2, #4
+ 379 0086 0DEB0201 		add	r1, sp, r2
+ 380 008a 1748     		ldr	r0, .L37
+ 381 008c FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 382              	.LVL20:
+ 383 0090 00BB     		cbnz	r0, .L34
+ 384              	.L25:
+ 105:tim.c         ****   {
+ 385              		.loc 1 105 0
+ 386 0092 0822     		movs	r2, #8
+ 387 0094 01A9     		add	r1, sp, #4
+ 388 0096 1448     		ldr	r0, .L37
+ 389 0098 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 390              	.LVL21:
+ 391 009c E8B9     		cbnz	r0, .L35
+ 392              	.L26:
+ 109:tim.c         ****   {
+ 393              		.loc 1 109 0
+ 394 009e 0C22     		movs	r2, #12
+ 395 00a0 01A9     		add	r1, sp, #4
+ 396 00a2 1148     		ldr	r0, .L37
+ 397 00a4 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 398              	.LVL22:
+ 399 00a8 D0B9     		cbnz	r0, .L36
+ 400              	.L27:
+ 113:tim.c         **** 
+ 401              		.loc 1 113 0
+ 402 00aa 0F48     		ldr	r0, .L37
+ 403 00ac FFF7FEFF 		bl	HAL_TIM_MspPostInit
+ 404              	.LVL23:
+ 115:tim.c         **** /* TIM4 init function */
+ 405              		.loc 1 115 0
+ 406 00b0 0FB0     		add	sp, sp, #60
+ 407              	.LCFI10:
+ 408              		.cfi_remember_state
+ 409              		.cfi_def_cfa_offset 4
+ 410              		@ sp needed
+ 411 00b2 5DF804FB 		ldr	pc, [sp], #4
+ 412              	.L29:
+ 413              	.LCFI11:
+ 414              		.cfi_restore_state
+  76:tim.c         ****   }
+ 415              		.loc 1 76 0
+ 416 00b6 FFF7FEFF 		bl	Error_Handler
+ 417              	.LVL24:
+ 418 00ba C1E7     		b	.L20
+ 419              	.L30:
+  81:tim.c         ****   }
+ 420              		.loc 1 81 0
+ 421 00bc FFF7FEFF 		bl	Error_Handler
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 14
+
+
+ 422              	.LVL25:
+ 423 00c0 C8E7     		b	.L21
+ 424              	.L31:
+  85:tim.c         ****   }
+ 425              		.loc 1 85 0
+ 426 00c2 FFF7FEFF 		bl	Error_Handler
+ 427              	.LVL26:
+ 428 00c6 CAE7     		b	.L22
+ 429              	.L32:
+  91:tim.c         ****   }
+ 430              		.loc 1 91 0
+ 431 00c8 FFF7FEFF 		bl	Error_Handler
+ 432              	.LVL27:
+ 433 00cc CFE7     		b	.L23
+ 434              	.L33:
+  99:tim.c         ****   }
+ 435              		.loc 1 99 0
+ 436 00ce FFF7FEFF 		bl	Error_Handler
+ 437              	.LVL28:
+ 438 00d2 D7E7     		b	.L24
+ 439              	.L34:
+ 103:tim.c         ****   }
+ 440              		.loc 1 103 0
+ 441 00d4 FFF7FEFF 		bl	Error_Handler
+ 442              	.LVL29:
+ 443 00d8 DBE7     		b	.L25
+ 444              	.L35:
+ 107:tim.c         ****   }
+ 445              		.loc 1 107 0
+ 446 00da FFF7FEFF 		bl	Error_Handler
+ 447              	.LVL30:
+ 448 00de DEE7     		b	.L26
+ 449              	.L36:
+ 111:tim.c         ****   }
+ 450              		.loc 1 111 0
+ 451 00e0 FFF7FEFF 		bl	Error_Handler
+ 452              	.LVL31:
+ 453 00e4 E1E7     		b	.L27
+ 454              	.L38:
+ 455 00e6 00BF     		.align	2
+ 456              	.L37:
+ 457 00e8 00000000 		.word	htim3
+ 458 00ec 00040040 		.word	1073742848
+ 459              		.cfi_endproc
+ 460              	.LFE126:
+ 462              		.section	.text.MX_TIM4_Init,"ax",%progbits
+ 463              		.align	1
+ 464              		.global	MX_TIM4_Init
+ 465              		.syntax unified
+ 466              		.thumb
+ 467              		.thumb_func
+ 468              		.fpu fpv4-sp-d16
+ 470              	MX_TIM4_Init:
+ 471              	.LFB127:
+ 118:tim.c         ****   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+ 472              		.loc 1 118 0
+ 473              		.cfi_startproc
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 15
+
+
+ 474              		@ args = 0, pretend = 0, frame = 56
+ 475              		@ frame_needed = 0, uses_anonymous_args = 0
+ 476 0000 00B5     		push	{lr}
+ 477              	.LCFI12:
+ 478              		.cfi_def_cfa_offset 4
+ 479              		.cfi_offset 14, -4
+ 480 0002 8FB0     		sub	sp, sp, #60
+ 481              	.LCFI13:
+ 482              		.cfi_def_cfa_offset 64
+ 119:tim.c         ****   TIM_MasterConfigTypeDef sMasterConfig = {0};
+ 483              		.loc 1 119 0
+ 484 0004 0023     		movs	r3, #0
+ 485 0006 0A93     		str	r3, [sp, #40]
+ 486 0008 0B93     		str	r3, [sp, #44]
+ 487 000a 0C93     		str	r3, [sp, #48]
+ 488 000c 0D93     		str	r3, [sp, #52]
+ 120:tim.c         ****   TIM_OC_InitTypeDef sConfigOC = {0};
+ 489              		.loc 1 120 0
+ 490 000e 0893     		str	r3, [sp, #32]
+ 491 0010 0993     		str	r3, [sp, #36]
+ 121:tim.c         **** 
+ 492              		.loc 1 121 0
+ 493 0012 0193     		str	r3, [sp, #4]
+ 494 0014 0293     		str	r3, [sp, #8]
+ 495 0016 0393     		str	r3, [sp, #12]
+ 496 0018 0493     		str	r3, [sp, #16]
+ 497 001a 0593     		str	r3, [sp, #20]
+ 498 001c 0693     		str	r3, [sp, #24]
+ 499 001e 0793     		str	r3, [sp, #28]
+ 123:tim.c         ****   htim4.Init.Prescaler = 6000;
+ 500              		.loc 1 123 0
+ 501 0020 3148     		ldr	r0, .L57
+ 502 0022 324A     		ldr	r2, .L57+4
+ 503 0024 0260     		str	r2, [r0]
+ 124:tim.c         ****   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+ 504              		.loc 1 124 0
+ 505 0026 41F27072 		movw	r2, #6000
+ 506 002a 4260     		str	r2, [r0, #4]
+ 125:tim.c         ****   htim4.Init.Period = 1000;
+ 507              		.loc 1 125 0
+ 508 002c 8360     		str	r3, [r0, #8]
+ 126:tim.c         ****   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+ 509              		.loc 1 126 0
+ 510 002e 4FF47A72 		mov	r2, #1000
+ 511 0032 C260     		str	r2, [r0, #12]
+ 127:tim.c         ****   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+ 512              		.loc 1 127 0
+ 513 0034 0361     		str	r3, [r0, #16]
+ 128:tim.c         ****   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+ 514              		.loc 1 128 0
+ 515 0036 8361     		str	r3, [r0, #24]
+ 129:tim.c         ****   {
+ 516              		.loc 1 129 0
+ 517 0038 FFF7FEFF 		bl	HAL_TIM_Base_Init
+ 518              	.LVL32:
+ 519 003c 0028     		cmp	r0, #0
+ 520 003e 3AD1     		bne	.L49
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 16
+
+
+ 521              	.L40:
+ 133:tim.c         ****   if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+ 522              		.loc 1 133 0
+ 523 0040 0EA9     		add	r1, sp, #56
+ 524 0042 4FF48053 		mov	r3, #4096
+ 525 0046 41F8103D 		str	r3, [r1, #-16]!
+ 134:tim.c         ****   {
+ 526              		.loc 1 134 0
+ 527 004a 2748     		ldr	r0, .L57
+ 528 004c FFF7FEFF 		bl	HAL_TIM_ConfigClockSource
+ 529              	.LVL33:
+ 530 0050 0028     		cmp	r0, #0
+ 531 0052 33D1     		bne	.L50
+ 532              	.L41:
+ 138:tim.c         ****   {
+ 533              		.loc 1 138 0
+ 534 0054 2448     		ldr	r0, .L57
+ 535 0056 FFF7FEFF 		bl	HAL_TIM_PWM_Init
+ 536              	.LVL34:
+ 537 005a 0028     		cmp	r0, #0
+ 538 005c 31D1     		bne	.L51
+ 539              	.L42:
+ 142:tim.c         ****   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+ 540              		.loc 1 142 0
+ 541 005e 0023     		movs	r3, #0
+ 542 0060 0893     		str	r3, [sp, #32]
+ 143:tim.c         ****   if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+ 543              		.loc 1 143 0
+ 544 0062 0993     		str	r3, [sp, #36]
+ 144:tim.c         ****   {
+ 545              		.loc 1 144 0
+ 546 0064 08A9     		add	r1, sp, #32
+ 547 0066 2048     		ldr	r0, .L57
+ 548 0068 FFF7FEFF 		bl	HAL_TIMEx_MasterConfigSynchronization
+ 549              	.LVL35:
+ 550 006c 60BB     		cbnz	r0, .L52
+ 551              	.L43:
+ 148:tim.c         ****   sConfigOC.Pulse = 0;
+ 552              		.loc 1 148 0
+ 553 006e 6023     		movs	r3, #96
+ 554 0070 0193     		str	r3, [sp, #4]
+ 149:tim.c         ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+ 555              		.loc 1 149 0
+ 556 0072 0022     		movs	r2, #0
+ 557 0074 0292     		str	r2, [sp, #8]
+ 150:tim.c         ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+ 558              		.loc 1 150 0
+ 559 0076 0392     		str	r2, [sp, #12]
+ 151:tim.c         ****   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+ 560              		.loc 1 151 0
+ 561 0078 0592     		str	r2, [sp, #20]
+ 152:tim.c         ****   {
+ 562              		.loc 1 152 0
+ 563 007a 01A9     		add	r1, sp, #4
+ 564 007c 1A48     		ldr	r0, .L57
+ 565 007e FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 566              	.LVL36:
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 17
+
+
+ 567 0082 20BB     		cbnz	r0, .L53
+ 568              	.L44:
+ 156:tim.c         ****   {
+ 569              		.loc 1 156 0
+ 570 0084 0422     		movs	r2, #4
+ 571 0086 0DEB0201 		add	r1, sp, r2
+ 572 008a 1748     		ldr	r0, .L57
+ 573 008c FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 574              	.LVL37:
+ 575 0090 00BB     		cbnz	r0, .L54
+ 576              	.L45:
+ 160:tim.c         ****   {
+ 577              		.loc 1 160 0
+ 578 0092 0822     		movs	r2, #8
+ 579 0094 01A9     		add	r1, sp, #4
+ 580 0096 1448     		ldr	r0, .L57
+ 581 0098 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 582              	.LVL38:
+ 583 009c E8B9     		cbnz	r0, .L55
+ 584              	.L46:
+ 164:tim.c         ****   {
+ 585              		.loc 1 164 0
+ 586 009e 0C22     		movs	r2, #12
+ 587 00a0 01A9     		add	r1, sp, #4
+ 588 00a2 1148     		ldr	r0, .L57
+ 589 00a4 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 590              	.LVL39:
+ 591 00a8 D0B9     		cbnz	r0, .L56
+ 592              	.L47:
+ 168:tim.c         **** 
+ 593              		.loc 1 168 0
+ 594 00aa 0F48     		ldr	r0, .L57
+ 595 00ac FFF7FEFF 		bl	HAL_TIM_MspPostInit
+ 596              	.LVL40:
+ 170:tim.c         **** 
+ 597              		.loc 1 170 0
+ 598 00b0 0FB0     		add	sp, sp, #60
+ 599              	.LCFI14:
+ 600              		.cfi_remember_state
+ 601              		.cfi_def_cfa_offset 4
+ 602              		@ sp needed
+ 603 00b2 5DF804FB 		ldr	pc, [sp], #4
+ 604              	.L49:
+ 605              	.LCFI15:
+ 606              		.cfi_restore_state
+ 131:tim.c         ****   }
+ 607              		.loc 1 131 0
+ 608 00b6 FFF7FEFF 		bl	Error_Handler
+ 609              	.LVL41:
+ 610 00ba C1E7     		b	.L40
+ 611              	.L50:
+ 136:tim.c         ****   }
+ 612              		.loc 1 136 0
+ 613 00bc FFF7FEFF 		bl	Error_Handler
+ 614              	.LVL42:
+ 615 00c0 C8E7     		b	.L41
+ 616              	.L51:
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 18
+
+
+ 140:tim.c         ****   }
+ 617              		.loc 1 140 0
+ 618 00c2 FFF7FEFF 		bl	Error_Handler
+ 619              	.LVL43:
+ 620 00c6 CAE7     		b	.L42
+ 621              	.L52:
+ 146:tim.c         ****   }
+ 622              		.loc 1 146 0
+ 623 00c8 FFF7FEFF 		bl	Error_Handler
+ 624              	.LVL44:
+ 625 00cc CFE7     		b	.L43
+ 626              	.L53:
+ 154:tim.c         ****   }
+ 627              		.loc 1 154 0
+ 628 00ce FFF7FEFF 		bl	Error_Handler
+ 629              	.LVL45:
+ 630 00d2 D7E7     		b	.L44
+ 631              	.L54:
+ 158:tim.c         ****   }
+ 632              		.loc 1 158 0
+ 633 00d4 FFF7FEFF 		bl	Error_Handler
+ 634              	.LVL46:
+ 635 00d8 DBE7     		b	.L45
+ 636              	.L55:
+ 162:tim.c         ****   }
+ 637              		.loc 1 162 0
+ 638 00da FFF7FEFF 		bl	Error_Handler
+ 639              	.LVL47:
+ 640 00de DEE7     		b	.L46
+ 641              	.L56:
+ 166:tim.c         ****   }
+ 642              		.loc 1 166 0
+ 643 00e0 FFF7FEFF 		bl	Error_Handler
+ 644              	.LVL48:
+ 645 00e4 E1E7     		b	.L47
+ 646              	.L58:
+ 647 00e6 00BF     		.align	2
+ 648              	.L57:
+ 649 00e8 00000000 		.word	htim4
+ 650 00ec 00080040 		.word	1073743872
+ 651              		.cfi_endproc
+ 652              	.LFE127:
+ 654              		.section	.text.HAL_TIM_Base_MspDeInit,"ax",%progbits
+ 655              		.align	1
+ 656              		.global	HAL_TIM_Base_MspDeInit
+ 657              		.syntax unified
+ 658              		.thumb
+ 659              		.thumb_func
+ 660              		.fpu fpv4-sp-d16
+ 662              	HAL_TIM_Base_MspDeInit:
+ 663              	.LFB130:
+ 275:tim.c         **** 
+ 276:tim.c         **** void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
+ 277:tim.c         **** {
+ 664              		.loc 1 277 0
+ 665              		.cfi_startproc
+ 666              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 19
+
+
+ 667              		@ frame_needed = 0, uses_anonymous_args = 0
+ 668              	.LVL49:
+ 669 0000 08B5     		push	{r3, lr}
+ 670              	.LCFI16:
+ 671              		.cfi_def_cfa_offset 8
+ 672              		.cfi_offset 3, -8
+ 673              		.cfi_offset 14, -4
+ 278:tim.c         **** 
+ 279:tim.c         ****   if(tim_baseHandle->Instance==TIM3)
+ 674              		.loc 1 279 0
+ 675 0002 0368     		ldr	r3, [r0]
+ 676 0004 104A     		ldr	r2, .L67
+ 677 0006 9342     		cmp	r3, r2
+ 678 0008 06D0     		beq	.L64
+ 280:tim.c         ****   {
+ 281:tim.c         ****   /* USER CODE BEGIN TIM3_MspDeInit 0 */
+ 282:tim.c         **** 
+ 283:tim.c         ****   /* USER CODE END TIM3_MspDeInit 0 */
+ 284:tim.c         ****     /* Peripheral clock disable */
+ 285:tim.c         ****     __HAL_RCC_TIM3_CLK_DISABLE();
+ 286:tim.c         ****   /* USER CODE BEGIN TIM3_MspDeInit 1 */
+ 287:tim.c         **** 
+ 288:tim.c         ****   /* USER CODE END TIM3_MspDeInit 1 */
+ 289:tim.c         ****   }
+ 290:tim.c         ****   else if(tim_baseHandle->Instance==TIM4)
+ 679              		.loc 1 290 0
+ 680 000a 104A     		ldr	r2, .L67+4
+ 681 000c 9342     		cmp	r3, r2
+ 682 000e 0AD0     		beq	.L65
+ 291:tim.c         ****   {
+ 292:tim.c         ****   /* USER CODE BEGIN TIM4_MspDeInit 0 */
+ 293:tim.c         **** 
+ 294:tim.c         ****   /* USER CODE END TIM4_MspDeInit 0 */
+ 295:tim.c         ****     /* Peripheral clock disable */
+ 296:tim.c         ****     __HAL_RCC_TIM4_CLK_DISABLE();
+ 297:tim.c         ****   /* USER CODE BEGIN TIM4_MspDeInit 1 */
+ 298:tim.c         **** 
+ 299:tim.c         ****   /* USER CODE END TIM4_MspDeInit 1 */
+ 300:tim.c         ****   }
+ 301:tim.c         ****   else if(tim_baseHandle->Instance==TIM6)
+ 683              		.loc 1 301 0
+ 684 0010 0F4A     		ldr	r2, .L67+8
+ 685 0012 9342     		cmp	r3, r2
+ 686 0014 0ED0     		beq	.L66
+ 687              	.LVL50:
+ 688              	.L59:
+ 302:tim.c         ****   {
+ 303:tim.c         ****   /* USER CODE BEGIN TIM6_MspDeInit 0 */
+ 304:tim.c         **** 
+ 305:tim.c         ****   /* USER CODE END TIM6_MspDeInit 0 */
+ 306:tim.c         ****     /* Peripheral clock disable */
+ 307:tim.c         ****     __HAL_RCC_TIM6_CLK_DISABLE();
+ 308:tim.c         **** 
+ 309:tim.c         ****     /* TIM6 interrupt Deinit */
+ 310:tim.c         ****     HAL_NVIC_DisableIRQ(TIM6_DAC1_IRQn);
+ 311:tim.c         ****   /* USER CODE BEGIN TIM6_MspDeInit 1 */
+ 312:tim.c         **** 
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 20
+
+
+ 313:tim.c         ****   /* USER CODE END TIM6_MspDeInit 1 */
+ 314:tim.c         ****   }
+ 315:tim.c         **** } 
+ 689              		.loc 1 315 0
+ 690 0016 08BD     		pop	{r3, pc}
+ 691              	.LVL51:
+ 692              	.L64:
+ 285:tim.c         ****   /* USER CODE BEGIN TIM3_MspDeInit 1 */
+ 693              		.loc 1 285 0
+ 694 0018 02F50332 		add	r2, r2, #134144
+ 695 001c D369     		ldr	r3, [r2, #28]
+ 696 001e 23F00203 		bic	r3, r3, #2
+ 697 0022 D361     		str	r3, [r2, #28]
+ 698 0024 F7E7     		b	.L59
+ 699              	.L65:
+ 296:tim.c         ****   /* USER CODE BEGIN TIM4_MspDeInit 1 */
+ 700              		.loc 1 296 0
+ 701 0026 02F50232 		add	r2, r2, #133120
+ 702 002a D369     		ldr	r3, [r2, #28]
+ 703 002c 23F00403 		bic	r3, r3, #4
+ 704 0030 D361     		str	r3, [r2, #28]
+ 705 0032 F0E7     		b	.L59
+ 706              	.L66:
+ 307:tim.c         **** 
+ 707              		.loc 1 307 0
+ 708 0034 02F50032 		add	r2, r2, #131072
+ 709 0038 D369     		ldr	r3, [r2, #28]
+ 710 003a 23F01003 		bic	r3, r3, #16
+ 711 003e D361     		str	r3, [r2, #28]
+ 310:tim.c         ****   /* USER CODE BEGIN TIM6_MspDeInit 1 */
+ 712              		.loc 1 310 0
+ 713 0040 3620     		movs	r0, #54
+ 714              	.LVL52:
+ 715 0042 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+ 716              	.LVL53:
+ 717              		.loc 1 315 0
+ 718 0046 E6E7     		b	.L59
+ 719              	.L68:
+ 720              		.align	2
+ 721              	.L67:
+ 722 0048 00040040 		.word	1073742848
+ 723 004c 00080040 		.word	1073743872
+ 724 0050 00100040 		.word	1073745920
+ 725              		.cfi_endproc
+ 726              	.LFE130:
+ 728              		.comm	htim6,64,4
+ 729              		.comm	htim4,64,4
+ 730              		.comm	htim3,64,4
+ 731              		.text
+ 732              	.Letext0:
+ 733              		.file 2 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/machine/_d
+ 734              		.file 3 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_stdin
+ 735              		.file 4 "../Drivers/CMSIS/Include/core_cm4.h"
+ 736              		.file 5 "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
+ 737              		.file 6 "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 738              		.file 7 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/lock.h
+ 739              		.file 8 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_types
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 21
+
+
+ 740              		.file 9 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/lib/gcc/arm-none-eabi/7.3.1/incl
+ 741              		.file 10 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/reent
+ 742              		.file 11 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 743              		.file 12 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+ 744              		.file 13 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 745              		.file 14 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
+ 746              		.file 15 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim_ex.h"
+ 747              		.file 16 "tim.h"
+ 748              		.file 17 "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h"
+ 749              		.file 18 "main.h"
+ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 tim.c
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:18     .text.HAL_TIM_Base_MspInit:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:25     .text.HAL_TIM_Base_MspInit:0000000000000000 HAL_TIM_Base_MspInit
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:119    .text.HAL_TIM_Base_MspInit:0000000000000070 $d
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:127    .text.HAL_TIM_MspPostInit:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:134    .text.HAL_TIM_MspPostInit:0000000000000000 HAL_TIM_MspPostInit
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:263    .text.HAL_TIM_MspPostInit:00000000000000a0 $d
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:271    .text.MX_TIM3_Init:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:278    .text.MX_TIM3_Init:0000000000000000 MX_TIM3_Init
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:457    .text.MX_TIM3_Init:00000000000000e8 $d
+                            *COM*:0000000000000040 htim3
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:463    .text.MX_TIM4_Init:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:470    .text.MX_TIM4_Init:0000000000000000 MX_TIM4_Init
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:649    .text.MX_TIM4_Init:00000000000000e8 $d
+                            *COM*:0000000000000040 htim4
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:655    .text.HAL_TIM_Base_MspDeInit:0000000000000000 $t
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:662    .text.HAL_TIM_Base_MspDeInit:0000000000000000 HAL_TIM_Base_MspDeInit
+/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cc0A8PM3.s:722    .text.HAL_TIM_Base_MspDeInit:0000000000000048 $d
+                            *COM*:0000000000000040 htim6
+
+UNDEFINED SYMBOLS
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+HAL_GPIO_Init
+HAL_TIM_Base_Init
+HAL_TIM_ConfigClockSource
+HAL_TIM_PWM_Init
+HAL_TIMEx_MasterConfigSynchronization
+HAL_TIM_PWM_ConfigChannel
+Error_Handler
+HAL_NVIC_DisableIRQ

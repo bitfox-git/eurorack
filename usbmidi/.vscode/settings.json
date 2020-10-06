@@ -1,0 +1,30 @@
+{
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "files.associations": {
+      "stdbool.h": "c",
+      "algorithm": "c",
+      "spi.h": "c",
+      "memory": "cpp",
+      "random": "cpp",
+      "optional": "cpp",
+      "vector": "cpp",
+      "*.tcc": "cpp",
+      "string": "cpp",
+      "string_view": "cpp",
+      "midi.h": "c",
+      "usbh_midi.h": "c",
+      "usbh_core.h": "c",
+      "stm32f4xx_hal.c": "c",
+      "stm32f4xx_hal.h": "c",
+      "hashtable": "cpp",
+      "usbd_midi_if.h": "c",
+      "usbd_core.h": "c",
+      "stm32f3xx_hal_conf.h": "c",
+      "stm32f3xx_hal.h": "c",
+      "dac.h": "c",
+      "array": "c",
+      "ringbuffer.h": "c",
+      "analog.h": "c"
+    },
+    "python.pythonPath": "/usr/local/bin/python3.8"
+}
