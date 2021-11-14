@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -20,13 +20,14 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 1
   17              		.section	.text.MX_DMA_Init,"ax",%progbits
   18              		.align	1
   19              		.global	MX_DMA_Init
-  20              		.syntax unified
-  21              		.thumb
-  22              		.thumb_func
-  23              		.fpu fpv4-sp-d16
-  25              	MX_DMA_Init:
-  26              	.LFB126:
-  27              		.file 1 "Src/dma.c"
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	MX_DMA_Init:
+  27              	.LFB126:
+  28              		.file 1 "Src/dma.c"
    1:Src/dma.c     **** /**
    2:Src/dma.c     ****   ******************************************************************************
    3:Src/dma.c     ****   * File Name          : dma.c
@@ -57,10 +58,10 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 1
   28:Src/dma.c     ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
   29:Src/dma.c     ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
   30:Src/dma.c     ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s 			page 2
+
+
   31:Src/dma.c     ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 2
-
-
   32:Src/dma.c     ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
   33:Src/dma.c     ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
   34:Src/dma.c     ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
@@ -88,112 +89,110 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 1
   56:Src/dma.c     ****   */
   57:Src/dma.c     **** void MX_DMA_Init(void) 
   58:Src/dma.c     **** {
-  28              		.loc 1 58 0
-  29              		.cfi_startproc
-  30              		@ args = 0, pretend = 0, frame = 8
-  31              		@ frame_needed = 0, uses_anonymous_args = 0
-  32 0000 00B5     		push	{lr}
-  33              	.LCFI0:
-  34              		.cfi_def_cfa_offset 4
-  35              		.cfi_offset 14, -4
-  36 0002 83B0     		sub	sp, sp, #12
-  37              	.LCFI1:
-  38              		.cfi_def_cfa_offset 16
-  39              	.LBB2:
+  29              		.loc 1 58 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 00B5     		push	{lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 4
+  36              		.cfi_offset 14, -4
+  37 0002 83B0     		sub	sp, sp, #12
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 16
   59:Src/dma.c     ****   /* DMA controller clock enable */
   60:Src/dma.c     ****   __HAL_RCC_DMA2_CLK_ENABLE();
-  40              		.loc 1 60 0
-  41 0004 124B     		ldr	r3, .L3
-  42 0006 5A69     		ldr	r2, [r3, #20]
-  43 0008 42F00202 		orr	r2, r2, #2
-  44 000c 5A61     		str	r2, [r3, #20]
-  45 000e 5B69     		ldr	r3, [r3, #20]
-  46 0010 03F00203 		and	r3, r3, #2
-  47 0014 0193     		str	r3, [sp, #4]
-  48 0016 019B     		ldr	r3, [sp, #4]
-  49              	.LBE2:
+  40              		.loc 1 60 3 view .LVU1
+  41              	.LBB2:
+  42              		.loc 1 60 3 view .LVU2
+  43              		.loc 1 60 3 view .LVU3
+  44 0004 124B     		ldr	r3, .L3
+  45 0006 5A69     		ldr	r2, [r3, #20]
+  46 0008 42F00202 		orr	r2, r2, #2
+  47 000c 5A61     		str	r2, [r3, #20]
+  48              		.loc 1 60 3 view .LVU4
+  49 000e 5B69     		ldr	r3, [r3, #20]
+  50 0010 03F00203 		and	r3, r3, #2
+  51 0014 0193     		str	r3, [sp, #4]
+  52              		.loc 1 60 3 view .LVU5
+  53 0016 019B     		ldr	r3, [sp, #4]
+  54              	.LBE2:
+  55              		.loc 1 60 3 view .LVU6
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s 			page 3
+
+
   61:Src/dma.c     **** 
   62:Src/dma.c     ****   /* DMA interrupt init */
   63:Src/dma.c     ****   /* DMA2_Channel3_IRQn interrupt configuration */
   64:Src/dma.c     ****   HAL_NVIC_SetPriority(DMA2_Channel3_IRQn, 0, 0);
-  50              		.loc 1 64 0
-  51 0018 0022     		movs	r2, #0
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 3
-
-
-  52 001a 1146     		mov	r1, r2
-  53 001c 3A20     		movs	r0, #58
-  54 001e FFF7FEFF 		bl	HAL_NVIC_SetPriority
-  55              	.LVL0:
+  56              		.loc 1 64 3 view .LVU7
+  57 0018 0022     		movs	r2, #0
+  58 001a 1146     		mov	r1, r2
+  59 001c 3A20     		movs	r0, #58
+  60 001e FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  61              	.LVL0:
   65:Src/dma.c     ****   HAL_NVIC_EnableIRQ(DMA2_Channel3_IRQn);
-  56              		.loc 1 65 0
-  57 0022 3A20     		movs	r0, #58
-  58 0024 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
-  59              	.LVL1:
+  62              		.loc 1 65 3 view .LVU8
+  63 0022 3A20     		movs	r0, #58
+  64 0024 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+  65              	.LVL1:
   66:Src/dma.c     ****   /* DMA2_Channel4_IRQn interrupt configuration */
   67:Src/dma.c     ****   HAL_NVIC_SetPriority(DMA2_Channel4_IRQn, 0, 0);
-  60              		.loc 1 67 0
-  61 0028 0022     		movs	r2, #0
-  62 002a 1146     		mov	r1, r2
-  63 002c 3B20     		movs	r0, #59
-  64 002e FFF7FEFF 		bl	HAL_NVIC_SetPriority
-  65              	.LVL2:
+  66              		.loc 1 67 3 view .LVU9
+  67 0028 0022     		movs	r2, #0
+  68 002a 1146     		mov	r1, r2
+  69 002c 3B20     		movs	r0, #59
+  70 002e FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  71              	.LVL2:
   68:Src/dma.c     ****   HAL_NVIC_EnableIRQ(DMA2_Channel4_IRQn);
-  66              		.loc 1 68 0
-  67 0032 3B20     		movs	r0, #59
-  68 0034 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
-  69              	.LVL3:
+  72              		.loc 1 68 3 view .LVU10
+  73 0032 3B20     		movs	r0, #59
+  74 0034 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+  75              	.LVL3:
   69:Src/dma.c     ****   /* DMA2_Channel5_IRQn interrupt configuration */
   70:Src/dma.c     ****   HAL_NVIC_SetPriority(DMA2_Channel5_IRQn, 0, 0);
-  70              		.loc 1 70 0
-  71 0038 0022     		movs	r2, #0
-  72 003a 1146     		mov	r1, r2
-  73 003c 3C20     		movs	r0, #60
-  74 003e FFF7FEFF 		bl	HAL_NVIC_SetPriority
-  75              	.LVL4:
+  76              		.loc 1 70 3 view .LVU11
+  77 0038 0022     		movs	r2, #0
+  78 003a 1146     		mov	r1, r2
+  79 003c 3C20     		movs	r0, #60
+  80 003e FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  81              	.LVL4:
   71:Src/dma.c     ****   HAL_NVIC_EnableIRQ(DMA2_Channel5_IRQn);
-  76              		.loc 1 71 0
-  77 0042 3C20     		movs	r0, #60
-  78 0044 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
-  79              	.LVL5:
+  82              		.loc 1 71 3 view .LVU12
+  83 0042 3C20     		movs	r0, #60
+  84 0044 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+  85              	.LVL5:
   72:Src/dma.c     **** 
   73:Src/dma.c     **** }
-  80              		.loc 1 73 0
-  81 0048 03B0     		add	sp, sp, #12
-  82              	.LCFI2:
-  83              		.cfi_def_cfa_offset 4
-  84              		@ sp needed
-  85 004a 5DF804FB 		ldr	pc, [sp], #4
-  86              	.L4:
-  87 004e 00BF     		.align	2
-  88              	.L3:
-  89 0050 00100240 		.word	1073876992
-  90              		.cfi_endproc
-  91              	.LFE126:
-  93              		.text
-  94              	.Letext0:
-  95              		.file 2 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/machine/_d
-  96              		.file 3 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_stdin
-  97              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
-  98              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
-  99              		.file 6 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
- 100              		.file 7 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/lock.h
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 4
+  86              		.loc 1 73 1 is_stmt 0 view .LVU13
+  87 0048 03B0     		add	sp, sp, #12
+  88              	.LCFI2:
+  89              		.cfi_def_cfa_offset 4
+  90              		@ sp needed
+  91 004a 5DF804FB 		ldr	pc, [sp], #4
+  92              	.L4:
+  93 004e 00BF     		.align	2
+  94              	.L3:
+  95 0050 00100240 		.word	1073876992
+  96              		.cfi_endproc
+  97              	.LFE126:
+  99              		.text
+ 100              	.Letext0:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s 			page 4
 
 
- 101              		.file 8 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_types
- 102              		.file 9 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/lib/gcc/arm-none-eabi/7.3.1/incl
- 103              		.file 10 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/reent
- 104              		.file 11 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
- 105              		.file 12 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h"
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s 			page 5
+ 101              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 102              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 103              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 104              		.file 5 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 dma.c
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s:18     .text.MX_DMA_Init:0000000000000000 $t
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s:25     .text.MX_DMA_Init:0000000000000000 MX_DMA_Init
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//cckhUX40.s:89     .text.MX_DMA_Init:0000000000000050 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s:18     .text.MX_DMA_Init:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s:26     .text.MX_DMA_Init:0000000000000000 MX_DMA_Init
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccqjDiWK.s:95     .text.MX_DMA_Init:0000000000000050 $d
 
 UNDEFINED SYMBOLS
 HAL_NVIC_SetPriority

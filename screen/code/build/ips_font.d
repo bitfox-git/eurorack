@@ -1,3 +1,2 @@
-build/ips_font.o: Src/ips_font.c Inc/ips_font.h
-
-Inc/ips_font.h:
+build/ips_font.o: Project/Display/ips_font.c Project/Display/ips_font.h
+Project/Display/ips_font.h:

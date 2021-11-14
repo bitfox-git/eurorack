@@ -37,12 +37,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f373xc.h"
-// #include "../Drivers/CMSIS/Include/arm_math.h"
-// #include "kiss_fft.h"
-#include "pitch.h"
+
+#include "yin.h"
 #include "stdio.h"
 #include "math.h"
-// #include "audiodata.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

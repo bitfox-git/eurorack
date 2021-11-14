@@ -1,5 +1,5 @@
 #include <math.h>
-#include "pitch.h"
+#include "yin.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "ssd1306.h"
@@ -192,8 +192,6 @@ float Yin_getPitch(float* buffer, uint16_t bufferSize, float threshold, bool fft
 	
 	/* Step 1: Calculates the squared difference of the signal with a shifted version of itself. */
   Yin_difference(&yinobject, buffer);
-
-  
   
   /* Step 2: Calculate the cumulative mean on the normalised difference calculated in step 1 */
 	Yin_cumulativeMeanNormalizedDifference(&yinobject);

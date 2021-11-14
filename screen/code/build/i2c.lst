@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -20,13 +20,14 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
   17              		.section	.text.MX_I2C1_Init,"ax",%progbits
   18              		.align	1
   19              		.global	MX_I2C1_Init
-  20              		.syntax unified
-  21              		.thumb
-  22              		.thumb_func
-  23              		.fpu fpv4-sp-d16
-  25              	MX_I2C1_Init:
-  26              	.LFB126:
-  27              		.file 1 "Src/i2c.c"
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	MX_I2C1_Init:
+  27              	.LFB126:
+  28              		.file 1 "Src/i2c.c"
    1:Src/i2c.c     **** /**
    2:Src/i2c.c     ****   ******************************************************************************
    3:Src/i2c.c     ****   * File Name          : I2C.c
@@ -57,10 +58,10 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
   28:Src/i2c.c     ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
   29:Src/i2c.c     ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
   30:Src/i2c.c     ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 2
+
+
   31:Src/i2c.c     ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 2
-
-
   32:Src/i2c.c     ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
   33:Src/i2c.c     ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
   34:Src/i2c.c     ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
@@ -81,172 +82,194 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
   49:Src/i2c.c     **** /* I2C1 init function */
   50:Src/i2c.c     **** void MX_I2C1_Init(void)
   51:Src/i2c.c     **** {
-  28              		.loc 1 51 0
-  29              		.cfi_startproc
-  30              		@ args = 0, pretend = 0, frame = 0
-  31              		@ frame_needed = 0, uses_anonymous_args = 0
-  32 0000 08B5     		push	{r3, lr}
-  33              	.LCFI0:
-  34              		.cfi_def_cfa_offset 8
-  35              		.cfi_offset 3, -8
-  36              		.cfi_offset 14, -4
+  29              		.loc 1 51 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
   52:Src/i2c.c     **** 
   53:Src/i2c.c     ****   hi2c1.Instance = I2C1;
-  37              		.loc 1 53 0
-  38 0002 1548     		ldr	r0, .L9
-  39 0004 154B     		ldr	r3, .L9+4
-  40 0006 0360     		str	r3, [r0]
+  38              		.loc 1 53 3 view .LVU1
+  39              		.loc 1 53 18 is_stmt 0 view .LVU2
+  40 0002 1548     		ldr	r0, .L9
+  41 0004 154B     		ldr	r3, .L9+4
+  42 0006 0360     		str	r3, [r0]
   54:Src/i2c.c     ****   hi2c1.Init.Timing = 0x00000002;
-  41              		.loc 1 54 0
-  42 0008 0223     		movs	r3, #2
-  43 000a 4360     		str	r3, [r0, #4]
+  43              		.loc 1 54 3 is_stmt 1 view .LVU3
+  44              		.loc 1 54 21 is_stmt 0 view .LVU4
+  45 0008 0223     		movs	r3, #2
+  46 000a 4360     		str	r3, [r0, #4]
   55:Src/i2c.c     ****   hi2c1.Init.OwnAddress1 = 0;
-  44              		.loc 1 55 0
-  45 000c 0023     		movs	r3, #0
-  46 000e 8360     		str	r3, [r0, #8]
+  47              		.loc 1 55 3 is_stmt 1 view .LVU5
+  48              		.loc 1 55 26 is_stmt 0 view .LVU6
+  49 000c 0023     		movs	r3, #0
+  50 000e 8360     		str	r3, [r0, #8]
   56:Src/i2c.c     ****   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  47              		.loc 1 56 0
-  48 0010 0122     		movs	r2, #1
-  49 0012 C260     		str	r2, [r0, #12]
+  51              		.loc 1 56 3 is_stmt 1 view .LVU7
+  52              		.loc 1 56 29 is_stmt 0 view .LVU8
+  53 0010 0122     		movs	r2, #1
+  54 0012 C260     		str	r2, [r0, #12]
   57:Src/i2c.c     ****   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  50              		.loc 1 57 0
-  51 0014 0361     		str	r3, [r0, #16]
+  55              		.loc 1 57 3 is_stmt 1 view .LVU9
+  56              		.loc 1 57 30 is_stmt 0 view .LVU10
+  57 0014 0361     		str	r3, [r0, #16]
   58:Src/i2c.c     ****   hi2c1.Init.OwnAddress2 = 0;
-  52              		.loc 1 58 0
-  53 0016 4361     		str	r3, [r0, #20]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 3
+
+
+  58              		.loc 1 58 3 is_stmt 1 view .LVU11
+  59              		.loc 1 58 26 is_stmt 0 view .LVU12
+  60 0016 4361     		str	r3, [r0, #20]
   59:Src/i2c.c     ****   hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  54              		.loc 1 59 0
-  55 0018 8361     		str	r3, [r0, #24]
+  61              		.loc 1 59 3 is_stmt 1 view .LVU13
+  62              		.loc 1 59 31 is_stmt 0 view .LVU14
+  63 0018 8361     		str	r3, [r0, #24]
   60:Src/i2c.c     ****   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 3
-
-
-  56              		.loc 1 60 0
-  57 001a C361     		str	r3, [r0, #28]
+  64              		.loc 1 60 3 is_stmt 1 view .LVU15
+  65              		.loc 1 60 30 is_stmt 0 view .LVU16
+  66 001a C361     		str	r3, [r0, #28]
   61:Src/i2c.c     ****   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  58              		.loc 1 61 0
-  59 001c 0362     		str	r3, [r0, #32]
+  67              		.loc 1 61 3 is_stmt 1 view .LVU17
+  68              		.loc 1 61 28 is_stmt 0 view .LVU18
+  69 001c 0362     		str	r3, [r0, #32]
   62:Src/i2c.c     ****   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  60              		.loc 1 62 0
-  61 001e FFF7FEFF 		bl	HAL_I2C_Init
-  62              	.LVL0:
-  63 0022 80B9     		cbnz	r0, .L6
-  64              	.L2:
+  70              		.loc 1 62 3 is_stmt 1 view .LVU19
+  71              		.loc 1 62 7 is_stmt 0 view .LVU20
+  72 001e FFF7FEFF 		bl	HAL_I2C_Init
+  73              	.LVL0:
+  74              		.loc 1 62 6 view .LVU21
+  75 0022 80B9     		cbnz	r0, .L6
+  76              	.L2:
   63:Src/i2c.c     ****   {
   64:Src/i2c.c     ****     Error_Handler();
   65:Src/i2c.c     ****   }
   66:Src/i2c.c     ****   /**Configure Analogue filter 
   67:Src/i2c.c     ****   */
   68:Src/i2c.c     ****   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_DISABLE) != HAL_OK)
-  65              		.loc 1 68 0
-  66 0024 4FF48051 		mov	r1, #4096
-  67 0028 0B48     		ldr	r0, .L9
-  68 002a FFF7FEFF 		bl	HAL_I2CEx_ConfigAnalogFilter
-  69              	.LVL1:
-  70 002e 68B9     		cbnz	r0, .L7
-  71              	.L3:
+  77              		.loc 1 68 3 is_stmt 1 view .LVU22
+  78              		.loc 1 68 7 is_stmt 0 view .LVU23
+  79 0024 4FF48051 		mov	r1, #4096
+  80 0028 0B48     		ldr	r0, .L9
+  81 002a FFF7FEFF 		bl	HAL_I2CEx_ConfigAnalogFilter
+  82              	.LVL1:
+  83              		.loc 1 68 6 view .LVU24
+  84 002e 68B9     		cbnz	r0, .L7
+  85              	.L3:
   69:Src/i2c.c     ****   {
   70:Src/i2c.c     ****     Error_Handler();
   71:Src/i2c.c     ****   }
   72:Src/i2c.c     ****   /**Configure Digital filter 
   73:Src/i2c.c     ****   */
   74:Src/i2c.c     ****   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-  72              		.loc 1 74 0
-  73 0030 0021     		movs	r1, #0
-  74 0032 0948     		ldr	r0, .L9
-  75 0034 FFF7FEFF 		bl	HAL_I2CEx_ConfigDigitalFilter
-  76              	.LVL2:
-  77 0038 58B9     		cbnz	r0, .L8
-  78              	.L4:
+  86              		.loc 1 74 3 is_stmt 1 view .LVU25
+  87              		.loc 1 74 7 is_stmt 0 view .LVU26
+  88 0030 0021     		movs	r1, #0
+  89 0032 0948     		ldr	r0, .L9
+  90 0034 FFF7FEFF 		bl	HAL_I2CEx_ConfigDigitalFilter
+  91              	.LVL2:
+  92              		.loc 1 74 6 view .LVU27
+  93 0038 58B9     		cbnz	r0, .L8
+  94              	.L4:
   75:Src/i2c.c     ****   {
   76:Src/i2c.c     ****     Error_Handler();
   77:Src/i2c.c     ****   }
   78:Src/i2c.c     ****   /**I2C Fast mode Plus enable 
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 4
+
+
   79:Src/i2c.c     ****   */
   80:Src/i2c.c     ****   __HAL_SYSCFG_FASTMODEPLUS_ENABLE(I2C_FASTMODEPLUS_I2C1);
-  79              		.loc 1 80 0
-  80 003a 094A     		ldr	r2, .L9+8
-  81 003c 1368     		ldr	r3, [r2]
-  82 003e 43F48013 		orr	r3, r3, #1048576
-  83 0042 1360     		str	r3, [r2]
+  95              		.loc 1 80 3 is_stmt 1 view .LVU28
+  96              		.loc 1 80 3 view .LVU29
+  97              		.loc 1 80 3 view .LVU30
+  98 003a 094A     		ldr	r2, .L9+8
+  99 003c 1368     		ldr	r3, [r2]
+ 100 003e 43F48013 		orr	r3, r3, #1048576
+ 101 0042 1360     		str	r3, [r2]
+ 102              		.loc 1 80 3 view .LVU31
   81:Src/i2c.c     **** 
   82:Src/i2c.c     **** }
-  84              		.loc 1 82 0
-  85 0044 08BD     		pop	{r3, pc}
-  86              	.L6:
+ 103              		.loc 1 82 1 is_stmt 0 view .LVU32
+ 104 0044 08BD     		pop	{r3, pc}
+ 105              	.L6:
   64:Src/i2c.c     ****   }
-  87              		.loc 1 64 0
-  88 0046 FFF7FEFF 		bl	Error_Handler
-  89              	.LVL3:
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 4
-
-
-  90 004a EBE7     		b	.L2
-  91              	.L7:
+ 106              		.loc 1 64 5 is_stmt 1 view .LVU33
+ 107 0046 FFF7FEFF 		bl	Error_Handler
+ 108              	.LVL3:
+ 109 004a EBE7     		b	.L2
+ 110              	.L7:
   70:Src/i2c.c     ****   }
-  92              		.loc 1 70 0
-  93 004c FFF7FEFF 		bl	Error_Handler
-  94              	.LVL4:
-  95 0050 EEE7     		b	.L3
-  96              	.L8:
+ 111              		.loc 1 70 5 view .LVU34
+ 112 004c FFF7FEFF 		bl	Error_Handler
+ 113              	.LVL4:
+ 114 0050 EEE7     		b	.L3
+ 115              	.L8:
   76:Src/i2c.c     ****   }
-  97              		.loc 1 76 0
-  98 0052 FFF7FEFF 		bl	Error_Handler
-  99              	.LVL5:
- 100 0056 F0E7     		b	.L4
- 101              	.L10:
- 102              		.align	2
- 103              	.L9:
- 104 0058 00000000 		.word	hi2c1
- 105 005c 00540040 		.word	1073763328
- 106 0060 00000140 		.word	1073807360
- 107              		.cfi_endproc
- 108              	.LFE126:
- 110              		.section	.text.HAL_I2C_MspInit,"ax",%progbits
- 111              		.align	1
- 112              		.global	HAL_I2C_MspInit
- 113              		.syntax unified
- 114              		.thumb
- 115              		.thumb_func
- 116              		.fpu fpv4-sp-d16
- 118              	HAL_I2C_MspInit:
- 119              	.LFB127:
+ 116              		.loc 1 76 5 view .LVU35
+ 117 0052 FFF7FEFF 		bl	Error_Handler
+ 118              	.LVL5:
+ 119 0056 F0E7     		b	.L4
+ 120              	.L10:
+ 121              		.align	2
+ 122              	.L9:
+ 123 0058 00000000 		.word	.LANCHOR0
+ 124 005c 00540040 		.word	1073763328
+ 125 0060 00000140 		.word	1073807360
+ 126              		.cfi_endproc
+ 127              	.LFE126:
+ 129              		.section	.text.HAL_I2C_MspInit,"ax",%progbits
+ 130              		.align	1
+ 131              		.global	HAL_I2C_MspInit
+ 132              		.syntax unified
+ 133              		.thumb
+ 134              		.thumb_func
+ 135              		.fpu fpv4-sp-d16
+ 137              	HAL_I2C_MspInit:
+ 138              	.LVL6:
+ 139              	.LFB127:
   83:Src/i2c.c     **** 
   84:Src/i2c.c     **** void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   85:Src/i2c.c     **** {
- 120              		.loc 1 85 0
- 121              		.cfi_startproc
- 122              		@ args = 0, pretend = 0, frame = 32
- 123              		@ frame_needed = 0, uses_anonymous_args = 0
- 124              	.LVL6:
- 125 0000 10B5     		push	{r4, lr}
- 126              	.LCFI1:
- 127              		.cfi_def_cfa_offset 8
- 128              		.cfi_offset 4, -8
- 129              		.cfi_offset 14, -4
- 130 0002 88B0     		sub	sp, sp, #32
- 131              	.LCFI2:
- 132              		.cfi_def_cfa_offset 40
+ 140              		.loc 1 85 1 view -0
+ 141              		.cfi_startproc
+ 142              		@ args = 0, pretend = 0, frame = 32
+ 143              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 5
+
+
+ 144              		.loc 1 85 1 is_stmt 0 view .LVU37
+ 145 0000 10B5     		push	{r4, lr}
+ 146              	.LCFI1:
+ 147              		.cfi_def_cfa_offset 8
+ 148              		.cfi_offset 4, -8
+ 149              		.cfi_offset 14, -4
+ 150 0002 88B0     		sub	sp, sp, #32
+ 151              	.LCFI2:
+ 152              		.cfi_def_cfa_offset 40
   86:Src/i2c.c     **** 
   87:Src/i2c.c     ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
- 133              		.loc 1 87 0
- 134 0004 0023     		movs	r3, #0
- 135 0006 0393     		str	r3, [sp, #12]
- 136 0008 0493     		str	r3, [sp, #16]
- 137 000a 0593     		str	r3, [sp, #20]
- 138 000c 0693     		str	r3, [sp, #24]
- 139 000e 0793     		str	r3, [sp, #28]
+ 153              		.loc 1 87 3 is_stmt 1 view .LVU38
+ 154              		.loc 1 87 20 is_stmt 0 view .LVU39
+ 155 0004 0023     		movs	r3, #0
+ 156 0006 0393     		str	r3, [sp, #12]
+ 157 0008 0493     		str	r3, [sp, #16]
+ 158 000a 0593     		str	r3, [sp, #20]
+ 159 000c 0693     		str	r3, [sp, #24]
+ 160 000e 0793     		str	r3, [sp, #28]
   88:Src/i2c.c     ****   if(i2cHandle->Instance==I2C1)
- 140              		.loc 1 88 0
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 5
-
-
- 141 0010 0268     		ldr	r2, [r0]
- 142 0012 134B     		ldr	r3, .L15
- 143 0014 9A42     		cmp	r2, r3
- 144 0016 01D0     		beq	.L14
- 145              	.LVL7:
- 146              	.L11:
+ 161              		.loc 1 88 3 is_stmt 1 view .LVU40
+ 162              		.loc 1 88 15 is_stmt 0 view .LVU41
+ 163 0010 0268     		ldr	r2, [r0]
+ 164              		.loc 1 88 5 view .LVU42
+ 165 0012 134B     		ldr	r3, .L15
+ 166 0014 9A42     		cmp	r2, r3
+ 167 0016 01D0     		beq	.L14
+ 168              	.LVL7:
+ 169              	.L11:
   89:Src/i2c.c     ****   {
   90:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 0 */
   91:Src/i2c.c     **** 
@@ -271,114 +294,152 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
  110:Src/i2c.c     ****   /* USER CODE END I2C1_MspInit 1 */
  111:Src/i2c.c     ****   }
  112:Src/i2c.c     **** }
- 147              		.loc 1 112 0
- 148 0018 08B0     		add	sp, sp, #32
- 149              	.LCFI3:
- 150              		.cfi_remember_state
- 151              		.cfi_def_cfa_offset 8
- 152              		@ sp needed
- 153 001a 10BD     		pop	{r4, pc}
- 154              	.LVL8:
- 155              	.L14:
- 156              	.LCFI4:
- 157              		.cfi_restore_state
- 158              	.LBB2:
+ 170              		.loc 1 112 1 view .LVU43
+ 171 0018 08B0     		add	sp, sp, #32
+ 172              	.LCFI3:
+ 173              		.cfi_remember_state
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 6
+
+
+ 174              		.cfi_def_cfa_offset 8
+ 175              		@ sp needed
+ 176 001a 10BD     		pop	{r4, pc}
+ 177              	.LVL8:
+ 178              	.L14:
+ 179              	.LCFI4:
+ 180              		.cfi_restore_state
   94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
- 159              		.loc 1 94 0
- 160 001c 114C     		ldr	r4, .L15+4
- 161 001e 6369     		ldr	r3, [r4, #20]
- 162 0020 43F48023 		orr	r3, r3, #262144
- 163 0024 6361     		str	r3, [r4, #20]
- 164 0026 6369     		ldr	r3, [r4, #20]
- 165 0028 03F48023 		and	r3, r3, #262144
- 166 002c 0193     		str	r3, [sp, #4]
- 167 002e 019B     		ldr	r3, [sp, #4]
- 168              	.LBE2:
+ 181              		.loc 1 94 5 is_stmt 1 view .LVU44
+ 182              	.LBB2:
+  94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
+ 183              		.loc 1 94 5 view .LVU45
+  94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
+ 184              		.loc 1 94 5 view .LVU46
+ 185 001c 114C     		ldr	r4, .L15+4
+ 186 001e 6369     		ldr	r3, [r4, #20]
+ 187 0020 43F48023 		orr	r3, r3, #262144
+ 188 0024 6361     		str	r3, [r4, #20]
+  94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
+ 189              		.loc 1 94 5 view .LVU47
+ 190 0026 6369     		ldr	r3, [r4, #20]
+ 191 0028 03F48023 		and	r3, r3, #262144
+ 192 002c 0193     		str	r3, [sp, #4]
+  94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
+ 193              		.loc 1 94 5 view .LVU48
+ 194 002e 019B     		ldr	r3, [sp, #4]
+ 195              	.LBE2:
+  94:Src/i2c.c     ****     /**I2C1 GPIO Configuration    
+ 196              		.loc 1 94 5 view .LVU49
   99:Src/i2c.c     ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
- 169              		.loc 1 99 0
- 170 0030 C023     		movs	r3, #192
- 171 0032 0393     		str	r3, [sp, #12]
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 6
-
-
+ 197              		.loc 1 99 5 view .LVU50
+  99:Src/i2c.c     ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+ 198              		.loc 1 99 25 is_stmt 0 view .LVU51
+ 199 0030 C023     		movs	r3, #192
+ 200 0032 0393     		str	r3, [sp, #12]
  100:Src/i2c.c     ****     GPIO_InitStruct.Pull = GPIO_PULLUP;
- 172              		.loc 1 100 0
- 173 0034 1223     		movs	r3, #18
- 174 0036 0493     		str	r3, [sp, #16]
+ 201              		.loc 1 100 5 is_stmt 1 view .LVU52
+ 100:Src/i2c.c     ****     GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 202              		.loc 1 100 26 is_stmt 0 view .LVU53
+ 203 0034 1223     		movs	r3, #18
+ 204 0036 0493     		str	r3, [sp, #16]
  101:Src/i2c.c     ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
- 175              		.loc 1 101 0
- 176 0038 0123     		movs	r3, #1
- 177 003a 0593     		str	r3, [sp, #20]
+ 205              		.loc 1 101 5 is_stmt 1 view .LVU54
+ 101:Src/i2c.c     ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+ 206              		.loc 1 101 26 is_stmt 0 view .LVU55
+ 207 0038 0123     		movs	r3, #1
+ 208 003a 0593     		str	r3, [sp, #20]
  102:Src/i2c.c     ****     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
- 178              		.loc 1 102 0
- 179 003c 0323     		movs	r3, #3
- 180 003e 0693     		str	r3, [sp, #24]
+ 209              		.loc 1 102 5 is_stmt 1 view .LVU56
+ 102:Src/i2c.c     ****     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+ 210              		.loc 1 102 27 is_stmt 0 view .LVU57
+ 211 003c 0323     		movs	r3, #3
+ 212 003e 0693     		str	r3, [sp, #24]
  103:Src/i2c.c     ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
- 181              		.loc 1 103 0
- 182 0040 0423     		movs	r3, #4
- 183 0042 0793     		str	r3, [sp, #28]
+ 213              		.loc 1 103 5 is_stmt 1 view .LVU58
+ 103:Src/i2c.c     ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 214              		.loc 1 103 31 is_stmt 0 view .LVU59
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 7
+
+
+ 215 0040 0423     		movs	r3, #4
+ 216 0042 0793     		str	r3, [sp, #28]
  104:Src/i2c.c     **** 
- 184              		.loc 1 104 0
- 185 0044 03A9     		add	r1, sp, #12
- 186 0046 0848     		ldr	r0, .L15+8
- 187              	.LVL9:
- 188 0048 FFF7FEFF 		bl	HAL_GPIO_Init
- 189              	.LVL10:
- 190              	.LBB3:
+ 217              		.loc 1 104 5 is_stmt 1 view .LVU60
+ 218 0044 03A9     		add	r1, sp, #12
+ 219 0046 0848     		ldr	r0, .L15+8
+ 220              	.LVL9:
+ 104:Src/i2c.c     **** 
+ 221              		.loc 1 104 5 is_stmt 0 view .LVU61
+ 222 0048 FFF7FEFF 		bl	HAL_GPIO_Init
+ 223              	.LVL10:
  107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
- 191              		.loc 1 107 0
- 192 004c E369     		ldr	r3, [r4, #28]
- 193 004e 43F40013 		orr	r3, r3, #2097152
- 194 0052 E361     		str	r3, [r4, #28]
- 195 0054 E369     		ldr	r3, [r4, #28]
- 196 0056 03F40013 		and	r3, r3, #2097152
- 197 005a 0293     		str	r3, [sp, #8]
- 198 005c 029B     		ldr	r3, [sp, #8]
- 199              	.LBE3:
- 200              		.loc 1 112 0
- 201 005e DBE7     		b	.L11
- 202              	.L16:
- 203              		.align	2
- 204              	.L15:
- 205 0060 00540040 		.word	1073763328
- 206 0064 00100240 		.word	1073876992
- 207 0068 00040048 		.word	1207960576
- 208              		.cfi_endproc
- 209              	.LFE127:
- 211              		.section	.text.HAL_I2C_MspDeInit,"ax",%progbits
- 212              		.align	1
- 213              		.global	HAL_I2C_MspDeInit
- 214              		.syntax unified
- 215              		.thumb
- 216              		.thumb_func
- 217              		.fpu fpv4-sp-d16
- 219              	HAL_I2C_MspDeInit:
- 220              	.LFB128:
+ 224              		.loc 1 107 5 is_stmt 1 view .LVU62
+ 225              	.LBB3:
+ 107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
+ 226              		.loc 1 107 5 view .LVU63
+ 107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
+ 227              		.loc 1 107 5 view .LVU64
+ 228 004c E369     		ldr	r3, [r4, #28]
+ 229 004e 43F40013 		orr	r3, r3, #2097152
+ 230 0052 E361     		str	r3, [r4, #28]
+ 107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
+ 231              		.loc 1 107 5 view .LVU65
+ 232 0054 E369     		ldr	r3, [r4, #28]
+ 233 0056 03F40013 		and	r3, r3, #2097152
+ 234 005a 0293     		str	r3, [sp, #8]
+ 107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
+ 235              		.loc 1 107 5 view .LVU66
+ 236 005c 029B     		ldr	r3, [sp, #8]
+ 237              	.LBE3:
+ 107:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspInit 1 */
+ 238              		.loc 1 107 5 view .LVU67
+ 239              		.loc 1 112 1 is_stmt 0 view .LVU68
+ 240 005e DBE7     		b	.L11
+ 241              	.L16:
+ 242              		.align	2
+ 243              	.L15:
+ 244 0060 00540040 		.word	1073763328
+ 245 0064 00100240 		.word	1073876992
+ 246 0068 00040048 		.word	1207960576
+ 247              		.cfi_endproc
+ 248              	.LFE127:
+ 250              		.section	.text.HAL_I2C_MspDeInit,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	HAL_I2C_MspDeInit
+ 253              		.syntax unified
+ 254              		.thumb
+ 255              		.thumb_func
+ 256              		.fpu fpv4-sp-d16
+ 258              	HAL_I2C_MspDeInit:
+ 259              	.LVL11:
+ 260              	.LFB128:
  113:Src/i2c.c     **** 
  114:Src/i2c.c     **** void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
  115:Src/i2c.c     **** {
- 221              		.loc 1 115 0
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 7
+ 261              		.loc 1 115 1 is_stmt 1 view -0
+ 262              		.cfi_startproc
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 8
 
 
- 222              		.cfi_startproc
- 223              		@ args = 0, pretend = 0, frame = 0
- 224              		@ frame_needed = 0, uses_anonymous_args = 0
- 225              	.LVL11:
- 226 0000 08B5     		push	{r3, lr}
- 227              	.LCFI5:
- 228              		.cfi_def_cfa_offset 8
- 229              		.cfi_offset 3, -8
- 230              		.cfi_offset 14, -4
+ 263              		@ args = 0, pretend = 0, frame = 0
+ 264              		@ frame_needed = 0, uses_anonymous_args = 0
+ 265              		.loc 1 115 1 is_stmt 0 view .LVU70
+ 266 0000 08B5     		push	{r3, lr}
+ 267              	.LCFI5:
+ 268              		.cfi_def_cfa_offset 8
+ 269              		.cfi_offset 3, -8
+ 270              		.cfi_offset 14, -4
  116:Src/i2c.c     **** 
  117:Src/i2c.c     ****   if(i2cHandle->Instance==I2C1)
- 231              		.loc 1 117 0
- 232 0002 0268     		ldr	r2, [r0]
- 233 0004 064B     		ldr	r3, .L21
- 234 0006 9A42     		cmp	r2, r3
- 235 0008 00D0     		beq	.L20
- 236              	.LVL12:
- 237              	.L17:
+ 271              		.loc 1 117 3 is_stmt 1 view .LVU71
+ 272              		.loc 1 117 15 is_stmt 0 view .LVU72
+ 273 0002 0268     		ldr	r2, [r0]
+ 274              		.loc 1 117 5 view .LVU73
+ 275 0004 064B     		ldr	r3, .L21
+ 276 0006 9A42     		cmp	r2, r3
+ 277 0008 00D0     		beq	.L20
+ 278              	.LVL12:
+ 279              	.L17:
  118:Src/i2c.c     ****   {
  119:Src/i2c.c     ****   /* USER CODE BEGIN I2C1_MspDeInit 0 */
  120:Src/i2c.c     **** 
@@ -397,71 +458,76 @@ ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 1
  133:Src/i2c.c     ****   /* USER CODE END I2C1_MspDeInit 1 */
  134:Src/i2c.c     ****   }
  135:Src/i2c.c     **** } 
- 238              		.loc 1 135 0
- 239 000a 08BD     		pop	{r3, pc}
- 240              	.LVL13:
- 241              	.L20:
+ 280              		.loc 1 135 1 view .LVU74
+ 281 000a 08BD     		pop	{r3, pc}
+ 282              	.LVL13:
+ 283              	.L20:
  123:Src/i2c.c     ****   
- 242              		.loc 1 123 0
- 243 000c 054A     		ldr	r2, .L21+4
- 244 000e D369     		ldr	r3, [r2, #28]
- 245 0010 23F40013 		bic	r3, r3, #2097152
- 246 0014 D361     		str	r3, [r2, #28]
+ 284              		.loc 1 123 5 is_stmt 1 view .LVU75
+ 285 000c 054A     		ldr	r2, .L21+4
+ 286 000e D369     		ldr	r3, [r2, #28]
+ 287 0010 23F40013 		bic	r3, r3, #2097152
+ 288 0014 D361     		str	r3, [r2, #28]
  129:Src/i2c.c     **** 
- 247              		.loc 1 129 0
- 248 0016 C021     		movs	r1, #192
- 249 0018 0348     		ldr	r0, .L21+8
- 250              	.LVL14:
- 251 001a FFF7FEFF 		bl	HAL_GPIO_DeInit
- 252              	.LVL15:
- 253              		.loc 1 135 0
- 254 001e F4E7     		b	.L17
- 255              	.L22:
- 256              		.align	2
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 8
+ 289              		.loc 1 129 5 view .LVU76
+ 290 0016 C021     		movs	r1, #192
+ 291 0018 0348     		ldr	r0, .L21+8
+ 292              	.LVL14:
+ 129:Src/i2c.c     **** 
+ 293              		.loc 1 129 5 is_stmt 0 view .LVU77
+ 294 001a FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 295              	.LVL15:
+ 296              		.loc 1 135 1 view .LVU78
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 9
 
 
- 257              	.L21:
- 258 0020 00540040 		.word	1073763328
- 259 0024 00100240 		.word	1073876992
- 260 0028 00040048 		.word	1207960576
- 261              		.cfi_endproc
- 262              	.LFE128:
- 264              		.comm	hi2c1,76,4
- 265              		.text
- 266              	.Letext0:
- 267              		.file 2 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/machine/_d
- 268              		.file 3 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_stdin
- 269              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
- 270              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
- 271              		.file 6 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
- 272              		.file 7 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/lock.h
- 273              		.file 8 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/_types
- 274              		.file 9 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/lib/gcc/arm-none-eabi/7.3.1/incl
- 275              		.file 10 "/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update/gcc/arm-none-eabi/include/sys/reent
- 276              		.file 11 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
- 277              		.file 12 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
- 278              		.file 13 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
- 279              		.file 14 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h"
- 280              		.file 15 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
- 281              		.file 16 "Inc/i2c.h"
- 282              		.file 17 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c_ex.h"
- 283              		.file 18 "Inc/main.h"
-ARM GAS  /var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s 			page 9
+ 297 001e F4E7     		b	.L17
+ 298              	.L22:
+ 299              		.align	2
+ 300              	.L21:
+ 301 0020 00540040 		.word	1073763328
+ 302 0024 00100240 		.word	1073876992
+ 303 0028 00040048 		.word	1207960576
+ 304              		.cfi_endproc
+ 305              	.LFE128:
+ 307              		.global	hi2c1
+ 308              		.section	.bss.hi2c1,"aw",%nobits
+ 309              		.align	2
+ 310              		.set	.LANCHOR0,. + 0
+ 313              	hi2c1:
+ 314 0000 00000000 		.space	76
+ 314      00000000 
+ 314      00000000 
+ 314      00000000 
+ 314      00000000 
+ 315              		.text
+ 316              	.Letext0:
+ 317              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 318              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 319              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 320              		.file 5 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 321              		.file 6 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+ 322              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 323              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h"
+ 324              		.file 9 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c_ex.h"
+ 325              		.file 10 "Inc/main.h"
+ 326              		.file 11 "Inc/i2c.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s 			page 10
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 i2c.c
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:18     .text.MX_I2C1_Init:0000000000000000 $t
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:25     .text.MX_I2C1_Init:0000000000000000 MX_I2C1_Init
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:104    .text.MX_I2C1_Init:0000000000000058 $d
-                            *COM*:000000000000004c hi2c1
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:111    .text.HAL_I2C_MspInit:0000000000000000 $t
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:118    .text.HAL_I2C_MspInit:0000000000000000 HAL_I2C_MspInit
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:205    .text.HAL_I2C_MspInit:0000000000000060 $d
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:212    .text.HAL_I2C_MspDeInit:0000000000000000 $t
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:219    .text.HAL_I2C_MspDeInit:0000000000000000 HAL_I2C_MspDeInit
-/var/folders/k_/r2bh2pj93_jff4n9gmtn9jvr0000gn/T//ccSusImt.s:258    .text.HAL_I2C_MspDeInit:0000000000000020 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:18     .text.MX_I2C1_Init:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:26     .text.MX_I2C1_Init:0000000000000000 MX_I2C1_Init
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:123    .text.MX_I2C1_Init:0000000000000058 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:130    .text.HAL_I2C_MspInit:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:137    .text.HAL_I2C_MspInit:0000000000000000 HAL_I2C_MspInit
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:244    .text.HAL_I2C_MspInit:0000000000000060 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:251    .text.HAL_I2C_MspDeInit:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:258    .text.HAL_I2C_MspDeInit:0000000000000000 HAL_I2C_MspDeInit
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:301    .text.HAL_I2C_MspDeInit:0000000000000020 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:313    .bss.hi2c1:0000000000000000 hi2c1
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cclmiKWr.s:309    .bss.hi2c1:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 HAL_I2C_Init

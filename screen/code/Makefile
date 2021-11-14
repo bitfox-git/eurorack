@@ -40,13 +40,11 @@ Src/main.c \
 Src/stm32f3xx_it.c \
 Src/stm32f3xx_hal_msp.c \
 Src/system_stm32f3xx.c \
-Src/ssd1306.c \
-Src/pitch.c \
-Src/ips_font.c \
 Src/gpio.c \
 Src/i2c.c \
 Src/sdadc.c \
 Src/tim.c \
+Src/dma.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_sdadc.c \
@@ -62,7 +60,9 @@ Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c \
 Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c \
-Src/dma.c
+Project/yin.c \
+Project/Display/ssd1306.c \
+Project/Display/ips_font.c 
 
 # ASM sources
 ASM_SOURCES =  \
@@ -121,6 +121,8 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
+-IProject \
+-IProject/Display \
 -IDrivers/STM32F3xx_HAL_Driver/Inc \
 -IDrivers/STM32F3xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F3xx/Include \
@@ -147,7 +149,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 LDSCRIPT = STM32F373CCTx_FLASH.ld
 
 # libraries
-LIBS = -lc -larm_cortexM4lf_math -lm -lnosys 
+LIBS = -lc -lm -lnosys 
 LIBDIR = -L.
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
