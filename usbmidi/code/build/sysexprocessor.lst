@@ -1,0 +1,3567 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"sysexprocessor.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.MidiBytestoByte,"ax",%progbits
+  18              		.align	1
+  19              		.global	MidiBytestoByte
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	MidiBytestoByte:
+  27              	.LVL0:
+  28              	.LFB126:
+  29              		.file 1 "Src/sysexprocessor.c"
+   1:Src/sysexprocessor.c **** #include "sysexprocessor.h"
+   2:Src/sysexprocessor.c **** #include "dac.h"
+   3:Src/sysexprocessor.c **** #include "main.h"
+   4:Src/sysexprocessor.c **** #include <string.h>
+   5:Src/sysexprocessor.c **** #include "configuration.h"
+   6:Src/sysexprocessor.c **** #include "usb_device.h"
+   7:Src/sysexprocessor.c **** #include "usbd_midi.h"
+   8:Src/sysexprocessor.c **** #include "usbd_midi_if.h"
+   9:Src/sysexprocessor.c **** #include "led.h"
+  10:Src/sysexprocessor.c **** 
+  11:Src/sysexprocessor.c **** #define kFIRMWARE_VERSION 0x02
+  12:Src/sysexprocessor.c **** 
+  13:Src/sysexprocessor.c **** // Private Variables
+  14:Src/sysexprocessor.c **** //Sysex
+  15:Src/sysexprocessor.c **** enum SysexEnum{Off, Initialization, MessageType, Configure, Calibrate, Update, EndUpdate, Finished,
+  16:Src/sysexprocessor.c **** uint8_t sysexstatus = Off;
+  17:Src/sysexprocessor.c **** 
+  18:Src/sysexprocessor.c **** const uint8_t sysexverify[5] = {0x00,0x46,0x47,0x57,0x00};
+  19:Src/sysexprocessor.c **** uint8_t sysexverifyindex;
+  20:Src/sysexprocessor.c **** 
+  21:Src/sysexprocessor.c **** 
+  22:Src/sysexprocessor.c **** 
+  23:Src/sysexprocessor.c **** // Helper Functions
+  24:Src/sysexprocessor.c **** uint8_t MidiBytestoByte(uint8_t *bufferarray, int *bufferindex) {
+  30              		.loc 1 24 65 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 2
+
+
+  25:Src/sysexprocessor.c ****   uint8_t temp = bufferarray[*bufferindex] + (bufferarray[*bufferindex + 1] << 7 & 0x80);
+  35              		.loc 1 25 3 view .LVU1
+  36              		.loc 1 25 30 is_stmt 0 view .LVU2
+  37 0000 0B68     		ldr	r3, [r1]
+  38              		.loc 1 25 29 view .LVU3
+  39 0002 C25C     		ldrb	r2, [r0, r3]	@ zero_extendqisi2
+  40              		.loc 1 25 58 view .LVU4
+  41 0004 1844     		add	r0, r0, r3
+  42              	.LVL1:
+  43              		.loc 1 25 58 view .LVU5
+  44 0006 4078     		ldrb	r0, [r0, #1]	@ zero_extendqisi2
+  45              		.loc 1 25 77 view .LVU6
+  46 0008 C001     		lsls	r0, r0, #7
+  47              		.loc 1 25 44 view .LVU7
+  48 000a C0B2     		uxtb	r0, r0
+  49              		.loc 1 25 11 view .LVU8
+  50 000c 1044     		add	r0, r0, r2
+  51              	.LVL2:
+  26:Src/sysexprocessor.c ****   *bufferindex += 2;
+  52              		.loc 1 26 3 is_stmt 1 view .LVU9
+  53              		.loc 1 26 16 is_stmt 0 view .LVU10
+  54 000e 0233     		adds	r3, r3, #2
+  55 0010 0B60     		str	r3, [r1]
+  27:Src/sysexprocessor.c ****   return temp;
+  56              		.loc 1 27 3 is_stmt 1 view .LVU11
+  28:Src/sysexprocessor.c **** }
+  57              		.loc 1 28 1 is_stmt 0 view .LVU12
+  58 0012 C0B2     		uxtb	r0, r0
+  59              		.loc 1 28 1 view .LVU13
+  60 0014 7047     		bx	lr
+  61              		.cfi_endproc
+  62              	.LFE126:
+  64              		.section	.text.MidiBytestoHalfWord,"ax",%progbits
+  65              		.align	1
+  66              		.global	MidiBytestoHalfWord
+  67              		.syntax unified
+  68              		.thumb
+  69              		.thumb_func
+  70              		.fpu fpv4-sp-d16
+  72              	MidiBytestoHalfWord:
+  73              	.LVL3:
+  74              	.LFB127:
+  29:Src/sysexprocessor.c **** uint16_t MidiBytestoHalfWord(uint8_t *bufferarray, int *bufferindex) { 
+  75              		.loc 1 29 70 is_stmt 1 view -0
+  76              		.cfi_startproc
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+  79              		@ link register save eliminated.
+  30:Src/sysexprocessor.c ****   uint16_t temp = bufferarray[*bufferindex] + (bufferarray[*bufferindex + 1] << 7 & 0x3F80)  + (buf
+  80              		.loc 1 30 3 view .LVU15
+  81              		.loc 1 30 31 is_stmt 0 view .LVU16
+  82 0000 0A68     		ldr	r2, [r1]
+  83              		.loc 1 30 30 view .LVU17
+  84 0002 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+  85              		.loc 1 30 59 view .LVU18
+  86 0004 1044     		add	r0, r0, r2
+  87              	.LVL4:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 3
+
+
+  88              		.loc 1 30 59 view .LVU19
+  89 0006 90F801C0 		ldrb	ip, [r0, #1]	@ zero_extendqisi2
+  90              		.loc 1 30 78 view .LVU20
+  91 000a 4FEACC1C 		lsl	ip, ip, #7
+  92              		.loc 1 30 83 view .LVU21
+  93 000e 0CF47E5C 		and	ip, ip, #16256
+  94              		.loc 1 30 45 view .LVU22
+  95 0012 6344     		add	r3, r3, ip
+  96              		.loc 1 30 108 view .LVU23
+  97 0014 8078     		ldrb	r0, [r0, #2]	@ zero_extendqisi2
+  98              		.loc 1 30 127 view .LVU24
+  99 0016 8003     		lsls	r0, r0, #14
+ 100              		.loc 1 30 94 view .LVU25
+ 101 0018 80B2     		uxth	r0, r0
+ 102              		.loc 1 30 12 view .LVU26
+ 103 001a 1844     		add	r0, r0, r3
+ 104              	.LVL5:
+  31:Src/sysexprocessor.c ****   *bufferindex += 3;
+ 105              		.loc 1 31 3 is_stmt 1 view .LVU27
+ 106              		.loc 1 31 16 is_stmt 0 view .LVU28
+ 107 001c 0332     		adds	r2, r2, #3
+ 108 001e 0A60     		str	r2, [r1]
+  32:Src/sysexprocessor.c ****   return temp;
+ 109              		.loc 1 32 3 is_stmt 1 view .LVU29
+  33:Src/sysexprocessor.c **** }
+ 110              		.loc 1 33 1 is_stmt 0 view .LVU30
+ 111 0020 80B2     		uxth	r0, r0
+ 112              		.loc 1 33 1 view .LVU31
+ 113 0022 7047     		bx	lr
+ 114              		.cfi_endproc
+ 115              	.LFE127:
+ 117              		.section	.text.MidiBytestoWord,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	MidiBytestoWord
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 123              		.fpu fpv4-sp-d16
+ 125              	MidiBytestoWord:
+ 126              	.LVL6:
+ 127              	.LFB128:
+  34:Src/sysexprocessor.c **** uint32_t MidiBytestoWord(uint8_t *bufferarray, int *bufferindex) {
+ 128              		.loc 1 34 66 is_stmt 1 view -0
+ 129              		.cfi_startproc
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132              		@ link register save eliminated.
+ 133              		.loc 1 34 66 is_stmt 0 view .LVU33
+ 134 0000 10B4     		push	{r4}
+ 135              	.LCFI0:
+ 136              		.cfi_def_cfa_offset 4
+ 137              		.cfi_offset 4, -4
+  35:Src/sysexprocessor.c ****   uint32_t temp = bufferarray[*bufferindex] + (bufferarray[*bufferindex + 1] << 7 & 0x00003F80)  + 
+ 138              		.loc 1 35 3 is_stmt 1 view .LVU34
+ 139              		.loc 1 35 31 is_stmt 0 view .LVU35
+ 140 0002 0C68     		ldr	r4, [r1]
+ 141              		.loc 1 35 30 view .LVU36
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 4
+
+
+ 142 0004 025D     		ldrb	r2, [r0, r4]	@ zero_extendqisi2
+ 143              		.loc 1 35 59 view .LVU37
+ 144 0006 0319     		adds	r3, r0, r4
+ 145 0008 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 146              	.LVL7:
+ 147              		.loc 1 35 78 view .LVU38
+ 148 000a C001     		lsls	r0, r0, #7
+ 149              		.loc 1 35 83 view .LVU39
+ 150 000c 00F47E50 		and	r0, r0, #16256
+ 151              		.loc 1 35 45 view .LVU40
+ 152 0010 0244     		add	r2, r2, r0
+ 153              		.loc 1 35 112 view .LVU41
+ 154 0012 9878     		ldrb	r0, [r3, #2]	@ zero_extendqisi2
+ 155              		.loc 1 35 131 view .LVU42
+ 156 0014 8003     		lsls	r0, r0, #14
+ 157              		.loc 1 35 137 view .LVU43
+ 158 0016 00F4FE10 		and	r0, r0, #2080768
+ 159              		.loc 1 35 98 view .LVU44
+ 160 001a 0244     		add	r2, r2, r0
+  36:Src/sysexprocessor.c ****                   + (bufferarray[*bufferindex + 3] << 21 & 0x0FE00000)  + (bufferarray[*bufferindex
+ 161              		.loc 1 36 33 view .LVU45
+ 162 001c D878     		ldrb	r0, [r3, #3]	@ zero_extendqisi2
+ 163              		.loc 1 36 52 view .LVU46
+ 164 001e 4005     		lsls	r0, r0, #21
+ 165              		.loc 1 36 58 view .LVU47
+ 166 0020 00F07E60 		and	r0, r0, #266338304
+ 167              		.loc 1 36 19 view .LVU48
+ 168 0024 0244     		add	r2, r2, r0
+ 169              		.loc 1 36 87 view .LVU49
+ 170 0026 1879     		ldrb	r0, [r3, #4]	@ zero_extendqisi2
+ 171              	.LVL8:
+  37:Src/sysexprocessor.c ****   *bufferindex += 5;
+ 172              		.loc 1 37 3 is_stmt 1 view .LVU50
+ 173              		.loc 1 37 16 is_stmt 0 view .LVU51
+ 174 0028 0534     		adds	r4, r4, #5
+ 175 002a 0C60     		str	r4, [r1]
+  38:Src/sysexprocessor.c ****   return temp;
+ 176              		.loc 1 38 3 is_stmt 1 view .LVU52
+  39:Src/sysexprocessor.c **** }
+ 177              		.loc 1 39 1 is_stmt 0 view .LVU53
+ 178 002c 02EB0070 		add	r0, r2, r0, lsl #28
+ 179              	.LVL9:
+ 180              		.loc 1 39 1 view .LVU54
+ 181 0030 5DF8044B 		ldr	r4, [sp], #4
+ 182              	.LCFI1:
+ 183              		.cfi_restore 4
+ 184              		.cfi_def_cfa_offset 0
+ 185 0034 7047     		bx	lr
+ 186              		.cfi_endproc
+ 187              	.LFE128:
+ 189              		.section	.text.MidiBytestoFloat,"ax",%progbits
+ 190              		.align	1
+ 191              		.global	MidiBytestoFloat
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 195              		.fpu fpv4-sp-d16
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 5
+
+
+ 197              	MidiBytestoFloat:
+ 198              	.LVL10:
+ 199              	.LFB129:
+  40:Src/sysexprocessor.c **** float MidiBytestoFloat(uint8_t *bufferarray, int *bufferindex) {
+ 200              		.loc 1 40 64 is_stmt 1 view -0
+ 201              		.cfi_startproc
+ 202              		@ args = 0, pretend = 0, frame = 8
+ 203              		@ frame_needed = 0, uses_anonymous_args = 0
+ 204              		@ link register save eliminated.
+ 205              		.loc 1 40 64 is_stmt 0 view .LVU56
+ 206 0000 82B0     		sub	sp, sp, #8
+ 207              	.LCFI2:
+ 208              		.cfi_def_cfa_offset 8
+  41:Src/sysexprocessor.c ****   uint32_t temp = bufferarray[*bufferindex] + (bufferarray[*bufferindex + 1] << 7 & 0x00003F80)  + 
+ 209              		.loc 1 41 3 is_stmt 1 view .LVU57
+ 210              		.loc 1 41 31 is_stmt 0 view .LVU58
+ 211 0002 0A68     		ldr	r2, [r1]
+ 212              		.loc 1 41 30 view .LVU59
+ 213 0004 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+ 214              		.loc 1 41 59 view .LVU60
+ 215 0006 1044     		add	r0, r0, r2
+ 216              	.LVL11:
+ 217              		.loc 1 41 59 view .LVU61
+ 218 0008 90F801C0 		ldrb	ip, [r0, #1]	@ zero_extendqisi2
+ 219              		.loc 1 41 78 view .LVU62
+ 220 000c 4FEACC1C 		lsl	ip, ip, #7
+ 221              		.loc 1 41 83 view .LVU63
+ 222 0010 0CF47E5C 		and	ip, ip, #16256
+ 223              		.loc 1 41 45 view .LVU64
+ 224 0014 6344     		add	r3, r3, ip
+ 225              		.loc 1 41 112 view .LVU65
+ 226 0016 90F802C0 		ldrb	ip, [r0, #2]	@ zero_extendqisi2
+ 227              		.loc 1 41 131 view .LVU66
+ 228 001a 4FEA8C3C 		lsl	ip, ip, #14
+ 229              		.loc 1 41 137 view .LVU67
+ 230 001e 0CF4FE1C 		and	ip, ip, #2080768
+ 231              		.loc 1 41 98 view .LVU68
+ 232 0022 6344     		add	r3, r3, ip
+  42:Src/sysexprocessor.c ****                   + (bufferarray[*bufferindex + 3] << 21 & 0x0FE00000)  + (bufferarray[*bufferindex
+ 233              		.loc 1 42 33 view .LVU69
+ 234 0024 90F803C0 		ldrb	ip, [r0, #3]	@ zero_extendqisi2
+ 235              		.loc 1 42 52 view .LVU70
+ 236 0028 4FEA4C5C 		lsl	ip, ip, #21
+ 237              		.loc 1 42 58 view .LVU71
+ 238 002c 0CF07E6C 		and	ip, ip, #266338304
+ 239              		.loc 1 42 19 view .LVU72
+ 240 0030 6344     		add	r3, r3, ip
+ 241              		.loc 1 42 87 view .LVU73
+ 242 0032 0079     		ldrb	r0, [r0, #4]	@ zero_extendqisi2
+ 243              		.loc 1 42 73 view .LVU74
+ 244 0034 03EB0073 		add	r3, r3, r0, lsl #28
+ 245              	.LVL12:
+  43:Src/sysexprocessor.c ****   *bufferindex += 5;
+ 246              		.loc 1 43 3 is_stmt 1 view .LVU75
+ 247              		.loc 1 43 16 is_stmt 0 view .LVU76
+ 248 0038 0532     		adds	r2, r2, #5
+ 249 003a 0A60     		str	r2, [r1]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 6
+
+
+  44:Src/sysexprocessor.c ****   float tempf;
+ 250              		.loc 1 44 3 is_stmt 1 view .LVU77
+  45:Src/sysexprocessor.c ****   memcpy(&tempf, &temp, sizeof(uint32_t));
+ 251              		.loc 1 45 3 view .LVU78
+ 252 003c 0193     		str	r3, [sp, #4]
+  46:Src/sysexprocessor.c ****   return tempf;
+ 253              		.loc 1 46 3 view .LVU79
+ 254              		.loc 1 46 10 is_stmt 0 view .LVU80
+ 255 003e 00EE103A 		vmov	s0, r3
+  47:Src/sysexprocessor.c **** }
+ 256              		.loc 1 47 1 view .LVU81
+ 257 0042 02B0     		add	sp, sp, #8
+ 258              	.LCFI3:
+ 259              		.cfi_def_cfa_offset 0
+ 260              		@ sp needed
+ 261 0044 7047     		bx	lr
+ 262              		.cfi_endproc
+ 263              	.LFE129:
+ 265              		.section	.text.BytetoMidiBytes,"ax",%progbits
+ 266              		.align	1
+ 267              		.global	BytetoMidiBytes
+ 268              		.syntax unified
+ 269              		.thumb
+ 270              		.thumb_func
+ 271              		.fpu fpv4-sp-d16
+ 273              	BytetoMidiBytes:
+ 274              	.LVL13:
+ 275              	.LFB130:
+  48:Src/sysexprocessor.c **** 
+  49:Src/sysexprocessor.c **** void BytetoMidiBytes(uint8_t input, uint8_t *bufferarray, int *bufferindex) {
+ 276              		.loc 1 49 77 is_stmt 1 view -0
+ 277              		.cfi_startproc
+ 278              		@ args = 0, pretend = 0, frame = 0
+ 279              		@ frame_needed = 0, uses_anonymous_args = 0
+ 280              		@ link register save eliminated.
+  50:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = input & 0x7F;
+ 281              		.loc 1 50 3 view .LVU83
+ 282              		.loc 1 50 15 is_stmt 0 view .LVU84
+ 283 0000 1368     		ldr	r3, [r2]
+ 284              		.loc 1 50 37 view .LVU85
+ 285 0002 00F07F0C 		and	ip, r0, #127
+ 286              		.loc 1 50 29 view .LVU86
+ 287 0006 01F803C0 		strb	ip, [r1, r3]
+  51:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 288              		.loc 1 51 3 is_stmt 1 view .LVU87
+ 289              		.loc 1 51 16 is_stmt 0 view .LVU88
+ 290 000a 1368     		ldr	r3, [r2]
+ 291 000c 0133     		adds	r3, r3, #1
+ 292 000e 1360     		str	r3, [r2]
+  52:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = (input >> 7) & 0x01;
+ 293              		.loc 1 52 3 is_stmt 1 view .LVU89
+ 294              		.loc 1 52 29 is_stmt 0 view .LVU90
+ 295 0010 C009     		lsrs	r0, r0, #7
+ 296              	.LVL14:
+ 297              		.loc 1 52 29 view .LVU91
+ 298 0012 C854     		strb	r0, [r1, r3]
+  53:Src/sysexprocessor.c ****   *bufferindex += 1;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 7
+
+
+ 299              		.loc 1 53 3 is_stmt 1 view .LVU92
+ 300              		.loc 1 53 16 is_stmt 0 view .LVU93
+ 301 0014 1368     		ldr	r3, [r2]
+ 302 0016 0133     		adds	r3, r3, #1
+ 303 0018 1360     		str	r3, [r2]
+  54:Src/sysexprocessor.c **** }
+ 304              		.loc 1 54 1 view .LVU94
+ 305 001a 7047     		bx	lr
+ 306              		.cfi_endproc
+ 307              	.LFE130:
+ 309              		.section	.text.HalfWordtoMidiBytes,"ax",%progbits
+ 310              		.align	1
+ 311              		.global	HalfWordtoMidiBytes
+ 312              		.syntax unified
+ 313              		.thumb
+ 314              		.thumb_func
+ 315              		.fpu fpv4-sp-d16
+ 317              	HalfWordtoMidiBytes:
+ 318              	.LVL15:
+ 319              	.LFB131:
+  55:Src/sysexprocessor.c **** void HalfWordtoMidiBytes(uint16_t input, uint8_t *bufferarray, int *bufferindex) {
+ 320              		.loc 1 55 82 is_stmt 1 view -0
+ 321              		.cfi_startproc
+ 322              		@ args = 0, pretend = 0, frame = 0
+ 323              		@ frame_needed = 0, uses_anonymous_args = 0
+ 324              		@ link register save eliminated.
+  56:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = input & 0x7F;
+ 325              		.loc 1 56 3 view .LVU96
+ 326              		.loc 1 56 15 is_stmt 0 view .LVU97
+ 327 0000 1368     		ldr	r3, [r2]
+ 328              		.loc 1 56 37 view .LVU98
+ 329 0002 00F07F0C 		and	ip, r0, #127
+ 330              		.loc 1 56 29 view .LVU99
+ 331 0006 01F803C0 		strb	ip, [r1, r3]
+  57:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 332              		.loc 1 57 3 is_stmt 1 view .LVU100
+ 333              		.loc 1 57 16 is_stmt 0 view .LVU101
+ 334 000a 1368     		ldr	r3, [r2]
+ 335 000c 0133     		adds	r3, r3, #1
+ 336 000e 1360     		str	r3, [r2]
+  58:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = (input >> 7) & 0x7F;
+ 337              		.loc 1 58 3 is_stmt 1 view .LVU102
+ 338              		.loc 1 58 44 is_stmt 0 view .LVU103
+ 339 0010 C0F3C61C 		ubfx	ip, r0, #7, #7
+ 340              		.loc 1 58 29 view .LVU104
+ 341 0014 01F803C0 		strb	ip, [r1, r3]
+  59:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 342              		.loc 1 59 3 is_stmt 1 view .LVU105
+ 343              		.loc 1 59 16 is_stmt 0 view .LVU106
+ 344 0018 1368     		ldr	r3, [r2]
+ 345 001a 0133     		adds	r3, r3, #1
+ 346 001c 1360     		str	r3, [r2]
+  60:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = (input >> 14) & 0x03;
+ 347              		.loc 1 60 3 is_stmt 1 view .LVU107
+ 348              		.loc 1 60 45 is_stmt 0 view .LVU108
+ 349 001e 800B     		lsrs	r0, r0, #14
+ 350              	.LVL16:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 8
+
+
+ 351              		.loc 1 60 29 view .LVU109
+ 352 0020 C854     		strb	r0, [r1, r3]
+  61:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 353              		.loc 1 61 3 is_stmt 1 view .LVU110
+ 354              		.loc 1 61 16 is_stmt 0 view .LVU111
+ 355 0022 1368     		ldr	r3, [r2]
+ 356 0024 0133     		adds	r3, r3, #1
+ 357 0026 1360     		str	r3, [r2]
+  62:Src/sysexprocessor.c **** }
+ 358              		.loc 1 62 1 view .LVU112
+ 359 0028 7047     		bx	lr
+ 360              		.cfi_endproc
+ 361              	.LFE131:
+ 363              		.section	.text.WordtoMidiBytes,"ax",%progbits
+ 364              		.align	1
+ 365              		.global	WordtoMidiBytes
+ 366              		.syntax unified
+ 367              		.thumb
+ 368              		.thumb_func
+ 369              		.fpu fpv4-sp-d16
+ 371              	WordtoMidiBytes:
+ 372              	.LVL17:
+ 373              	.LFB132:
+  63:Src/sysexprocessor.c **** void WordtoMidiBytes(uint32_t input, uint8_t *bufferarray, int *bufferindex) {
+ 374              		.loc 1 63 78 is_stmt 1 view -0
+ 375              		.cfi_startproc
+ 376              		@ args = 0, pretend = 0, frame = 0
+ 377              		@ frame_needed = 0, uses_anonymous_args = 0
+ 378              		@ link register save eliminated.
+ 379              		.loc 1 63 78 is_stmt 0 view .LVU114
+ 380 0000 10B4     		push	{r4}
+ 381              	.LCFI4:
+ 382              		.cfi_def_cfa_offset 4
+ 383              		.cfi_offset 4, -4
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 384              		.loc 1 64 3 is_stmt 1 view .LVU115
+ 385              	.LBB2:
+ 386              		.loc 1 64 8 view .LVU116
+ 387              	.LVL18:
+ 388              		.loc 1 64 16 is_stmt 0 view .LVU117
+ 389 0002 0023     		movs	r3, #0
+ 390              		.loc 1 64 3 view .LVU118
+ 391 0004 0DE0     		b	.L10
+ 392              	.LVL19:
+ 393              	.L11:
+  65:Src/sysexprocessor.c ****     bufferarray[*bufferindex] = (input >> i*7) & 0x7F;
+ 394              		.loc 1 65 5 is_stmt 1 discriminator 3 view .LVU119
+ 395              		.loc 1 65 44 is_stmt 0 discriminator 3 view .LVU120
+ 396 0006 C3EBC30C 		rsb	ip, r3, r3, lsl #3
+ 397              		.loc 1 65 40 discriminator 3 view .LVU121
+ 398 000a 20FA0CFC 		lsr	ip, r0, ip
+ 399              		.loc 1 65 17 discriminator 3 view .LVU122
+ 400 000e 1468     		ldr	r4, [r2]
+ 401              		.loc 1 65 48 discriminator 3 view .LVU123
+ 402 0010 0CF07F0C 		and	ip, ip, #127
+ 403              		.loc 1 65 31 discriminator 3 view .LVU124
+ 404 0014 01F804C0 		strb	ip, [r1, r4]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 9
+
+
+  66:Src/sysexprocessor.c ****     *bufferindex += 1;
+ 405              		.loc 1 66 5 is_stmt 1 discriminator 3 view .LVU125
+ 406              		.loc 1 66 18 is_stmt 0 discriminator 3 view .LVU126
+ 407 0018 1468     		ldr	r4, [r2]
+ 408 001a 0134     		adds	r4, r4, #1
+ 409 001c 1460     		str	r4, [r2]
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 410              		.loc 1 64 30 is_stmt 1 discriminator 3 view .LVU127
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 411              		.loc 1 64 31 is_stmt 0 discriminator 3 view .LVU128
+ 412 001e 0133     		adds	r3, r3, #1
+ 413              	.LVL20:
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 414              		.loc 1 64 31 discriminator 3 view .LVU129
+ 415 0020 DBB2     		uxtb	r3, r3
+ 416              	.LVL21:
+ 417              	.L10:
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 418              		.loc 1 64 23 is_stmt 1 discriminator 1 view .LVU130
+  64:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 419              		.loc 1 64 3 is_stmt 0 discriminator 1 view .LVU131
+ 420 0022 032B     		cmp	r3, #3
+ 421 0024 EFD9     		bls	.L11
+ 422              	.LBE2:
+  67:Src/sysexprocessor.c ****   }
+  68:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = (input >> 28) & 0x0F;
+ 423              		.loc 1 68 3 is_stmt 1 view .LVU132
+ 424              		.loc 1 68 38 is_stmt 0 view .LVU133
+ 425 0026 000F     		lsrs	r0, r0, #28
+ 426              	.LVL22:
+ 427              		.loc 1 68 15 view .LVU134
+ 428 0028 1368     		ldr	r3, [r2]
+ 429              	.LVL23:
+ 430              		.loc 1 68 29 view .LVU135
+ 431 002a C854     		strb	r0, [r1, r3]
+  69:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 432              		.loc 1 69 3 is_stmt 1 view .LVU136
+ 433              		.loc 1 69 16 is_stmt 0 view .LVU137
+ 434 002c 1368     		ldr	r3, [r2]
+ 435 002e 0133     		adds	r3, r3, #1
+ 436 0030 1360     		str	r3, [r2]
+  70:Src/sysexprocessor.c **** }
+ 437              		.loc 1 70 1 view .LVU138
+ 438 0032 5DF8044B 		ldr	r4, [sp], #4
+ 439              	.LCFI5:
+ 440              		.cfi_restore 4
+ 441              		.cfi_def_cfa_offset 0
+ 442 0036 7047     		bx	lr
+ 443              		.cfi_endproc
+ 444              	.LFE132:
+ 446              		.section	.text.FloatToMidiBytes,"ax",%progbits
+ 447              		.align	1
+ 448              		.global	FloatToMidiBytes
+ 449              		.syntax unified
+ 450              		.thumb
+ 451              		.thumb_func
+ 452              		.fpu fpv4-sp-d16
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 10
+
+
+ 454              	FloatToMidiBytes:
+ 455              	.LVL24:
+ 456              	.LFB133:
+  71:Src/sysexprocessor.c **** void FloatToMidiBytes(float input, uint8_t *bufferarray, int *bufferindex) {
+ 457              		.loc 1 71 76 is_stmt 1 view -0
+ 458              		.cfi_startproc
+ 459              		@ args = 0, pretend = 0, frame = 8
+ 460              		@ frame_needed = 0, uses_anonymous_args = 0
+ 461              		@ link register save eliminated.
+ 462              		.loc 1 71 76 is_stmt 0 view .LVU140
+ 463 0000 10B4     		push	{r4}
+ 464              	.LCFI6:
+ 465              		.cfi_def_cfa_offset 4
+ 466              		.cfi_offset 4, -4
+ 467 0002 83B0     		sub	sp, sp, #12
+ 468              	.LCFI7:
+ 469              		.cfi_def_cfa_offset 16
+ 470 0004 8DED010A 		vstr.32	s0, [sp, #4]
+  72:Src/sysexprocessor.c ****   uint32_t tempuint;
+ 471              		.loc 1 72 3 is_stmt 1 view .LVU141
+  73:Src/sysexprocessor.c ****   memcpy(&tempuint, &input, sizeof(uint32_t));
+ 472              		.loc 1 73 3 view .LVU142
+ 473 0008 DDF804C0 		ldr	ip, [sp, #4]
+ 474              	.LVL25:
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 475              		.loc 1 74 3 view .LVU143
+ 476              	.LBB3:
+ 477              		.loc 1 74 8 view .LVU144
+ 478              		.loc 1 74 16 is_stmt 0 view .LVU145
+ 479 000c 0023     		movs	r3, #0
+ 480              		.loc 1 74 3 view .LVU146
+ 481 000e 0CE0     		b	.L14
+ 482              	.LVL26:
+ 483              	.L15:
+  75:Src/sysexprocessor.c ****     bufferarray[*bufferindex] = (tempuint >> i*7) & 0x7F;
+ 484              		.loc 1 75 5 is_stmt 1 discriminator 3 view .LVU147
+ 485              		.loc 1 75 47 is_stmt 0 discriminator 3 view .LVU148
+ 486 0010 C3EBC302 		rsb	r2, r3, r3, lsl #3
+ 487              		.loc 1 75 43 discriminator 3 view .LVU149
+ 488 0014 2CFA02F2 		lsr	r2, ip, r2
+ 489              		.loc 1 75 51 discriminator 3 view .LVU150
+ 490 0018 02F07F02 		and	r2, r2, #127
+ 491              		.loc 1 75 31 discriminator 3 view .LVU151
+ 492 001c 0C68     		ldr	r4, [r1]
+ 493 001e 0255     		strb	r2, [r0, r4]
+  76:Src/sysexprocessor.c ****     *bufferindex += 1;
+ 494              		.loc 1 76 5 is_stmt 1 discriminator 3 view .LVU152
+ 495              		.loc 1 76 18 is_stmt 0 discriminator 3 view .LVU153
+ 496 0020 0A68     		ldr	r2, [r1]
+ 497 0022 0132     		adds	r2, r2, #1
+ 498 0024 0A60     		str	r2, [r1]
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 499              		.loc 1 74 30 is_stmt 1 discriminator 3 view .LVU154
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 500              		.loc 1 74 31 is_stmt 0 discriminator 3 view .LVU155
+ 501 0026 0133     		adds	r3, r3, #1
+ 502              	.LVL27:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 11
+
+
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 503              		.loc 1 74 31 discriminator 3 view .LVU156
+ 504 0028 DBB2     		uxtb	r3, r3
+ 505              	.LVL28:
+ 506              	.L14:
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 507              		.loc 1 74 23 is_stmt 1 discriminator 1 view .LVU157
+  74:Src/sysexprocessor.c ****   for (uint8_t i = 0; i < 4; i++) {
+ 508              		.loc 1 74 3 is_stmt 0 discriminator 1 view .LVU158
+ 509 002a 032B     		cmp	r3, #3
+ 510 002c F0D9     		bls	.L15
+ 511              	.LBE3:
+  77:Src/sysexprocessor.c ****   }
+  78:Src/sysexprocessor.c ****   bufferarray[*bufferindex] = (tempuint >> 28) & 0x0F;
+ 512              		.loc 1 78 3 is_stmt 1 view .LVU159
+ 513              		.loc 1 78 41 is_stmt 0 view .LVU160
+ 514 002e 4FEA1C7C 		lsr	ip, ip, #28
+ 515              		.loc 1 78 15 view .LVU161
+ 516 0032 0B68     		ldr	r3, [r1]
+ 517              	.LVL29:
+ 518              		.loc 1 78 29 view .LVU162
+ 519 0034 00F803C0 		strb	ip, [r0, r3]
+  79:Src/sysexprocessor.c ****   *bufferindex += 1;
+ 520              		.loc 1 79 3 is_stmt 1 view .LVU163
+ 521              		.loc 1 79 16 is_stmt 0 view .LVU164
+ 522 0038 0B68     		ldr	r3, [r1]
+ 523 003a 0133     		adds	r3, r3, #1
+ 524 003c 0B60     		str	r3, [r1]
+  80:Src/sysexprocessor.c **** }
+ 525              		.loc 1 80 1 view .LVU165
+ 526 003e 03B0     		add	sp, sp, #12
+ 527              	.LCFI8:
+ 528              		.cfi_def_cfa_offset 4
+ 529              		@ sp needed
+ 530 0040 5DF8044B 		ldr	r4, [sp], #4
+ 531              	.LCFI9:
+ 532              		.cfi_restore 4
+ 533              		.cfi_def_cfa_offset 0
+ 534 0044 7047     		bx	lr
+ 535              		.cfi_endproc
+ 536              	.LFE133:
+ 538              		.section	.text.Sysex_FlashUpdate,"ax",%progbits
+ 539              		.align	1
+ 540              		.global	Sysex_FlashUpdate
+ 541              		.syntax unified
+ 542              		.thumb
+ 543              		.thumb_func
+ 544              		.fpu fpv4-sp-d16
+ 546              	Sysex_FlashUpdate:
+ 547              	.LVL30:
+ 548              	.LFB134:
+  81:Src/sysexprocessor.c **** 
+  82:Src/sysexprocessor.c **** 
+  83:Src/sysexprocessor.c **** 
+  84:Src/sysexprocessor.c **** uint8_t sysexflashbuf[5];
+  85:Src/sysexprocessor.c **** int sysexflashbufindex = 0;
+  86:Src/sysexprocessor.c **** void Sysex_FlashUpdate(uint8_t input) {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 12
+
+
+ 549              		.loc 1 86 39 is_stmt 1 view -0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 0
+ 552              		@ frame_needed = 0, uses_anonymous_args = 0
+ 553              		.loc 1 86 39 is_stmt 0 view .LVU167
+ 554 0000 38B5     		push	{r3, r4, r5, lr}
+ 555              	.LCFI10:
+ 556              		.cfi_def_cfa_offset 16
+ 557              		.cfi_offset 3, -16
+ 558              		.cfi_offset 4, -12
+ 559              		.cfi_offset 5, -8
+ 560              		.cfi_offset 14, -4
+  87:Src/sysexprocessor.c ****   sysexflashbuf[sysexflashbufindex] = input;
+ 561              		.loc 1 87 3 is_stmt 1 view .LVU168
+ 562              		.loc 1 87 16 is_stmt 0 view .LVU169
+ 563 0002 0A4A     		ldr	r2, .L21
+ 564 0004 1368     		ldr	r3, [r2]
+ 565              		.loc 1 87 37 view .LVU170
+ 566 0006 0A49     		ldr	r1, .L21+4
+ 567 0008 C854     		strb	r0, [r1, r3]
+  88:Src/sysexprocessor.c ****   sysexflashbufindex++;
+ 568              		.loc 1 88 3 is_stmt 1 view .LVU171
+ 569              		.loc 1 88 21 is_stmt 0 view .LVU172
+ 570 000a 0133     		adds	r3, r3, #1
+ 571 000c 1360     		str	r3, [r2]
+  89:Src/sysexprocessor.c ****   if(sysexflashbufindex >= 5) {
+ 572              		.loc 1 89 3 is_stmt 1 view .LVU173
+ 573              		.loc 1 89 5 is_stmt 0 view .LVU174
+ 574 000e 042B     		cmp	r3, #4
+ 575 0010 00DC     		bgt	.L20
+ 576              	.LVL31:
+ 577              	.L17:
+  90:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+  91:Src/sysexprocessor.c ****     uint32_t data = MidiBytestoWord(sysexflashbuf,&sysexflashbufindex);
+  92:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+  93:Src/sysexprocessor.c ****     Config_FlashWriteAppWord(data);
+  94:Src/sysexprocessor.c ****   }
+  95:Src/sysexprocessor.c **** }
+ 578              		.loc 1 95 1 view .LVU175
+ 579 0012 38BD     		pop	{r3, r4, r5, pc}
+ 580              	.LVL32:
+ 581              	.L20:
+ 582              	.LBB4:
+  90:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 583              		.loc 1 90 5 is_stmt 1 view .LVU176
+  90:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 584              		.loc 1 90 24 is_stmt 0 view .LVU177
+ 585 0014 1446     		mov	r4, r2
+ 586 0016 0025     		movs	r5, #0
+ 587 0018 1560     		str	r5, [r2]
+  91:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 588              		.loc 1 91 5 is_stmt 1 view .LVU178
+  91:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 589              		.loc 1 91 21 is_stmt 0 view .LVU179
+ 590 001a 1146     		mov	r1, r2
+ 591 001c 0448     		ldr	r0, .L21+4
+ 592              	.LVL33:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 13
+
+
+  91:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 593              		.loc 1 91 21 view .LVU180
+ 594 001e FFF7FEFF 		bl	MidiBytestoWord
+ 595              	.LVL34:
+  92:Src/sysexprocessor.c ****     Config_FlashWriteAppWord(data);
+ 596              		.loc 1 92 5 is_stmt 1 view .LVU181
+  92:Src/sysexprocessor.c ****     Config_FlashWriteAppWord(data);
+ 597              		.loc 1 92 24 is_stmt 0 view .LVU182
+ 598 0022 2560     		str	r5, [r4]
+  93:Src/sysexprocessor.c ****   }
+ 599              		.loc 1 93 5 is_stmt 1 view .LVU183
+ 600 0024 FFF7FEFF 		bl	Config_FlashWriteAppWord
+ 601              	.LVL35:
+  93:Src/sysexprocessor.c ****   }
+ 602              		.loc 1 93 5 is_stmt 0 view .LVU184
+ 603              	.LBE4:
+ 604              		.loc 1 95 1 view .LVU185
+ 605 0028 F3E7     		b	.L17
+ 606              	.L22:
+ 607 002a 00BF     		.align	2
+ 608              	.L21:
+ 609 002c 00000000 		.word	.LANCHOR0
+ 610 0030 00000000 		.word	.LANCHOR1
+ 611              		.cfi_endproc
+ 612              	.LFE134:
+ 614              		.section	.text.Sysex_ConfigUpdate,"ax",%progbits
+ 615              		.align	1
+ 616              		.global	Sysex_ConfigUpdate
+ 617              		.syntax unified
+ 618              		.thumb
+ 619              		.thumb_func
+ 620              		.fpu fpv4-sp-d16
+ 622              	Sysex_ConfigUpdate:
+ 623              	.LVL36:
+ 624              	.LFB135:
+  96:Src/sysexprocessor.c **** 
+  97:Src/sysexprocessor.c **** uint32_t sysexconfigupdate;
+  98:Src/sysexprocessor.c **** void Sysex_ConfigUpdate(uint8_t input) {
+ 625              		.loc 1 98 40 is_stmt 1 view -0
+ 626              		.cfi_startproc
+ 627              		@ args = 0, pretend = 0, frame = 0
+ 628              		@ frame_needed = 0, uses_anonymous_args = 0
+ 629              		.loc 1 98 40 is_stmt 0 view .LVU187
+ 630 0000 38B5     		push	{r3, r4, r5, lr}
+ 631              	.LCFI11:
+ 632              		.cfi_def_cfa_offset 16
+ 633              		.cfi_offset 3, -16
+ 634              		.cfi_offset 4, -12
+ 635              		.cfi_offset 5, -8
+ 636              		.cfi_offset 14, -4
+  99:Src/sysexprocessor.c ****   sysexflashbuf[sysexflashbufindex] = input;
+ 637              		.loc 1 99 3 is_stmt 1 view .LVU188
+ 638              		.loc 1 99 16 is_stmt 0 view .LVU189
+ 639 0002 224A     		ldr	r2, .L29
+ 640 0004 1368     		ldr	r3, [r2]
+ 641              		.loc 1 99 37 view .LVU190
+ 642 0006 2249     		ldr	r1, .L29+4
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 14
+
+
+ 643 0008 C854     		strb	r0, [r1, r3]
+ 100:Src/sysexprocessor.c ****   sysexflashbufindex++;
+ 644              		.loc 1 100 3 is_stmt 1 view .LVU191
+ 645              		.loc 1 100 21 is_stmt 0 view .LVU192
+ 646 000a 0133     		adds	r3, r3, #1
+ 647 000c 1360     		str	r3, [r2]
+ 101:Src/sysexprocessor.c ****   if(sysexflashbufindex >= 5) {
+ 648              		.loc 1 101 3 is_stmt 1 view .LVU193
+ 649              		.loc 1 101 5 is_stmt 0 view .LVU194
+ 650 000e 042B     		cmp	r3, #4
+ 651 0010 00DC     		bgt	.L28
+ 652              	.LVL37:
+ 653              	.L23:
+ 102:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 103:Src/sysexprocessor.c ****     uint32_t data = MidiBytestoWord(sysexflashbuf,&sysexflashbufindex);
+ 104:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 105:Src/sysexprocessor.c **** 
+ 106:Src/sysexprocessor.c ****     if(sysexconfigupdate%2 == 0) {
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogmode[(sysexconfigupdate/2)%4] = data >> 24;
+ 108:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 109:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 110:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 111:Src/sysexprocessor.c ****     } else {
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalmode[(sysexconfigupdate/2)%4] = data >> 24;
+ 113:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 114:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 115:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 116:Src/sysexprocessor.c ****     }
+ 117:Src/sysexprocessor.c **** 
+ 118:Src/sysexprocessor.c ****     sysexconfigupdate += 1;
+ 119:Src/sysexprocessor.c ****   }
+ 120:Src/sysexprocessor.c **** }
+ 654              		.loc 1 120 1 view .LVU195
+ 655 0012 38BD     		pop	{r3, r4, r5, pc}
+ 656              	.LVL38:
+ 657              	.L28:
+ 658              	.LBB5:
+ 102:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 659              		.loc 1 102 5 is_stmt 1 view .LVU196
+ 102:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 660              		.loc 1 102 24 is_stmt 0 view .LVU197
+ 661 0014 1446     		mov	r4, r2
+ 662 0016 0025     		movs	r5, #0
+ 663 0018 1560     		str	r5, [r2]
+ 103:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 664              		.loc 1 103 5 is_stmt 1 view .LVU198
+ 103:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 665              		.loc 1 103 21 is_stmt 0 view .LVU199
+ 666 001a 1146     		mov	r1, r2
+ 667 001c 1C48     		ldr	r0, .L29+4
+ 668              	.LVL39:
+ 103:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 669              		.loc 1 103 21 view .LVU200
+ 670 001e FFF7FEFF 		bl	MidiBytestoWord
+ 671              	.LVL40:
+ 104:Src/sysexprocessor.c **** 
+ 672              		.loc 1 104 5 is_stmt 1 view .LVU201
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 15
+
+
+ 104:Src/sysexprocessor.c **** 
+ 673              		.loc 1 104 24 is_stmt 0 view .LVU202
+ 674 0022 2560     		str	r5, [r4]
+ 106:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogmode[(sysexconfigupdate/2)%4] = data >> 24;
+ 675              		.loc 1 106 5 is_stmt 1 view .LVU203
+ 106:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogmode[(sysexconfigupdate/2)%4] = data >> 24;
+ 676              		.loc 1 106 25 is_stmt 0 view .LVU204
+ 677 0024 1B4B     		ldr	r3, .L29+8
+ 678 0026 1B68     		ldr	r3, [r3]
+ 106:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogmode[(sysexconfigupdate/2)%4] = data >> 24;
+ 679              		.loc 1 106 7 view .LVU205
+ 680 0028 13F0010F 		tst	r3, #1
+ 681 002c 17D1     		bne	.L25
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 682              		.loc 1 107 7 is_stmt 1 view .LVU206
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 683              		.loc 1 107 78 is_stmt 0 view .LVU207
+ 684 002e 4FEA106C 		lsr	ip, r0, #24
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 685              		.loc 1 107 31 view .LVU208
+ 686 0032 DC08     		lsrs	r4, r3, #3
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 687              		.loc 1 107 67 view .LVU209
+ 688 0034 C3F34102 		ubfx	r2, r3, #1, #2
+ 107:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 689              		.loc 1 107 71 view .LVU210
+ 690 0038 1749     		ldr	r1, .L29+12
+ 691 003a 01EB4415 		add	r5, r1, r4, lsl #5
+ 692 003e 05F802C0 		strb	ip, [r5, r2]
+ 108:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 693              		.loc 1 108 7 is_stmt 1 view .LVU211
+ 108:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 694              		.loc 1 108 93 is_stmt 0 view .LVU212
+ 695 0042 050C     		lsrs	r5, r0, #16
+ 108:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 696              		.loc 1 108 86 view .LVU213
+ 697 0044 02EB4202 		add	r2, r2, r2, lsl #1
+ 698 0048 02EB4412 		add	r2, r2, r4, lsl #5
+ 699 004c 0A44     		add	r2, r2, r1
+ 700 004e 1571     		strb	r5, [r2, #4]
+ 109:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 701              		.loc 1 109 7 is_stmt 1 view .LVU214
+ 109:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 702              		.loc 1 109 87 is_stmt 0 view .LVU215
+ 703 0050 010A     		lsrs	r1, r0, #8
+ 109:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].analogsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 704              		.loc 1 109 80 view .LVU216
+ 705 0052 5171     		strb	r1, [r2, #5]
+ 110:Src/sysexprocessor.c ****     } else {
+ 706              		.loc 1 110 7 is_stmt 1 view .LVU217
+ 110:Src/sysexprocessor.c ****     } else {
+ 707              		.loc 1 110 80 is_stmt 0 view .LVU218
+ 708 0054 9071     		strb	r0, [r2, #6]
+ 709              	.L26:
+ 118:Src/sysexprocessor.c ****   }
+ 710              		.loc 1 118 5 is_stmt 1 view .LVU219
+ 118:Src/sysexprocessor.c ****   }
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 16
+
+
+ 711              		.loc 1 118 23 is_stmt 0 view .LVU220
+ 712 0056 0133     		adds	r3, r3, #1
+ 713 0058 0E4A     		ldr	r2, .L29+8
+ 714 005a 1360     		str	r3, [r2]
+ 715              	.LBE5:
+ 716              		.loc 1 120 1 view .LVU221
+ 717 005c D9E7     		b	.L23
+ 718              	.L25:
+ 719              	.LBB6:
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 720              		.loc 1 112 7 is_stmt 1 view .LVU222
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 721              		.loc 1 112 79 is_stmt 0 view .LVU223
+ 722 005e 4FEA106C 		lsr	ip, r0, #24
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 723              		.loc 1 112 31 view .LVU224
+ 724 0062 DC08     		lsrs	r4, r3, #3
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 725              		.loc 1 112 68 view .LVU225
+ 726 0064 C3F34102 		ubfx	r2, r3, #1, #2
+ 112:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].midichannel = data >> 16;
+ 727              		.loc 1 112 72 view .LVU226
+ 728 0068 0B49     		ldr	r1, .L29+12
+ 729 006a 01EB4415 		add	r5, r1, r4, lsl #5
+ 730 006e 1544     		add	r5, r5, r2
+ 731 0070 85F810C0 		strb	ip, [r5, #16]
+ 113:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 732              		.loc 1 113 7 is_stmt 1 view .LVU227
+ 113:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 733              		.loc 1 113 94 is_stmt 0 view .LVU228
+ 734 0074 050C     		lsrs	r5, r0, #16
+ 113:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte2 = data >> 8;
+ 735              		.loc 1 113 87 view .LVU229
+ 736 0076 02EB4202 		add	r2, r2, r2, lsl #1
+ 737 007a 02EB4412 		add	r2, r2, r4, lsl #5
+ 738 007e 0A44     		add	r2, r2, r1
+ 739 0080 1575     		strb	r5, [r2, #20]
+ 114:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 740              		.loc 1 114 7 is_stmt 1 view .LVU230
+ 114:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 741              		.loc 1 114 88 is_stmt 0 view .LVU231
+ 742 0082 010A     		lsrs	r1, r0, #8
+ 114:Src/sysexprocessor.c ****       config[sysexconfigupdate/8].digitalsetting[(sysexconfigupdate/2)%4].byte3 = data >> 0;
+ 743              		.loc 1 114 81 view .LVU232
+ 744 0084 5175     		strb	r1, [r2, #21]
+ 115:Src/sysexprocessor.c ****     }
+ 745              		.loc 1 115 7 is_stmt 1 view .LVU233
+ 115:Src/sysexprocessor.c ****     }
+ 746              		.loc 1 115 81 is_stmt 0 view .LVU234
+ 747 0086 9075     		strb	r0, [r2, #22]
+ 748 0088 E5E7     		b	.L26
+ 749              	.L30:
+ 750 008a 00BF     		.align	2
+ 751              	.L29:
+ 752 008c 00000000 		.word	.LANCHOR0
+ 753 0090 00000000 		.word	.LANCHOR1
+ 754 0094 00000000 		.word	.LANCHOR2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 17
+
+
+ 755 0098 00000000 		.word	config
+ 756              	.LBE6:
+ 757              		.cfi_endproc
+ 758              	.LFE135:
+ 760              		.section	.text.Sysex_CalibrationUpdate,"ax",%progbits
+ 761              		.align	1
+ 762              		.global	Sysex_CalibrationUpdate
+ 763              		.syntax unified
+ 764              		.thumb
+ 765              		.thumb_func
+ 766              		.fpu fpv4-sp-d16
+ 768              	Sysex_CalibrationUpdate:
+ 769              	.LVL41:
+ 770              	.LFB136:
+ 121:Src/sysexprocessor.c **** 
+ 122:Src/sysexprocessor.c **** void Sysex_CalibrationUpdate(uint8_t input) {
+ 771              		.loc 1 122 45 is_stmt 1 view -0
+ 772              		.cfi_startproc
+ 773              		@ args = 0, pretend = 0, frame = 8
+ 774              		@ frame_needed = 0, uses_anonymous_args = 0
+ 123:Src/sysexprocessor.c ****   sysexflashbuf[sysexflashbufindex] = input;
+ 775              		.loc 1 123 3 view .LVU236
+ 776              		.loc 1 123 16 is_stmt 0 view .LVU237
+ 777 0000 194A     		ldr	r2, .L41
+ 778 0002 1368     		ldr	r3, [r2]
+ 779              		.loc 1 123 37 view .LVU238
+ 780 0004 1949     		ldr	r1, .L41+4
+ 781 0006 C854     		strb	r0, [r1, r3]
+ 124:Src/sysexprocessor.c ****   sysexflashbufindex++;
+ 782              		.loc 1 124 3 is_stmt 1 view .LVU239
+ 783              		.loc 1 124 21 is_stmt 0 view .LVU240
+ 784 0008 0133     		adds	r3, r3, #1
+ 785 000a 1360     		str	r3, [r2]
+ 125:Src/sysexprocessor.c ****   if(sysexflashbufindex >= 5) {
+ 786              		.loc 1 125 3 is_stmt 1 view .LVU241
+ 787              		.loc 1 125 5 is_stmt 0 view .LVU242
+ 788 000c 042B     		cmp	r3, #4
+ 789 000e 00DC     		bgt	.L39
+ 790 0010 7047     		bx	lr
+ 791              	.L39:
+ 122:Src/sysexprocessor.c ****   sysexflashbuf[sysexflashbufindex] = input;
+ 792              		.loc 1 122 45 view .LVU243
+ 793 0012 30B5     		push	{r4, r5, lr}
+ 794              	.LCFI12:
+ 795              		.cfi_def_cfa_offset 12
+ 796              		.cfi_offset 4, -12
+ 797              		.cfi_offset 5, -8
+ 798              		.cfi_offset 14, -4
+ 799 0014 83B0     		sub	sp, sp, #12
+ 800              	.LCFI13:
+ 801              		.cfi_def_cfa_offset 24
+ 802              	.LBB7:
+ 126:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 803              		.loc 1 126 5 is_stmt 1 view .LVU244
+ 804              		.loc 1 126 24 is_stmt 0 view .LVU245
+ 805 0016 1446     		mov	r4, r2
+ 806 0018 0025     		movs	r5, #0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 18
+
+
+ 807 001a 1560     		str	r5, [r2]
+ 127:Src/sysexprocessor.c ****     volatile float data = MidiBytestoFloat(sysexflashbuf,&sysexflashbufindex);
+ 808              		.loc 1 127 5 is_stmt 1 view .LVU246
+ 809              		.loc 1 127 27 is_stmt 0 view .LVU247
+ 810 001c 1146     		mov	r1, r2
+ 811 001e 1348     		ldr	r0, .L41+4
+ 812              	.LVL42:
+ 813              		.loc 1 127 27 view .LVU248
+ 814 0020 FFF7FEFF 		bl	MidiBytestoFloat
+ 815              	.LVL43:
+ 816              		.loc 1 127 20 view .LVU249
+ 817 0024 8DED010A 		vstr.32	s0, [sp, #4]
+ 128:Src/sysexprocessor.c ****     sysexflashbufindex = 0;
+ 818              		.loc 1 128 5 is_stmt 1 view .LVU250
+ 819              		.loc 1 128 24 is_stmt 0 view .LVU251
+ 820 0028 2560     		str	r5, [r4]
+ 129:Src/sysexprocessor.c **** 
+ 130:Src/sysexprocessor.c ****     if(sysexconfigupdate%2 == 0) {
+ 821              		.loc 1 130 5 is_stmt 1 view .LVU252
+ 822              		.loc 1 130 25 is_stmt 0 view .LVU253
+ 823 002a 114B     		ldr	r3, .L41+8
+ 824 002c 1B68     		ldr	r3, [r3]
+ 825              		.loc 1 130 7 view .LVU254
+ 826 002e 13F0010F 		tst	r3, #1
+ 827 0032 0DD1     		bne	.L33
+ 131:Src/sysexprocessor.c ****       dac.voltlow[sysexconfigupdate/2] = data;
+ 828              		.loc 1 131 7 is_stmt 1 view .LVU255
+ 829              		.loc 1 131 36 is_stmt 0 view .LVU256
+ 830 0034 5A08     		lsrs	r2, r3, #1
+ 831              		.loc 1 131 40 view .LVU257
+ 832 0036 0198     		ldr	r0, [sp, #4]	@ float
+ 833 0038 0632     		adds	r2, r2, #6
+ 834 003a 0E49     		ldr	r1, .L41+12
+ 835 003c 01EB8202 		add	r2, r1, r2, lsl #2
+ 836 0040 5060     		str	r0, [r2, #4]	@ float
+ 837              	.L34:
+ 132:Src/sysexprocessor.c ****     } else {
+ 133:Src/sysexprocessor.c ****       dac.volthigh[sysexconfigupdate/2] = data;
+ 134:Src/sysexprocessor.c ****     }
+ 135:Src/sysexprocessor.c **** 
+ 136:Src/sysexprocessor.c ****     sysexconfigupdate += 1;
+ 838              		.loc 1 136 5 is_stmt 1 view .LVU258
+ 839              		.loc 1 136 23 is_stmt 0 view .LVU259
+ 840 0042 0133     		adds	r3, r3, #1
+ 841 0044 0A4A     		ldr	r2, .L41+8
+ 842 0046 1360     		str	r3, [r2]
+ 137:Src/sysexprocessor.c ****     if(sysexconfigupdate == 8) {
+ 843              		.loc 1 137 5 is_stmt 1 view .LVU260
+ 844              		.loc 1 137 7 is_stmt 0 view .LVU261
+ 845 0048 082B     		cmp	r3, #8
+ 846 004a 09D0     		beq	.L40
+ 847              	.L31:
+ 848              	.LBE7:
+ 138:Src/sysexprocessor.c ****       DAC_Refresh();
+ 139:Src/sysexprocessor.c ****     }
+ 140:Src/sysexprocessor.c ****   }
+ 141:Src/sysexprocessor.c **** }
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 19
+
+
+ 849              		.loc 1 141 1 view .LVU262
+ 850 004c 03B0     		add	sp, sp, #12
+ 851              	.LCFI14:
+ 852              		.cfi_remember_state
+ 853              		.cfi_def_cfa_offset 12
+ 854              		@ sp needed
+ 855 004e 30BD     		pop	{r4, r5, pc}
+ 856              	.L33:
+ 857              	.LCFI15:
+ 858              		.cfi_restore_state
+ 859              	.LBB8:
+ 133:Src/sysexprocessor.c ****     }
+ 860              		.loc 1 133 7 is_stmt 1 view .LVU263
+ 133:Src/sysexprocessor.c ****     }
+ 861              		.loc 1 133 37 is_stmt 0 view .LVU264
+ 862 0050 5A08     		lsrs	r2, r3, #1
+ 133:Src/sysexprocessor.c ****     }
+ 863              		.loc 1 133 41 view .LVU265
+ 864 0052 0198     		ldr	r0, [sp, #4]	@ float
+ 865 0054 0A32     		adds	r2, r2, #10
+ 866 0056 0749     		ldr	r1, .L41+12
+ 867 0058 01EB8202 		add	r2, r1, r2, lsl #2
+ 868 005c 5060     		str	r0, [r2, #4]	@ float
+ 869 005e F0E7     		b	.L34
+ 870              	.L40:
+ 138:Src/sysexprocessor.c ****       DAC_Refresh();
+ 871              		.loc 1 138 7 is_stmt 1 view .LVU266
+ 872 0060 FFF7FEFF 		bl	DAC_Refresh
+ 873              	.LVL44:
+ 874              	.LBE8:
+ 875              		.loc 1 141 1 is_stmt 0 view .LVU267
+ 876 0064 F2E7     		b	.L31
+ 877              	.L42:
+ 878 0066 00BF     		.align	2
+ 879              	.L41:
+ 880 0068 00000000 		.word	.LANCHOR0
+ 881 006c 00000000 		.word	.LANCHOR1
+ 882 0070 00000000 		.word	.LANCHOR2
+ 883 0074 00000000 		.word	dac
+ 884              		.cfi_endproc
+ 885              	.LFE136:
+ 887              		.section	.text.Sysex_ConfigCalibInit,"ax",%progbits
+ 888              		.align	1
+ 889              		.global	Sysex_ConfigCalibInit
+ 890              		.syntax unified
+ 891              		.thumb
+ 892              		.thumb_func
+ 893              		.fpu fpv4-sp-d16
+ 895              	Sysex_ConfigCalibInit:
+ 896              	.LFB137:
+ 142:Src/sysexprocessor.c **** 
+ 143:Src/sysexprocessor.c **** void Sysex_ConfigCalibInit() {
+ 897              		.loc 1 143 30 is_stmt 1 view -0
+ 898              		.cfi_startproc
+ 899              		@ args = 0, pretend = 0, frame = 0
+ 900              		@ frame_needed = 0, uses_anonymous_args = 0
+ 901              		@ link register save eliminated.
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 20
+
+
+ 144:Src/sysexprocessor.c ****   sysexflashbufindex = 0;
+ 902              		.loc 1 144 3 view .LVU269
+ 903              		.loc 1 144 22 is_stmt 0 view .LVU270
+ 904 0000 0023     		movs	r3, #0
+ 905 0002 024A     		ldr	r2, .L44
+ 906 0004 1360     		str	r3, [r2]
+ 145:Src/sysexprocessor.c ****   sysexconfigupdate = 0;
+ 907              		.loc 1 145 3 is_stmt 1 view .LVU271
+ 908              		.loc 1 145 21 is_stmt 0 view .LVU272
+ 909 0006 024A     		ldr	r2, .L44+4
+ 910 0008 1360     		str	r3, [r2]
+ 146:Src/sysexprocessor.c **** }
+ 911              		.loc 1 146 1 view .LVU273
+ 912 000a 7047     		bx	lr
+ 913              	.L45:
+ 914              		.align	2
+ 915              	.L44:
+ 916 000c 00000000 		.word	.LANCHOR0
+ 917 0010 00000000 		.word	.LANCHOR2
+ 918              		.cfi_endproc
+ 919              	.LFE137:
+ 921              		.section	.text.Sysex_CalibrationLow,"ax",%progbits
+ 922              		.align	1
+ 923              		.global	Sysex_CalibrationLow
+ 924              		.syntax unified
+ 925              		.thumb
+ 926              		.thumb_func
+ 927              		.fpu fpv4-sp-d16
+ 929              	Sysex_CalibrationLow:
+ 930              	.LFB141:
+ 147:Src/sysexprocessor.c **** 
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 152:Src/sysexprocessor.c ****       return false;
+ 153:Src/sysexprocessor.c ****     }
+ 154:Src/sysexprocessor.c ****   }
+ 155:Src/sysexprocessor.c ****   return true;
+ 156:Src/sysexprocessor.c **** }
+ 157:Src/sysexprocessor.c **** 
+ 158:Src/sysexprocessor.c **** bool Sysex_VerifyApp() {
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 160:Src/sysexprocessor.c ****   {
+ 161:Src/sysexprocessor.c ****     LED_UploadIncrement();
+ 162:Src/sysexprocessor.c ****     uint32_t flashaddress = kUPDATE_ADDRESS + i*0x2000;
+ 163:Src/sysexprocessor.c ****     uint32_t maxflash = kUPDATE_ADDRESS + i*0x2000 + 0x2000;
+ 164:Src/sysexprocessor.c **** 
+ 165:Src/sysexprocessor.c ****     uint8_t verifyoutput[15];
+ 166:Src/sysexprocessor.c ****     int verifyindex = 0;
+ 167:Src/sysexprocessor.c ****     //Sending First 6 bytes
+ 168:Src/sysexprocessor.c ****     uint32_t data = Config_ReadWord(&flashaddress);
+ 169:Src/sysexprocessor.c ****     verifyoutput[verifyindex] = 0xF0;
+ 170:Src/sysexprocessor.c ****     verifyindex++;
+ 171:Src/sysexprocessor.c ****     WordtoMidiBytes(data, verifyoutput, &verifyindex);
+ 172:Src/sysexprocessor.c ****     
+ 173:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, verifyoutput[0], verifyoutput[1], verifyoutput[2]);
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 21
+
+
+ 174:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 175:Src/sysexprocessor.c ****       return false;
+ 176:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, verifyoutput[3], verifyoutput[4], verifyoutput[5]);
+ 177:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 178:Src/sysexprocessor.c ****       return false;
+ 179:Src/sysexprocessor.c **** 
+ 180:Src/sysexprocessor.c ****     while (flashaddress < maxflash)
+ 181:Src/sysexprocessor.c ****     {
+ 182:Src/sysexprocessor.c ****       verifyindex = 0;
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 185:Src/sysexprocessor.c ****           break;
+ 186:Src/sysexprocessor.c ****         }
+ 187:Src/sysexprocessor.c ****         data = Config_ReadWord(&flashaddress);
+ 188:Src/sysexprocessor.c ****         WordtoMidiBytes(data,verifyoutput,&verifyindex);
+ 189:Src/sysexprocessor.c ****       }
+ 190:Src/sysexprocessor.c ****       for (size_t i = 0; i < 5; i++) {
+ 191:Src/sysexprocessor.c ****         if(Sysex_UsbTimeout() == false) {
+ 192:Src/sysexprocessor.c ****           return false;
+ 193:Src/sysexprocessor.c ****         }
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 195:Src/sysexprocessor.c ****       }  
+ 196:Src/sysexprocessor.c ****     }
+ 197:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false){
+ 198:Src/sysexprocessor.c ****       return false;
+ 199:Src/sysexprocessor.c ****     }
+ 200:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x07,0x00,0x00,0xF7);
+ 201:Src/sysexprocessor.c ****     HAL_Delay(2000);
+ 202:Src/sysexprocessor.c ****   }
+ 203:Src/sysexprocessor.c ****   
+ 204:Src/sysexprocessor.c **** 
+ 205:Src/sysexprocessor.c ****   return true;
+ 206:Src/sysexprocessor.c **** }
+ 207:Src/sysexprocessor.c **** 
+ 208:Src/sysexprocessor.c **** 
+ 209:Src/sysexprocessor.c **** void Sysex_Process(uint8_t input) {
+ 210:Src/sysexprocessor.c ****   // leddriver.ChangeMode(leddriver.Connected);
+ 211:Src/sysexprocessor.c ****   
+ 212:Src/sysexprocessor.c ****   if(input == 0xF0) {
+ 213:Src/sysexprocessor.c ****     if(sysexstatus == Off) {
+ 214:Src/sysexprocessor.c ****       sysexstatus = Initialization;
+ 215:Src/sysexprocessor.c ****       sysexverifyindex = 0;
+ 216:Src/sysexprocessor.c ****     } else {
+ 217:Src/sysexprocessor.c ****       sysexstatus = Failed;
+ 218:Src/sysexprocessor.c ****     }
+ 219:Src/sysexprocessor.c ****   } else if(input == 0xF7) { // Could also check for sysexstatus_ == finished for correct upload of
+ 220:Src/sysexprocessor.c ****     if(sysexstatus == EndUpdate) {
+ 221:Src/sysexprocessor.c ****       Config_FlashEndWriteApp();
+ 222:Src/sysexprocessor.c ****       LED_SwitchUpload();
+ 223:Src/sysexprocessor.c ****       Sysex_VerifyApp();
+ 224:Src/sysexprocessor.c **** 
+ 225:Src/sysexprocessor.c ****     }
+ 226:Src/sysexprocessor.c ****     if(sysexstatus == Configure || sysexstatus == Calibrate) {
+ 227:Src/sysexprocessor.c ****       Config_Configure();
+ 228:Src/sysexprocessor.c ****     }
+ 229:Src/sysexprocessor.c ****     sysexstatus = Off;
+ 230:Src/sysexprocessor.c ****   } 
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 22
+
+
+ 231:Src/sysexprocessor.c ****   else if(input <= 127) 
+ 232:Src/sysexprocessor.c ****   {
+ 233:Src/sysexprocessor.c ****     switch(sysexstatus) {
+ 234:Src/sysexprocessor.c ****       case Initialization:
+ 235:Src/sysexprocessor.c ****         if(sysexverify[sysexverifyindex] == input) {
+ 236:Src/sysexprocessor.c ****           sysexverifyindex++;
+ 237:Src/sysexprocessor.c ****           if(sysexverifyindex == 5) {
+ 238:Src/sysexprocessor.c ****             sysexstatus = MessageType;
+ 239:Src/sysexprocessor.c ****           }
+ 240:Src/sysexprocessor.c ****         } else {
+ 241:Src/sysexprocessor.c ****           sysexstatus = Failed;
+ 242:Src/sysexprocessor.c ****         }
+ 243:Src/sysexprocessor.c ****         break;
+ 244:Src/sysexprocessor.c **** 
+ 245:Src/sysexprocessor.c ****       case MessageType:
+ 246:Src/sysexprocessor.c ****         if(input == 0x00) { // Am i alive ?
+ 247:Src/sysexprocessor.c ****           Sysex_SendMidiMessage(0x04,0xF0,kFIRMWARE_VERSION,0xF7);
+ 248:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 249:Src/sysexprocessor.c ****         }
+ 250:Src/sysexprocessor.c ****         if(input == 0x74) { // ConfigurePush
+ 251:Src/sysexprocessor.c ****           Config_WriteUserData();
+ 252:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 253:Src/sysexprocessor.c ****         }
+ 254:Src/sysexprocessor.c ****         if(input == 0x75) { // ConfigurePush
+ 255:Src/sysexprocessor.c ****           Sysex_ConfigCalibInit();
+ 256:Src/sysexprocessor.c ****           Config_DisableOutput();
+ 257:Src/sysexprocessor.c ****           sysexstatus = Configure;
+ 258:Src/sysexprocessor.c ****         }
+ 259:Src/sysexprocessor.c ****         if(input == 0x76) { // CalibratePush
+ 260:Src/sysexprocessor.c ****           Sysex_ConfigCalibInit();
+ 261:Src/sysexprocessor.c ****           sysexstatus = Calibrate;
+ 262:Src/sysexprocessor.c ****         }
+ 263:Src/sysexprocessor.c ****         if(input == 0x77) { 
+ 264:Src/sysexprocessor.c ****           Config_FlashSetAppBit();
+ 265:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 266:Src/sysexprocessor.c ****         }
+ 267:Src/sysexprocessor.c ****         if(input == 0x78) {
+ 268:Src/sysexprocessor.c ****           sysexstatus = EndUpdate;
+ 269:Src/sysexprocessor.c ****         }
+ 270:Src/sysexprocessor.c ****         if(input == 0x79) {
+ 271:Src/sysexprocessor.c ****           LED_UploadIncrement();
+ 272:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 273:Src/sysexprocessor.c ****         }
+ 274:Src/sysexprocessor.c ****         if(input == 0x7A) { // Write To Start Update App
+ 275:Src/sysexprocessor.c ****           Config_FlashInitWriteApp();
+ 276:Src/sysexprocessor.c ****           LED_UploadIncrement();
+ 277:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 278:Src/sysexprocessor.c ****         }
+ 279:Src/sysexprocessor.c ****         if(input == 0x7B) { // Load Current Program
+ 280:Src/sysexprocessor.c ****           Config_Configure();
+ 281:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 282:Src/sysexprocessor.c ****         }
+ 283:Src/sysexprocessor.c ****         if(input == 0x7C) { // Configure outputs off, set dac value to low
+ 284:Src/sysexprocessor.c ****           Sysex_CalibrationLow();
+ 285:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 286:Src/sysexprocessor.c ****         }
+ 287:Src/sysexprocessor.c ****         if(input == 0x7D) { // Configure outputs off, set dac value to low
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 23
+
+
+ 288:Src/sysexprocessor.c ****           Sysex_CalibrationHigh();
+ 289:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 290:Src/sysexprocessor.c ****         }
+ 291:Src/sysexprocessor.c ****         if(input == 0x7E ) { // Request Configuration Data
+ 292:Src/sysexprocessor.c ****           Sysex_DumpConfiguration();
+ 293:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 294:Src/sysexprocessor.c ****         }
+ 295:Src/sysexprocessor.c ****         if(input == 0x7F) { // Request Calibration Data
+ 296:Src/sysexprocessor.c ****           Sysex_DumpCalibration();
+ 297:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 298:Src/sysexprocessor.c ****         }
+ 299:Src/sysexprocessor.c ****         break;
+ 300:Src/sysexprocessor.c ****       
+ 301:Src/sysexprocessor.c ****       case Update:
+ 302:Src/sysexprocessor.c ****       case EndUpdate:
+ 303:Src/sysexprocessor.c ****         Sysex_FlashUpdate(input);
+ 304:Src/sysexprocessor.c ****         break;
+ 305:Src/sysexprocessor.c **** 
+ 306:Src/sysexprocessor.c ****       case Calibrate:
+ 307:Src/sysexprocessor.c ****         Sysex_CalibrationUpdate(input);
+ 308:Src/sysexprocessor.c ****         break;
+ 309:Src/sysexprocessor.c ****         
+ 310:Src/sysexprocessor.c ****       case Configure:
+ 311:Src/sysexprocessor.c ****         Sysex_ConfigUpdate(input);
+ 312:Src/sysexprocessor.c ****         break;
+ 313:Src/sysexprocessor.c **** 
+ 314:Src/sysexprocessor.c ****       default:
+ 315:Src/sysexprocessor.c ****         break;   
+ 316:Src/sysexprocessor.c ****     }
+ 317:Src/sysexprocessor.c ****   }
+ 318:Src/sysexprocessor.c **** }
+ 319:Src/sysexprocessor.c **** 
+ 320:Src/sysexprocessor.c **** void Sysex_CalibrationLow() {
+ 931              		.loc 1 320 29 is_stmt 1 view -0
+ 932              		.cfi_startproc
+ 933              		@ args = 0, pretend = 0, frame = 0
+ 934              		@ frame_needed = 0, uses_anonymous_args = 0
+ 935 0000 08B5     		push	{r3, lr}
+ 936              	.LCFI16:
+ 937              		.cfi_def_cfa_offset 8
+ 938              		.cfi_offset 3, -8
+ 939              		.cfi_offset 14, -4
+ 321:Src/sysexprocessor.c ****   Config_DisableOutput();
+ 940              		.loc 1 321 3 view .LVU275
+ 941 0002 FFF7FEFF 		bl	Config_DisableOutput
+ 942              	.LVL45:
+ 322:Src/sysexprocessor.c ****   LED_ChangeMode(LED_Fixed);
+ 943              		.loc 1 322 3 view .LVU276
+ 944 0006 0520     		movs	r0, #5
+ 945 0008 FFF7FEFF 		bl	LED_ChangeMode
+ 946              	.LVL46:
+ 323:Src/sysexprocessor.c ****   LED_Color(255,0);
+ 947              		.loc 1 323 3 view .LVU277
+ 948 000c 0021     		movs	r1, #0
+ 949 000e FF20     		movs	r0, #255
+ 950 0010 FFF7FEFF 		bl	LED_Color
+ 951              	.LVL47:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 24
+
+
+ 324:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 952              		.loc 1 324 3 view .LVU278
+ 953              	.LBB9:
+ 954              		.loc 1 324 8 view .LVU279
+ 955              		.loc 1 324 15 is_stmt 0 view .LVU280
+ 956 0014 0023     		movs	r3, #0
+ 957              		.loc 1 324 3 view .LVU281
+ 958 0016 05E0     		b	.L47
+ 959              	.LVL48:
+ 960              	.L48:
+ 325:Src/sysexprocessor.c ****     dac.values[i] = kDAC_CALIB_LOW;
+ 961              		.loc 1 325 5 is_stmt 1 discriminator 3 view .LVU282
+ 962              		.loc 1 325 19 is_stmt 0 discriminator 3 view .LVU283
+ 963 0018 044A     		ldr	r2, .L50
+ 964 001a 45F6BE71 		movw	r1, #24510
+ 965 001e 22F81310 		strh	r1, [r2, r3, lsl #1]	@ movhi
+ 324:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 966              		.loc 1 324 29 is_stmt 1 discriminator 3 view .LVU284
+ 324:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 967              		.loc 1 324 30 is_stmt 0 discriminator 3 view .LVU285
+ 968 0022 0133     		adds	r3, r3, #1
+ 969              	.LVL49:
+ 970              	.L47:
+ 324:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 971              		.loc 1 324 22 is_stmt 1 discriminator 1 view .LVU286
+ 324:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 972              		.loc 1 324 3 is_stmt 0 discriminator 1 view .LVU287
+ 973 0024 032B     		cmp	r3, #3
+ 974 0026 F7D9     		bls	.L48
+ 975              	.LBE9:
+ 326:Src/sysexprocessor.c ****   }
+ 327:Src/sysexprocessor.c **** }
+ 976              		.loc 1 327 1 view .LVU288
+ 977 0028 08BD     		pop	{r3, pc}
+ 978              	.LVL50:
+ 979              	.L51:
+ 980              		.loc 1 327 1 view .LVU289
+ 981 002a 00BF     		.align	2
+ 982              	.L50:
+ 983 002c 00000000 		.word	dac
+ 984              		.cfi_endproc
+ 985              	.LFE141:
+ 987              		.section	.text.Sysex_CalibrationHigh,"ax",%progbits
+ 988              		.align	1
+ 989              		.global	Sysex_CalibrationHigh
+ 990              		.syntax unified
+ 991              		.thumb
+ 992              		.thumb_func
+ 993              		.fpu fpv4-sp-d16
+ 995              	Sysex_CalibrationHigh:
+ 996              	.LFB142:
+ 328:Src/sysexprocessor.c **** 
+ 329:Src/sysexprocessor.c **** void Sysex_CalibrationHigh() {
+ 997              		.loc 1 329 30 is_stmt 1 view -0
+ 998              		.cfi_startproc
+ 999              		@ args = 0, pretend = 0, frame = 0
+ 1000              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 25
+
+
+ 1001 0000 08B5     		push	{r3, lr}
+ 1002              	.LCFI17:
+ 1003              		.cfi_def_cfa_offset 8
+ 1004              		.cfi_offset 3, -8
+ 1005              		.cfi_offset 14, -4
+ 330:Src/sysexprocessor.c ****   Config_DisableOutput();
+ 1006              		.loc 1 330 3 view .LVU291
+ 1007 0002 FFF7FEFF 		bl	Config_DisableOutput
+ 1008              	.LVL51:
+ 331:Src/sysexprocessor.c ****   LED_ChangeMode(LED_Fixed);
+ 1009              		.loc 1 331 3 view .LVU292
+ 1010 0006 0520     		movs	r0, #5
+ 1011 0008 FFF7FEFF 		bl	LED_ChangeMode
+ 1012              	.LVL52:
+ 332:Src/sysexprocessor.c ****   LED_Color(0,255);
+ 1013              		.loc 1 332 3 view .LVU293
+ 1014 000c FF21     		movs	r1, #255
+ 1015 000e 0020     		movs	r0, #0
+ 1016 0010 FFF7FEFF 		bl	LED_Color
+ 1017              	.LVL53:
+ 333:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1018              		.loc 1 333 3 view .LVU294
+ 1019              	.LBB10:
+ 1020              		.loc 1 333 8 view .LVU295
+ 1021              		.loc 1 333 15 is_stmt 0 view .LVU296
+ 1022 0014 0023     		movs	r3, #0
+ 1023              		.loc 1 333 3 view .LVU297
+ 1024 0016 05E0     		b	.L53
+ 1025              	.LVL54:
+ 1026              	.L54:
+ 334:Src/sysexprocessor.c ****     dac.values[i] = kDAC_CALIB_HIGH;
+ 1027              		.loc 1 334 5 is_stmt 1 discriminator 3 view .LVU298
+ 1028              		.loc 1 334 19 is_stmt 0 discriminator 3 view .LVU299
+ 1029 0018 044A     		ldr	r2, .L56
+ 1030 001a 49F20A71 		movw	r1, #38666
+ 1031 001e 22F81310 		strh	r1, [r2, r3, lsl #1]	@ movhi
+ 333:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1032              		.loc 1 333 29 is_stmt 1 discriminator 3 view .LVU300
+ 333:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1033              		.loc 1 333 30 is_stmt 0 discriminator 3 view .LVU301
+ 1034 0022 0133     		adds	r3, r3, #1
+ 1035              	.LVL55:
+ 1036              	.L53:
+ 333:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1037              		.loc 1 333 22 is_stmt 1 discriminator 1 view .LVU302
+ 333:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1038              		.loc 1 333 3 is_stmt 0 discriminator 1 view .LVU303
+ 1039 0024 032B     		cmp	r3, #3
+ 1040 0026 F7D9     		bls	.L54
+ 1041              	.LBE10:
+ 335:Src/sysexprocessor.c ****   }
+ 336:Src/sysexprocessor.c **** }
+ 1042              		.loc 1 336 1 view .LVU304
+ 1043 0028 08BD     		pop	{r3, pc}
+ 1044              	.LVL56:
+ 1045              	.L57:
+ 1046              		.loc 1 336 1 view .LVU305
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 26
+
+
+ 1047 002a 00BF     		.align	2
+ 1048              	.L56:
+ 1049 002c 00000000 		.word	dac
+ 1050              		.cfi_endproc
+ 1051              	.LFE142:
+ 1053              		.section	.text.Sysex_SendMidiMessage,"ax",%progbits
+ 1054              		.align	1
+ 1055              		.global	Sysex_SendMidiMessage
+ 1056              		.syntax unified
+ 1057              		.thumb
+ 1058              		.thumb_func
+ 1059              		.fpu fpv4-sp-d16
+ 1061              	Sysex_SendMidiMessage:
+ 1062              	.LVL57:
+ 1063              	.LFB145:
+ 337:Src/sysexprocessor.c **** 
+ 338:Src/sysexprocessor.c **** bool Sysex_DumpConfiguration() {
+ 339:Src/sysexprocessor.c ****   uint8_t bufferoutput[40*16+2];
+ 340:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 341:Src/sysexprocessor.c **** 
+ 342:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 343:Src/sysexprocessor.c ****   bufferindex++;
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 346:Src/sysexprocessor.c ****       uint8_t a = config[i].analogmode[j];
+ 347:Src/sysexprocessor.c ****       uint8_t b = config[i].analogsetting[j].midichannel;
+ 348:Src/sysexprocessor.c ****       uint8_t c = config[i].analogsetting[j].byte2;
+ 349:Src/sysexprocessor.c ****       uint8_t d = config[i].analogsetting[j].byte3;
+ 350:Src/sysexprocessor.c ****       uint32_t writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) 
+ 351:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 352:Src/sysexprocessor.c **** 
+ 353:Src/sysexprocessor.c ****       a = config[i].digitalmode[j];
+ 354:Src/sysexprocessor.c ****       b = config[i].digitalsetting[j].midichannel;
+ 355:Src/sysexprocessor.c ****       c = config[i].digitalsetting[j].byte2;
+ 356:Src/sysexprocessor.c ****       d = config[i].digitalsetting[j].byte3;
+ 357:Src/sysexprocessor.c ****       writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) | (d << 0
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 359:Src/sysexprocessor.c ****     }
+ 360:Src/sysexprocessor.c ****   }
+ 361:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 362:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x04, bufferoutput[0*3], bufferoutput[0*3+1], bufferoutput[0*3+2]);
+ 363:Src/sysexprocessor.c **** 
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 366:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 367:Src/sysexprocessor.c ****       return false;
+ 368:Src/sysexprocessor.c ****     }
+ 369:Src/sysexprocessor.c ****   }
+ 370:Src/sysexprocessor.c **** 
+ 371:Src/sysexprocessor.c ****   
+ 372:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x07, bufferoutput[639], bufferoutput[640], bufferoutput[641]);
+ 373:Src/sysexprocessor.c ****   return true;
+ 374:Src/sysexprocessor.c **** }
+ 375:Src/sysexprocessor.c **** 
+ 376:Src/sysexprocessor.c **** 
+ 377:Src/sysexprocessor.c **** 
+ 378:Src/sysexprocessor.c **** bool Sysex_DumpCalibration() {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 27
+
+
+ 379:Src/sysexprocessor.c ****   uint8_t bufferoutput[40+2];
+ 380:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 381:Src/sysexprocessor.c **** 
+ 382:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 383:Src/sysexprocessor.c ****   bufferindex++;
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 385:Src/sysexprocessor.c ****     FloatToMidiBytes(dac.voltlow[i], bufferoutput, &bufferindex);
+ 386:Src/sysexprocessor.c ****     FloatToMidiBytes(dac.volthigh[i], bufferoutput, &bufferindex);
+ 387:Src/sysexprocessor.c ****   }
+ 388:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 389:Src/sysexprocessor.c **** 
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 391:Src/sysexprocessor.c ****   {
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 393:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 394:Src/sysexprocessor.c ****       return false;
+ 395:Src/sysexprocessor.c ****     }
+ 396:Src/sysexprocessor.c ****   }  
+ 397:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x07, bufferoutput[39], bufferoutput[40], bufferoutput[41]);
+ 398:Src/sysexprocessor.c ****   return true;
+ 399:Src/sysexprocessor.c **** }
+ 400:Src/sysexprocessor.c **** 
+ 401:Src/sysexprocessor.c **** //this function does not do any parameter checking and sends raw data.
+ 402:Src/sysexprocessor.c **** void Sysex_SendMidiMessage(uint8_t usbmessagetype, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+ 1064              		.loc 1 402 97 is_stmt 1 view -0
+ 1065              		.cfi_startproc
+ 1066              		@ args = 0, pretend = 0, frame = 8
+ 1067              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1068              		.loc 1 402 97 is_stmt 0 view .LVU307
+ 1069 0000 10B5     		push	{r4, lr}
+ 1070              	.LCFI18:
+ 1071              		.cfi_def_cfa_offset 8
+ 1072              		.cfi_offset 4, -8
+ 1073              		.cfi_offset 14, -4
+ 1074 0002 82B0     		sub	sp, sp, #8
+ 1075              	.LCFI19:
+ 1076              		.cfi_def_cfa_offset 16
+ 403:Src/sysexprocessor.c ****   if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) {
+ 1077              		.loc 1 403 3 is_stmt 1 view .LVU308
+ 1078              		.loc 1 403 18 is_stmt 0 view .LVU309
+ 1079 0004 0B4C     		ldr	r4, .L62
+ 1080 0006 94F8FCC1 		ldrb	ip, [r4, #508]	@ zero_extendqisi2
+ 1081              		.loc 1 403 5 view .LVU310
+ 1082 000a BCF1030F 		cmp	ip, #3
+ 1083 000e 01D0     		beq	.L61
+ 1084              	.LVL58:
+ 1085              	.L58:
+ 404:Src/sysexprocessor.c ****     uint8_t buffer[4];
+ 405:Src/sysexprocessor.c ****     buffer[0] = usbmessagetype;
+ 406:Src/sysexprocessor.c ****     buffer[1] = byte1;
+ 407:Src/sysexprocessor.c ****     buffer[2] = byte2;
+ 408:Src/sysexprocessor.c ****     buffer[3] = byte3;
+ 409:Src/sysexprocessor.c ****     MIDI_DataTx(buffer, 4);
+ 410:Src/sysexprocessor.c ****     USBD_MIDI_SendPacket();
+ 411:Src/sysexprocessor.c ****   }
+ 412:Src/sysexprocessor.c **** }...
+ 1086              		.loc 1 412 1 view .LVU311
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 28
+
+
+ 1087 0010 02B0     		add	sp, sp, #8
+ 1088              	.LCFI20:
+ 1089              		.cfi_remember_state
+ 1090              		.cfi_def_cfa_offset 8
+ 1091              		@ sp needed
+ 1092 0012 10BD     		pop	{r4, pc}
+ 1093              	.LVL59:
+ 1094              	.L61:
+ 1095              	.LCFI21:
+ 1096              		.cfi_restore_state
+ 1097              	.LBB11:
+ 404:Src/sysexprocessor.c ****     uint8_t buffer[4];
+ 1098              		.loc 1 404 5 is_stmt 1 view .LVU312
+ 405:Src/sysexprocessor.c ****     buffer[0] = usbmessagetype;
+ 1099              		.loc 1 405 5 view .LVU313
+ 405:Src/sysexprocessor.c ****     buffer[0] = usbmessagetype;
+ 1100              		.loc 1 405 15 is_stmt 0 view .LVU314
+ 1101 0014 8DF80400 		strb	r0, [sp, #4]
+ 406:Src/sysexprocessor.c ****     buffer[1] = byte1;
+ 1102              		.loc 1 406 5 is_stmt 1 view .LVU315
+ 406:Src/sysexprocessor.c ****     buffer[1] = byte1;
+ 1103              		.loc 1 406 15 is_stmt 0 view .LVU316
+ 1104 0018 8DF80510 		strb	r1, [sp, #5]
+ 407:Src/sysexprocessor.c ****     buffer[2] = byte2;
+ 1105              		.loc 1 407 5 is_stmt 1 view .LVU317
+ 407:Src/sysexprocessor.c ****     buffer[2] = byte2;
+ 1106              		.loc 1 407 15 is_stmt 0 view .LVU318
+ 1107 001c 8DF80620 		strb	r2, [sp, #6]
+ 408:Src/sysexprocessor.c ****     buffer[3] = byte3;
+ 1108              		.loc 1 408 5 is_stmt 1 view .LVU319
+ 408:Src/sysexprocessor.c ****     buffer[3] = byte3;
+ 1109              		.loc 1 408 15 is_stmt 0 view .LVU320
+ 1110 0020 8DF80730 		strb	r3, [sp, #7]
+ 409:Src/sysexprocessor.c ****     MIDI_DataTx(buffer, 4);
+ 1111              		.loc 1 409 5 is_stmt 1 view .LVU321
+ 1112 0024 0421     		movs	r1, #4
+ 1113              	.LVL60:
+ 409:Src/sysexprocessor.c ****     MIDI_DataTx(buffer, 4);
+ 1114              		.loc 1 409 5 is_stmt 0 view .LVU322
+ 1115 0026 0DEB0100 		add	r0, sp, r1
+ 1116              	.LVL61:
+ 409:Src/sysexprocessor.c ****     MIDI_DataTx(buffer, 4);
+ 1117              		.loc 1 409 5 view .LVU323
+ 1118 002a FFF7FEFF 		bl	MIDI_DataTx
+ 1119              	.LVL62:
+ 410:Src/sysexprocessor.c ****     USBD_MIDI_SendPacket();
+ 1120              		.loc 1 410 5 is_stmt 1 view .LVU324
+ 1121 002e FFF7FEFF 		bl	USBD_MIDI_SendPacket
+ 1122              	.LVL63:
+ 1123              	.LBE11:
+ 1124              		.loc 1 412 1 is_stmt 0 view .LVU325
+ 1125 0032 EDE7     		b	.L58
+ 1126              	.L63:
+ 1127              		.align	2
+ 1128              	.L62:
+ 1129 0034 00000000 		.word	hUsbDeviceFS
+ 1130              		.cfi_endproc
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 29
+
+
+ 1131              	.LFE145:
+ 1133              		.section	.text.Sysex_VerifyApp,"ax",%progbits
+ 1134              		.align	1
+ 1135              		.global	Sysex_VerifyApp
+ 1136              		.syntax unified
+ 1137              		.thumb
+ 1138              		.thumb_func
+ 1139              		.fpu fpv4-sp-d16
+ 1141              	Sysex_VerifyApp:
+ 1142              	.LFB139:
+ 158:Src/sysexprocessor.c **** bool Sysex_VerifyApp() {
+ 1143              		.loc 1 158 24 is_stmt 1 view -0
+ 1144              		.cfi_startproc
+ 1145              		@ args = 0, pretend = 0, frame = 24
+ 1146              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1147 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1148              	.LCFI22:
+ 1149              		.cfi_def_cfa_offset 24
+ 1150              		.cfi_offset 4, -24
+ 1151              		.cfi_offset 5, -20
+ 1152              		.cfi_offset 6, -16
+ 1153              		.cfi_offset 7, -12
+ 1154              		.cfi_offset 8, -8
+ 1155              		.cfi_offset 14, -4
+ 1156 0004 86B0     		sub	sp, sp, #24
+ 1157              	.LCFI23:
+ 1158              		.cfi_def_cfa_offset 48
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1159              		.loc 1 159 3 view .LVU327
+ 1160              	.LBB24:
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1161              		.loc 1 159 8 view .LVU328
+ 1162              	.LVL64:
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1163              		.loc 1 159 15 is_stmt 0 view .LVU329
+ 1164 0006 4FF00008 		mov	r8, #0
+ 1165              	.LVL65:
+ 1166              	.L65:
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1167              		.loc 1 159 22 is_stmt 1 discriminator 1 view .LVU330
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1168              		.loc 1 159 3 is_stmt 0 discriminator 1 view .LVU331
+ 1169 000a B8F10E0F 		cmp	r8, #14
+ 1170 000e 00F2A680 		bhi	.L94
+ 1171              	.LBB25:
+ 161:Src/sysexprocessor.c ****     LED_UploadIncrement();
+ 1172              		.loc 1 161 5 is_stmt 1 view .LVU332
+ 1173 0012 FFF7FEFF 		bl	LED_UploadIncrement
+ 1174              	.LVL66:
+ 162:Src/sysexprocessor.c ****     uint32_t flashaddress = kUPDATE_ADDRESS + i*0x2000;
+ 1175              		.loc 1 162 5 view .LVU333
+ 162:Src/sysexprocessor.c ****     uint32_t flashaddress = kUPDATE_ADDRESS + i*0x2000;
+ 1176              		.loc 1 162 45 is_stmt 0 view .LVU334
+ 1177 0016 08F58043 		add	r3, r8, #16384
+ 1178 001a 1133     		adds	r3, r3, #17
+ 1179 001c 5B03     		lsls	r3, r3, #13
+ 162:Src/sysexprocessor.c ****     uint32_t flashaddress = kUPDATE_ADDRESS + i*0x2000;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 30
+
+
+ 1180              		.loc 1 162 14 view .LVU335
+ 1181 001e 0093     		str	r3, [sp]
+ 163:Src/sysexprocessor.c ****     uint32_t maxflash = kUPDATE_ADDRESS + i*0x2000 + 0x2000;
+ 1182              		.loc 1 163 5 is_stmt 1 view .LVU336
+ 163:Src/sysexprocessor.c ****     uint32_t maxflash = kUPDATE_ADDRESS + i*0x2000 + 0x2000;
+ 1183              		.loc 1 163 52 is_stmt 0 view .LVU337
+ 1184 0020 08F58046 		add	r6, r8, #16384
+ 1185 0024 1236     		adds	r6, r6, #18
+ 163:Src/sysexprocessor.c ****     uint32_t maxflash = kUPDATE_ADDRESS + i*0x2000 + 0x2000;
+ 1186              		.loc 1 163 14 view .LVU338
+ 1187 0026 7603     		lsls	r6, r6, #13
+ 1188              	.LVL67:
+ 165:Src/sysexprocessor.c ****     uint8_t verifyoutput[15];
+ 1189              		.loc 1 165 5 is_stmt 1 view .LVU339
+ 166:Src/sysexprocessor.c ****     int verifyindex = 0;
+ 1190              		.loc 1 166 5 view .LVU340
+ 166:Src/sysexprocessor.c ****     int verifyindex = 0;
+ 1191              		.loc 1 166 9 is_stmt 0 view .LVU341
+ 1192 0028 0023     		movs	r3, #0
+ 1193 002a 0193     		str	r3, [sp, #4]
+ 168:Src/sysexprocessor.c ****     uint32_t data = Config_ReadWord(&flashaddress);
+ 1194              		.loc 1 168 5 is_stmt 1 view .LVU342
+ 168:Src/sysexprocessor.c ****     uint32_t data = Config_ReadWord(&flashaddress);
+ 1195              		.loc 1 168 21 is_stmt 0 view .LVU343
+ 1196 002c 6846     		mov	r0, sp
+ 1197 002e FFF7FEFF 		bl	Config_ReadWord
+ 1198              	.LVL68:
+ 169:Src/sysexprocessor.c ****     verifyoutput[verifyindex] = 0xF0;
+ 1199              		.loc 1 169 5 is_stmt 1 view .LVU344
+ 169:Src/sysexprocessor.c ****     verifyoutput[verifyindex] = 0xF0;
+ 1200              		.loc 1 169 17 is_stmt 0 view .LVU345
+ 1201 0032 019B     		ldr	r3, [sp, #4]
+ 169:Src/sysexprocessor.c ****     verifyoutput[verifyindex] = 0xF0;
+ 1202              		.loc 1 169 31 view .LVU346
+ 1203 0034 06AA     		add	r2, sp, #24
+ 1204 0036 1A44     		add	r2, r2, r3
+ 1205 0038 F021     		movs	r1, #240
+ 1206 003a 02F8101C 		strb	r1, [r2, #-16]
+ 170:Src/sysexprocessor.c ****     verifyindex++;
+ 1207              		.loc 1 170 5 is_stmt 1 view .LVU347
+ 170:Src/sysexprocessor.c ****     verifyindex++;
+ 1208              		.loc 1 170 16 is_stmt 0 view .LVU348
+ 1209 003e 0133     		adds	r3, r3, #1
+ 1210 0040 0193     		str	r3, [sp, #4]
+ 171:Src/sysexprocessor.c ****     WordtoMidiBytes(data, verifyoutput, &verifyindex);
+ 1211              		.loc 1 171 5 is_stmt 1 view .LVU349
+ 1212 0042 01AA     		add	r2, sp, #4
+ 1213 0044 02A9     		add	r1, sp, #8
+ 1214 0046 FFF7FEFF 		bl	WordtoMidiBytes
+ 1215              	.LVL69:
+ 173:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, verifyoutput[0], verifyoutput[1], verifyoutput[2]);
+ 1216              		.loc 1 173 5 view .LVU350
+ 1217 004a 9DF80A30 		ldrb	r3, [sp, #10]	@ zero_extendqisi2
+ 1218 004e 9DF80920 		ldrb	r2, [sp, #9]	@ zero_extendqisi2
+ 1219 0052 9DF80810 		ldrb	r1, [sp, #8]	@ zero_extendqisi2
+ 1220 0056 0420     		movs	r0, #4
+ 1221 0058 FFF7FEFF 		bl	Sysex_SendMidiMessage
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 31
+
+
+ 1222              	.LVL70:
+ 174:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 1223              		.loc 1 174 5 view .LVU351
+ 1224              	.LBB26:
+ 1225              	.LBI26:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1226              		.loc 1 148 13 view .LVU352
+ 1227              	.LBB27:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1228              		.loc 1 149 3 view .LVU353
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1229              		.loc 1 149 26 is_stmt 0 view .LVU354
+ 1230 005c FFF7FEFF 		bl	HAL_GetTick
+ 1231              	.LVL71:
+ 1232 0060 0446     		mov	r4, r0
+ 1233              	.LVL72:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1234              		.loc 1 150 3 is_stmt 1 view .LVU355
+ 1235              	.L66:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1236              		.loc 1 150 8 view .LVU356
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1237              		.loc 1 150 9 is_stmt 0 view .LVU357
+ 1238 0062 404B     		ldr	r3, .L100
+ 1239 0064 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1240              		.loc 1 150 8 view .LVU358
+ 1241 0066 33B1     		cbz	r3, .L95
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1242              		.loc 1 151 5 is_stmt 1 view .LVU359
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1243              		.loc 1 151 8 is_stmt 0 view .LVU360
+ 1244 0068 FFF7FEFF 		bl	HAL_GetTick
+ 1245              	.LVL73:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1246              		.loc 1 151 22 view .LVU361
+ 1247 006c 001B     		subs	r0, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1248              		.loc 1 151 7 view .LVU362
+ 1249 006e 0328     		cmp	r0, #3
+ 1250 0070 F7D9     		bls	.L66
+ 152:Src/sysexprocessor.c ****       return false;
+ 1251              		.loc 1 152 14 view .LVU363
+ 1252 0072 0027     		movs	r7, #0
+ 1253 0074 00E0     		b	.L67
+ 1254              	.L95:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1255              		.loc 1 155 10 view .LVU364
+ 1256 0076 0127     		movs	r7, #1
+ 1257              	.L67:
+ 1258              	.LVL74:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1259              		.loc 1 155 10 view .LVU365
+ 1260              	.LBE27:
+ 1261              	.LBE26:
+ 174:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 1262              		.loc 1 174 7 view .LVU366
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 32
+
+
+ 1263 0078 002F     		cmp	r7, #0
+ 1264 007a 6CD0     		beq	.L69
+ 176:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, verifyoutput[3], verifyoutput[4], verifyoutput[5]);
+ 1265              		.loc 1 176 5 is_stmt 1 view .LVU367
+ 1266 007c 9DF80D30 		ldrb	r3, [sp, #13]	@ zero_extendqisi2
+ 1267 0080 9DF80C20 		ldrb	r2, [sp, #12]	@ zero_extendqisi2
+ 1268 0084 9DF80B10 		ldrb	r1, [sp, #11]	@ zero_extendqisi2
+ 1269 0088 0420     		movs	r0, #4
+ 1270 008a FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1271              	.LVL75:
+ 177:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 1272              		.loc 1 177 5 view .LVU368
+ 1273              	.LBB28:
+ 1274              	.LBI28:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1275              		.loc 1 148 13 view .LVU369
+ 1276              	.LBB29:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1277              		.loc 1 149 3 view .LVU370
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1278              		.loc 1 149 26 is_stmt 0 view .LVU371
+ 1279 008e FFF7FEFF 		bl	HAL_GetTick
+ 1280              	.LVL76:
+ 1281 0092 0446     		mov	r4, r0
+ 1282              	.LVL77:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1283              		.loc 1 150 3 is_stmt 1 view .LVU372
+ 1284              	.L70:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1285              		.loc 1 150 8 view .LVU373
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1286              		.loc 1 150 9 is_stmt 0 view .LVU374
+ 1287 0094 334B     		ldr	r3, .L100
+ 1288 0096 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1289              		.loc 1 150 8 view .LVU375
+ 1290 0098 2BB1     		cbz	r3, .L71
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1291              		.loc 1 151 5 is_stmt 1 view .LVU376
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1292              		.loc 1 151 8 is_stmt 0 view .LVU377
+ 1293 009a FFF7FEFF 		bl	HAL_GetTick
+ 1294              	.LVL78:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1295              		.loc 1 151 22 view .LVU378
+ 1296 009e 001B     		subs	r0, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1297              		.loc 1 151 7 view .LVU379
+ 1298 00a0 0328     		cmp	r0, #3
+ 1299 00a2 F7D9     		bls	.L70
+ 152:Src/sysexprocessor.c ****       return false;
+ 1300              		.loc 1 152 14 view .LVU380
+ 1301 00a4 0027     		movs	r7, #0
+ 1302              	.L71:
+ 1303              	.LVL79:
+ 152:Src/sysexprocessor.c ****       return false;
+ 1304              		.loc 1 152 14 view .LVU381
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 33
+
+
+ 1305              	.LBE29:
+ 1306              	.LBE28:
+ 177:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) 
+ 1307              		.loc 1 177 7 view .LVU382
+ 1308 00a6 002F     		cmp	r7, #0
+ 1309 00a8 55D0     		beq	.L69
+ 1310              	.L73:
+ 180:Src/sysexprocessor.c ****     while (flashaddress < maxflash)
+ 1311              		.loc 1 180 11 is_stmt 1 view .LVU383
+ 180:Src/sysexprocessor.c ****     while (flashaddress < maxflash)
+ 1312              		.loc 1 180 25 is_stmt 0 view .LVU384
+ 1313 00aa 009B     		ldr	r3, [sp]
+ 180:Src/sysexprocessor.c ****     while (flashaddress < maxflash)
+ 1314              		.loc 1 180 11 view .LVU385
+ 1315 00ac B342     		cmp	r3, r6
+ 1316 00ae 38D2     		bcs	.L96
+ 182:Src/sysexprocessor.c ****       verifyindex = 0;
+ 1317              		.loc 1 182 7 is_stmt 1 view .LVU386
+ 182:Src/sysexprocessor.c ****       verifyindex = 0;
+ 1318              		.loc 1 182 19 is_stmt 0 view .LVU387
+ 1319 00b0 0024     		movs	r4, #0
+ 1320 00b2 0194     		str	r4, [sp, #4]
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1321              		.loc 1 183 7 is_stmt 1 view .LVU388
+ 1322              	.LBB30:
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1323              		.loc 1 183 12 view .LVU389
+ 1324              	.LVL80:
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1325              		.loc 1 183 7 is_stmt 0 view .LVU390
+ 1326 00b4 07E0     		b	.L74
+ 1327              	.LVL81:
+ 1328              	.L98:
+ 187:Src/sysexprocessor.c ****         data = Config_ReadWord(&flashaddress);
+ 1329              		.loc 1 187 9 is_stmt 1 discriminator 2 view .LVU391
+ 187:Src/sysexprocessor.c ****         data = Config_ReadWord(&flashaddress);
+ 1330              		.loc 1 187 16 is_stmt 0 discriminator 2 view .LVU392
+ 1331 00b6 6846     		mov	r0, sp
+ 1332 00b8 FFF7FEFF 		bl	Config_ReadWord
+ 1333              	.LVL82:
+ 188:Src/sysexprocessor.c ****         WordtoMidiBytes(data,verifyoutput,&verifyindex);
+ 1334              		.loc 1 188 9 is_stmt 1 discriminator 2 view .LVU393
+ 1335 00bc 01AA     		add	r2, sp, #4
+ 1336 00be 02A9     		add	r1, sp, #8
+ 1337 00c0 FFF7FEFF 		bl	WordtoMidiBytes
+ 1338              	.LVL83:
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1339              		.loc 1 183 33 discriminator 2 view .LVU394
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1340              		.loc 1 183 34 is_stmt 0 discriminator 2 view .LVU395
+ 1341 00c4 0134     		adds	r4, r4, #1
+ 1342              	.LVL84:
+ 1343              	.L74:
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1344              		.loc 1 183 26 is_stmt 1 discriminator 1 view .LVU396
+ 183:Src/sysexprocessor.c ****       for (size_t i = 0; i < 3; i++) {
+ 1345              		.loc 1 183 7 is_stmt 0 discriminator 1 view .LVU397
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 34
+
+
+ 1346 00c6 022C     		cmp	r4, #2
+ 1347 00c8 04D8     		bhi	.L97
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 1348              		.loc 1 184 9 is_stmt 1 view .LVU398
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 1349              		.loc 1 184 25 is_stmt 0 view .LVU399
+ 1350 00ca 009B     		ldr	r3, [sp]
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 1351              		.loc 1 184 11 view .LVU400
+ 1352 00cc B342     		cmp	r3, r6
+ 1353 00ce F2D3     		bcc	.L98
+ 1354 00d0 0025     		movs	r5, #0
+ 1355 00d2 16E0     		b	.L80
+ 1356              	.L97:
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 1357              		.loc 1 184 11 view .LVU401
+ 1358 00d4 0025     		movs	r5, #0
+ 1359 00d6 14E0     		b	.L80
+ 1360              	.LVL85:
+ 1361              	.L99:
+ 184:Src/sysexprocessor.c ****         if(flashaddress >= maxflash) {
+ 1362              		.loc 1 184 11 view .LVU402
+ 1363              	.LBE30:
+ 1364              	.LBB31:
+ 1365              	.LBB32:
+ 1366              	.LBB33:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1367              		.loc 1 155 10 view .LVU403
+ 1368 00d8 3B46     		mov	r3, r7
+ 1369              	.L78:
+ 1370              	.LVL86:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1371              		.loc 1 155 10 view .LVU404
+ 1372              	.LBE33:
+ 1373              	.LBE32:
+ 191:Src/sysexprocessor.c ****         if(Sysex_UsbTimeout() == false) {
+ 1374              		.loc 1 191 11 view .LVU405
+ 1375 00da 002B     		cmp	r3, #0
+ 1376 00dc 3BD0     		beq	.L69
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 1377              		.loc 1 194 9 is_stmt 1 discriminator 2 view .LVU406
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 1378              		.loc 1 194 51 is_stmt 0 discriminator 2 view .LVU407
+ 1379 00de 05EB4503 		add	r3, r5, r5, lsl #1
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 1380              		.loc 1 194 72 discriminator 2 view .LVU408
+ 1381 00e2 5A1C     		adds	r2, r3, #1
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 1382              		.loc 1 194 93 discriminator 2 view .LVU409
+ 1383 00e4 981C     		adds	r0, r3, #2
+ 194:Src/sysexprocessor.c ****         Sysex_SendMidiMessage(0x04, verifyoutput[i*3], verifyoutput[i*3+1], verifyoutput[i*3+2]);
+ 1384              		.loc 1 194 9 discriminator 2 view .LVU410
+ 1385 00e6 06A9     		add	r1, sp, #24
+ 1386 00e8 0844     		add	r0, r0, r1
+ 1387 00ea 0A44     		add	r2, r2, r1
+ 1388 00ec 1944     		add	r1, r1, r3
+ 1389 00ee 10F8103C 		ldrb	r3, [r0, #-16]	@ zero_extendqisi2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 35
+
+
+ 1390 00f2 12F8102C 		ldrb	r2, [r2, #-16]	@ zero_extendqisi2
+ 1391 00f6 11F8101C 		ldrb	r1, [r1, #-16]	@ zero_extendqisi2
+ 1392 00fa 0420     		movs	r0, #4
+ 1393 00fc FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1394              	.LVL87:
+ 190:Src/sysexprocessor.c ****       for (size_t i = 0; i < 5; i++) {
+ 1395              		.loc 1 190 33 is_stmt 1 discriminator 2 view .LVU411
+ 190:Src/sysexprocessor.c ****       for (size_t i = 0; i < 5; i++) {
+ 1396              		.loc 1 190 34 is_stmt 0 discriminator 2 view .LVU412
+ 1397 0100 0135     		adds	r5, r5, #1
+ 1398              	.LVL88:
+ 1399              	.L80:
+ 190:Src/sysexprocessor.c ****       for (size_t i = 0; i < 5; i++) {
+ 1400              		.loc 1 190 26 is_stmt 1 discriminator 1 view .LVU413
+ 190:Src/sysexprocessor.c ****       for (size_t i = 0; i < 5; i++) {
+ 1401              		.loc 1 190 7 is_stmt 0 discriminator 1 view .LVU414
+ 1402 0102 042D     		cmp	r5, #4
+ 1403 0104 D1D8     		bhi	.L73
+ 191:Src/sysexprocessor.c ****         if(Sysex_UsbTimeout() == false) {
+ 1404              		.loc 1 191 9 is_stmt 1 view .LVU415
+ 1405              	.LBB35:
+ 1406              	.LBI32:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1407              		.loc 1 148 13 view .LVU416
+ 1408              	.LBB34:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1409              		.loc 1 149 3 view .LVU417
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1410              		.loc 1 149 26 is_stmt 0 view .LVU418
+ 1411 0106 FFF7FEFF 		bl	HAL_GetTick
+ 1412              	.LVL89:
+ 1413 010a 0446     		mov	r4, r0
+ 1414              	.LVL90:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1415              		.loc 1 150 3 is_stmt 1 view .LVU419
+ 1416              	.L77:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1417              		.loc 1 150 8 view .LVU420
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1418              		.loc 1 150 9 is_stmt 0 view .LVU421
+ 1419 010c 154B     		ldr	r3, .L100
+ 1420 010e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1421              		.loc 1 150 8 view .LVU422
+ 1422 0110 002B     		cmp	r3, #0
+ 1423 0112 E1D0     		beq	.L99
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1424              		.loc 1 151 5 is_stmt 1 view .LVU423
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1425              		.loc 1 151 8 is_stmt 0 view .LVU424
+ 1426 0114 FFF7FEFF 		bl	HAL_GetTick
+ 1427              	.LVL91:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1428              		.loc 1 151 22 view .LVU425
+ 1429 0118 001B     		subs	r0, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1430              		.loc 1 151 7 view .LVU426
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 36
+
+
+ 1431 011a 0328     		cmp	r0, #3
+ 1432 011c F6D9     		bls	.L77
+ 152:Src/sysexprocessor.c ****       return false;
+ 1433              		.loc 1 152 14 view .LVU427
+ 1434 011e 0023     		movs	r3, #0
+ 1435 0120 DBE7     		b	.L78
+ 1436              	.LVL92:
+ 1437              	.L96:
+ 152:Src/sysexprocessor.c ****       return false;
+ 1438              		.loc 1 152 14 view .LVU428
+ 1439              	.LBE34:
+ 1440              	.LBE35:
+ 1441              	.LBE31:
+ 197:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false){
+ 1442              		.loc 1 197 5 is_stmt 1 view .LVU429
+ 1443              	.LBB36:
+ 1444              	.LBI36:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1445              		.loc 1 148 13 view .LVU430
+ 1446              	.LBB37:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1447              		.loc 1 149 3 view .LVU431
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1448              		.loc 1 149 26 is_stmt 0 view .LVU432
+ 1449 0122 FFF7FEFF 		bl	HAL_GetTick
+ 1450              	.LVL93:
+ 1451 0126 0446     		mov	r4, r0
+ 1452              	.LVL94:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1453              		.loc 1 150 3 is_stmt 1 view .LVU433
+ 1454              	.L83:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1455              		.loc 1 150 8 view .LVU434
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1456              		.loc 1 150 9 is_stmt 0 view .LVU435
+ 1457 0128 0E4B     		ldr	r3, .L100
+ 1458 012a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1459              		.loc 1 150 8 view .LVU436
+ 1460 012c 2BB1     		cbz	r3, .L84
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1461              		.loc 1 151 5 is_stmt 1 view .LVU437
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1462              		.loc 1 151 8 is_stmt 0 view .LVU438
+ 1463 012e FFF7FEFF 		bl	HAL_GetTick
+ 1464              	.LVL95:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1465              		.loc 1 151 22 view .LVU439
+ 1466 0132 031B     		subs	r3, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1467              		.loc 1 151 7 view .LVU440
+ 1468 0134 032B     		cmp	r3, #3
+ 1469 0136 F7D9     		bls	.L83
+ 152:Src/sysexprocessor.c ****       return false;
+ 1470              		.loc 1 152 14 view .LVU441
+ 1471 0138 0027     		movs	r7, #0
+ 1472              	.L84:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 37
+
+
+ 1473              	.LVL96:
+ 152:Src/sysexprocessor.c ****       return false;
+ 1474              		.loc 1 152 14 view .LVU442
+ 1475              	.LBE37:
+ 1476              	.LBE36:
+ 197:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false){
+ 1477              		.loc 1 197 7 view .LVU443
+ 1478 013a 67B1     		cbz	r7, .L69
+ 200:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x07,0x00,0x00,0xF7);
+ 1479              		.loc 1 200 5 is_stmt 1 view .LVU444
+ 1480 013c F723     		movs	r3, #247
+ 1481 013e 0022     		movs	r2, #0
+ 1482 0140 1146     		mov	r1, r2
+ 1483 0142 0720     		movs	r0, #7
+ 1484 0144 FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1485              	.LVL97:
+ 201:Src/sysexprocessor.c ****     HAL_Delay(2000);
+ 1486              		.loc 1 201 5 view .LVU445
+ 1487 0148 4FF4FA60 		mov	r0, #2000
+ 1488 014c FFF7FEFF 		bl	HAL_Delay
+ 1489              	.LVL98:
+ 1490              	.LBE25:
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1491              		.loc 1 159 30 view .LVU446
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1492              		.loc 1 159 31 is_stmt 0 view .LVU447
+ 1493 0150 08F10108 		add	r8, r8, #1
+ 1494              	.LVL99:
+ 159:Src/sysexprocessor.c ****   for (size_t i = 0; i < 15; i++)
+ 1495              		.loc 1 159 31 view .LVU448
+ 1496 0154 59E7     		b	.L65
+ 1497              	.L69:
+ 1498              	.LBB38:
+ 175:Src/sysexprocessor.c ****       return false;
+ 1499              		.loc 1 175 14 discriminator 1 view .LVU449
+ 1500 0156 0020     		movs	r0, #0
+ 1501              	.LVL100:
+ 1502              	.L86:
+ 175:Src/sysexprocessor.c ****       return false;
+ 1503              		.loc 1 175 14 discriminator 1 view .LVU450
+ 1504              	.LBE38:
+ 1505              	.LBE24:
+ 206:Src/sysexprocessor.c **** }
+ 1506              		.loc 1 206 1 view .LVU451
+ 1507 0158 06B0     		add	sp, sp, #24
+ 1508              	.LCFI24:
+ 1509              		.cfi_remember_state
+ 1510              		.cfi_def_cfa_offset 24
+ 1511              		@ sp needed
+ 1512 015a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1513              	.LVL101:
+ 1514              	.L94:
+ 1515              	.LCFI25:
+ 1516              		.cfi_restore_state
+ 205:Src/sysexprocessor.c ****   return true;
+ 1517              		.loc 1 205 10 view .LVU452
+ 1518 015e 0120     		movs	r0, #1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 38
+
+
+ 1519 0160 FAE7     		b	.L86
+ 1520              	.L101:
+ 1521 0162 00BF     		.align	2
+ 1522              	.L100:
+ 1523 0164 00000000 		.word	USB_Tx_State
+ 1524              		.cfi_endproc
+ 1525              	.LFE139:
+ 1527              		.section	.text.Sysex_DumpConfiguration,"ax",%progbits
+ 1528              		.align	1
+ 1529              		.global	Sysex_DumpConfiguration
+ 1530              		.syntax unified
+ 1531              		.thumb
+ 1532              		.thumb_func
+ 1533              		.fpu fpv4-sp-d16
+ 1535              	Sysex_DumpConfiguration:
+ 1536              	.LFB143:
+ 338:Src/sysexprocessor.c **** bool Sysex_DumpConfiguration() {
+ 1537              		.loc 1 338 32 is_stmt 1 view -0
+ 1538              		.cfi_startproc
+ 1539              		@ args = 0, pretend = 0, frame = 648
+ 1540              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1541 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1542              	.LCFI26:
+ 1543              		.cfi_def_cfa_offset 20
+ 1544              		.cfi_offset 4, -20
+ 1545              		.cfi_offset 5, -16
+ 1546              		.cfi_offset 6, -12
+ 1547              		.cfi_offset 7, -8
+ 1548              		.cfi_offset 14, -4
+ 1549 0002 ADF5237D 		sub	sp, sp, #652
+ 1550              	.LCFI27:
+ 1551              		.cfi_def_cfa_offset 672
+ 339:Src/sysexprocessor.c ****   uint8_t bufferoutput[40*16+2];
+ 1552              		.loc 1 339 3 view .LVU454
+ 340:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 1553              		.loc 1 340 3 view .LVU455
+ 340:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 1554              		.loc 1 340 7 is_stmt 0 view .LVU456
+ 1555 0006 0026     		movs	r6, #0
+ 1556 0008 0096     		str	r6, [sp]
+ 342:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 1557              		.loc 1 342 3 is_stmt 1 view .LVU457
+ 342:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 1558              		.loc 1 342 29 is_stmt 0 view .LVU458
+ 1559 000a F023     		movs	r3, #240
+ 1560 000c 8DF80430 		strb	r3, [sp, #4]
+ 343:Src/sysexprocessor.c ****   bufferindex++;
+ 1561              		.loc 1 343 3 is_stmt 1 view .LVU459
+ 343:Src/sysexprocessor.c ****   bufferindex++;
+ 1562              		.loc 1 343 14 is_stmt 0 view .LVU460
+ 1563 0010 0123     		movs	r3, #1
+ 1564 0012 0093     		str	r3, [sp]
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1565              		.loc 1 344 3 is_stmt 1 view .LVU461
+ 1566              	.LBB45:
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1567              		.loc 1 344 8 view .LVU462
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 39
+
+
+ 1568              	.LVL102:
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1569              		.loc 1 344 3 is_stmt 0 view .LVU463
+ 1570 0014 00E0     		b	.L103
+ 1571              	.LVL103:
+ 1572              	.L116:
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1573              		.loc 1 344 30 is_stmt 1 discriminator 2 view .LVU464
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1574              		.loc 1 344 31 is_stmt 0 discriminator 2 view .LVU465
+ 1575 0016 0136     		adds	r6, r6, #1
+ 1576              	.LVL104:
+ 1577              	.L103:
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1578              		.loc 1 344 22 is_stmt 1 discriminator 1 view .LVU466
+ 344:Src/sysexprocessor.c ****   for (size_t i = 0; i < 16; i++)  {
+ 1579              		.loc 1 344 3 is_stmt 0 discriminator 1 view .LVU467
+ 1580 0018 0F2E     		cmp	r6, #15
+ 1581 001a 2AD8     		bhi	.L115
+ 1582              	.LBB46:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1583              		.loc 1 345 18 view .LVU468
+ 1584 001c 0025     		movs	r5, #0
+ 1585              	.L105:
+ 1586              	.LVL105:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1587              		.loc 1 345 25 is_stmt 1 discriminator 1 view .LVU469
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1588              		.loc 1 345 5 is_stmt 0 discriminator 1 view .LVU470
+ 1589 001e 032D     		cmp	r5, #3
+ 1590 0020 F9D8     		bhi	.L116
+ 1591              	.LBB47:
+ 346:Src/sysexprocessor.c ****       uint8_t a = config[i].analogmode[j];
+ 1592              		.loc 1 346 7 is_stmt 1 discriminator 3 view .LVU471
+ 346:Src/sysexprocessor.c ****       uint8_t a = config[i].analogmode[j];
+ 1593              		.loc 1 346 15 is_stmt 0 discriminator 3 view .LVU472
+ 1594 0022 314C     		ldr	r4, .L119
+ 1595 0024 04EB4613 		add	r3, r4, r6, lsl #5
+ 1596 0028 5F19     		adds	r7, r3, r5
+ 1597 002a 595D     		ldrb	r1, [r3, r5]	@ zero_extendqisi2
+ 1598              	.LVL106:
+ 347:Src/sysexprocessor.c ****       uint8_t b = config[i].analogsetting[j].midichannel;
+ 1599              		.loc 1 347 7 is_stmt 1 discriminator 3 view .LVU473
+ 347:Src/sysexprocessor.c ****       uint8_t b = config[i].analogsetting[j].midichannel;
+ 1600              		.loc 1 347 15 is_stmt 0 discriminator 3 view .LVU474
+ 1601 002c 05EB4502 		add	r2, r5, r5, lsl #1
+ 1602 0030 02EB4612 		add	r2, r2, r6, lsl #5
+ 1603 0034 1444     		add	r4, r4, r2
+ 1604 0036 2379     		ldrb	r3, [r4, #4]	@ zero_extendqisi2
+ 1605              	.LVL107:
+ 348:Src/sysexprocessor.c ****       uint8_t c = config[i].analogsetting[j].byte2;
+ 1606              		.loc 1 348 7 is_stmt 1 discriminator 3 view .LVU475
+ 348:Src/sysexprocessor.c ****       uint8_t c = config[i].analogsetting[j].byte2;
+ 1607              		.loc 1 348 15 is_stmt 0 discriminator 3 view .LVU476
+ 1608 0038 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 1609              	.LVL108:
+ 349:Src/sysexprocessor.c ****       uint8_t d = config[i].analogsetting[j].byte3;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 40
+
+
+ 1610              		.loc 1 349 7 is_stmt 1 discriminator 3 view .LVU477
+ 349:Src/sysexprocessor.c ****       uint8_t d = config[i].analogsetting[j].byte3;
+ 1611              		.loc 1 349 15 is_stmt 0 discriminator 3 view .LVU478
+ 1612 003a A079     		ldrb	r0, [r4, #6]	@ zero_extendqisi2
+ 1613              	.LVL109:
+ 350:Src/sysexprocessor.c ****       uint32_t writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) 
+ 1614              		.loc 1 350 7 is_stmt 1 discriminator 3 view .LVU479
+ 350:Src/sysexprocessor.c ****       uint32_t writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) 
+ 1615              		.loc 1 350 62 is_stmt 0 discriminator 3 view .LVU480
+ 1616 003c 1B04     		lsls	r3, r3, #16
+ 1617              	.LVL110:
+ 350:Src/sysexprocessor.c ****       uint32_t writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) 
+ 1618              		.loc 1 350 51 discriminator 3 view .LVU481
+ 1619 003e 43EA0163 		orr	r3, r3, r1, lsl #24
+ 350:Src/sysexprocessor.c ****       uint32_t writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) 
+ 1620              		.loc 1 350 76 discriminator 3 view .LVU482
+ 1621 0042 43EA0223 		orr	r3, r3, r2, lsl #8
+ 1622              	.LVL111:
+ 351:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1623              		.loc 1 351 7 is_stmt 1 discriminator 3 view .LVU483
+ 1624 0046 6A46     		mov	r2, sp
+ 1625              	.LVL112:
+ 351:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1626              		.loc 1 351 7 is_stmt 0 discriminator 3 view .LVU484
+ 1627 0048 01A9     		add	r1, sp, #4
+ 1628              	.LVL113:
+ 351:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1629              		.loc 1 351 7 discriminator 3 view .LVU485
+ 1630 004a 1843     		orrs	r0, r0, r3
+ 1631              	.LVL114:
+ 351:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1632              		.loc 1 351 7 discriminator 3 view .LVU486
+ 1633 004c FFF7FEFF 		bl	WordtoMidiBytes
+ 1634              	.LVL115:
+ 353:Src/sysexprocessor.c ****       a = config[i].digitalmode[j];
+ 1635              		.loc 1 353 7 is_stmt 1 discriminator 3 view .LVU487
+ 353:Src/sysexprocessor.c ****       a = config[i].digitalmode[j];
+ 1636              		.loc 1 353 9 is_stmt 0 discriminator 3 view .LVU488
+ 1637 0050 397C     		ldrb	r1, [r7, #16]	@ zero_extendqisi2
+ 1638              	.LVL116:
+ 354:Src/sysexprocessor.c ****       b = config[i].digitalsetting[j].midichannel;
+ 1639              		.loc 1 354 7 is_stmt 1 discriminator 3 view .LVU489
+ 354:Src/sysexprocessor.c ****       b = config[i].digitalsetting[j].midichannel;
+ 1640              		.loc 1 354 9 is_stmt 0 discriminator 3 view .LVU490
+ 1641 0052 237D     		ldrb	r3, [r4, #20]	@ zero_extendqisi2
+ 1642              	.LVL117:
+ 355:Src/sysexprocessor.c ****       c = config[i].digitalsetting[j].byte2;
+ 1643              		.loc 1 355 7 is_stmt 1 discriminator 3 view .LVU491
+ 355:Src/sysexprocessor.c ****       c = config[i].digitalsetting[j].byte2;
+ 1644              		.loc 1 355 9 is_stmt 0 discriminator 3 view .LVU492
+ 1645 0054 627D     		ldrb	r2, [r4, #21]	@ zero_extendqisi2
+ 1646              	.LVL118:
+ 356:Src/sysexprocessor.c ****       d = config[i].digitalsetting[j].byte3;
+ 1647              		.loc 1 356 7 is_stmt 1 discriminator 3 view .LVU493
+ 356:Src/sysexprocessor.c ****       d = config[i].digitalsetting[j].byte3;
+ 1648              		.loc 1 356 9 is_stmt 0 discriminator 3 view .LVU494
+ 1649 0056 A07D     		ldrb	r0, [r4, #22]	@ zero_extendqisi2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 41
+
+
+ 1650              	.LVL119:
+ 357:Src/sysexprocessor.c ****       writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) | (d << 0
+ 1651              		.loc 1 357 7 is_stmt 1 discriminator 3 view .LVU495
+ 357:Src/sysexprocessor.c ****       writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) | (d << 0
+ 1652              		.loc 1 357 53 is_stmt 0 discriminator 3 view .LVU496
+ 1653 0058 1B04     		lsls	r3, r3, #16
+ 1654              	.LVL120:
+ 357:Src/sysexprocessor.c ****       writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) | (d << 0
+ 1655              		.loc 1 357 42 discriminator 3 view .LVU497
+ 1656 005a 43EA0163 		orr	r3, r3, r1, lsl #24
+ 357:Src/sysexprocessor.c ****       writeword = (a << 24 & 0xFF000000) | (b << 16 & 0x00FF0000) | (c << 8 & 0x0000FF00) | (d << 0
+ 1657              		.loc 1 357 67 discriminator 3 view .LVU498
+ 1658 005e 43EA0223 		orr	r3, r3, r2, lsl #8
+ 1659              	.LVL121:
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1660              		.loc 1 358 7 is_stmt 1 discriminator 3 view .LVU499
+ 1661 0062 6A46     		mov	r2, sp
+ 1662              	.LVL122:
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1663              		.loc 1 358 7 is_stmt 0 discriminator 3 view .LVU500
+ 1664 0064 01A9     		add	r1, sp, #4
+ 1665              	.LVL123:
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1666              		.loc 1 358 7 discriminator 3 view .LVU501
+ 1667 0066 1843     		orrs	r0, r0, r3
+ 1668              	.LVL124:
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1669              		.loc 1 358 7 discriminator 3 view .LVU502
+ 1670 0068 FFF7FEFF 		bl	WordtoMidiBytes
+ 1671              	.LVL125:
+ 358:Src/sysexprocessor.c ****       WordtoMidiBytes(writeword,bufferoutput,&bufferindex);
+ 1672              		.loc 1 358 7 discriminator 3 view .LVU503
+ 1673              	.LBE47:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1674              		.loc 1 345 32 is_stmt 1 discriminator 3 view .LVU504
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1675              		.loc 1 345 33 is_stmt 0 discriminator 3 view .LVU505
+ 1676 006c 0135     		adds	r5, r5, #1
+ 1677              	.LVL126:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1678              		.loc 1 345 33 discriminator 3 view .LVU506
+ 1679 006e EDB2     		uxtb	r5, r5
+ 1680              	.LVL127:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1681              		.loc 1 345 33 discriminator 3 view .LVU507
+ 1682 0070 D5E7     		b	.L105
+ 1683              	.LVL128:
+ 1684              	.L115:
+ 345:Src/sysexprocessor.c ****     for (uint8_t j = 0; j < 4; j++) {
+ 1685              		.loc 1 345 33 discriminator 3 view .LVU508
+ 1686              	.LBE46:
+ 1687              	.LBE45:
+ 361:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1688              		.loc 1 361 3 is_stmt 1 view .LVU509
+ 361:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1689              		.loc 1 361 15 is_stmt 0 view .LVU510
+ 1690 0072 009B     		ldr	r3, [sp]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 42
+
+
+ 361:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1691              		.loc 1 361 29 view .LVU511
+ 1692 0074 01A9     		add	r1, sp, #4
+ 1693 0076 F722     		movs	r2, #247
+ 1694 0078 CA54     		strb	r2, [r1, r3]
+ 362:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x04, bufferoutput[0*3], bufferoutput[0*3+1], bufferoutput[0*3+2]);
+ 1695              		.loc 1 362 3 is_stmt 1 view .LVU512
+ 1696 007a 9DF80630 		ldrb	r3, [sp, #6]	@ zero_extendqisi2
+ 1697 007e 9DF80520 		ldrb	r2, [sp, #5]	@ zero_extendqisi2
+ 1698 0082 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 1699 0086 0420     		movs	r0, #4
+ 1700 0088 FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1701              	.LVL129:
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1702              		.loc 1 364 3 view .LVU513
+ 1703              	.LBB48:
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1704              		.loc 1 364 8 view .LVU514
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1705              		.loc 1 364 15 is_stmt 0 view .LVU515
+ 1706 008c 0125     		movs	r5, #1
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1707              		.loc 1 364 3 view .LVU516
+ 1708 008e 02E0     		b	.L106
+ 1709              	.LVL130:
+ 1710              	.L118:
+ 1711              	.LBB49:
+ 1712              	.LBB50:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1713              		.loc 1 155 10 view .LVU517
+ 1714 0090 0120     		movs	r0, #1
+ 1715              	.L108:
+ 1716              	.LVL131:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1717              		.loc 1 155 10 view .LVU518
+ 1718              	.LBE50:
+ 1719              	.LBE49:
+ 366:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 1720              		.loc 1 366 7 view .LVU519
+ 1721 0092 28B3     		cbz	r0, .L110
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1722              		.loc 1 364 31 is_stmt 1 discriminator 2 view .LVU520
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1723              		.loc 1 364 32 is_stmt 0 discriminator 2 view .LVU521
+ 1724 0094 0135     		adds	r5, r5, #1
+ 1725              	.LVL132:
+ 1726              	.L106:
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1727              		.loc 1 364 22 is_stmt 1 discriminator 1 view .LVU522
+ 364:Src/sysexprocessor.c ****   for (size_t i = 1; i < 213; i++) {
+ 1728              		.loc 1 364 3 is_stmt 0 discriminator 1 view .LVU523
+ 1729 0096 D42D     		cmp	r5, #212
+ 1730 0098 18D8     		bhi	.L117
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 1731              		.loc 1 365 5 is_stmt 1 view .LVU524
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 1732              		.loc 1 365 47 is_stmt 0 view .LVU525
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 43
+
+
+ 1733 009a 05EB4501 		add	r1, r5, r5, lsl #1
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 1734              		.loc 1 365 68 view .LVU526
+ 1735 009e 4A1C     		adds	r2, r1, #1
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 1736              		.loc 1 365 89 view .LVU527
+ 1737 00a0 8B1C     		adds	r3, r1, #2
+ 365:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);  
+ 1738              		.loc 1 365 5 view .LVU528
+ 1739 00a2 01A8     		add	r0, sp, #4
+ 1740 00a4 C35C     		ldrb	r3, [r0, r3]	@ zero_extendqisi2
+ 1741 00a6 825C     		ldrb	r2, [r0, r2]	@ zero_extendqisi2
+ 1742 00a8 415C     		ldrb	r1, [r0, r1]	@ zero_extendqisi2
+ 1743 00aa 0420     		movs	r0, #4
+ 1744 00ac FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1745              	.LVL133:
+ 366:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 1746              		.loc 1 366 5 is_stmt 1 view .LVU529
+ 1747              	.LBB52:
+ 1748              	.LBI49:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1749              		.loc 1 148 13 view .LVU530
+ 1750              	.LBB51:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1751              		.loc 1 149 3 view .LVU531
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1752              		.loc 1 149 26 is_stmt 0 view .LVU532
+ 1753 00b0 FFF7FEFF 		bl	HAL_GetTick
+ 1754              	.LVL134:
+ 1755 00b4 0446     		mov	r4, r0
+ 1756              	.LVL135:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1757              		.loc 1 150 3 is_stmt 1 view .LVU533
+ 1758              	.L107:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1759              		.loc 1 150 8 view .LVU534
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1760              		.loc 1 150 9 is_stmt 0 view .LVU535
+ 1761 00b6 0D4B     		ldr	r3, .L119+4
+ 1762 00b8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1763              		.loc 1 150 8 view .LVU536
+ 1764 00ba 002B     		cmp	r3, #0
+ 1765 00bc E8D0     		beq	.L118
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1766              		.loc 1 151 5 is_stmt 1 view .LVU537
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1767              		.loc 1 151 8 is_stmt 0 view .LVU538
+ 1768 00be FFF7FEFF 		bl	HAL_GetTick
+ 1769              	.LVL136:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1770              		.loc 1 151 22 view .LVU539
+ 1771 00c2 001B     		subs	r0, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1772              		.loc 1 151 7 view .LVU540
+ 1773 00c4 0328     		cmp	r0, #3
+ 1774 00c6 F6D9     		bls	.L107
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 44
+
+
+ 152:Src/sysexprocessor.c ****       return false;
+ 1775              		.loc 1 152 14 view .LVU541
+ 1776 00c8 0020     		movs	r0, #0
+ 1777 00ca E2E7     		b	.L108
+ 1778              	.LVL137:
+ 1779              	.L117:
+ 152:Src/sysexprocessor.c ****       return false;
+ 1780              		.loc 1 152 14 view .LVU542
+ 1781              	.LBE51:
+ 1782              	.LBE52:
+ 1783              	.LBE48:
+ 372:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x07, bufferoutput[639], bufferoutput[640], bufferoutput[641]);
+ 1784              		.loc 1 372 3 is_stmt 1 view .LVU543
+ 1785 00cc 9DF88532 		ldrb	r3, [sp, #645]	@ zero_extendqisi2
+ 1786 00d0 9DF88422 		ldrb	r2, [sp, #644]	@ zero_extendqisi2
+ 1787 00d4 9DF88312 		ldrb	r1, [sp, #643]	@ zero_extendqisi2
+ 1788 00d8 0720     		movs	r0, #7
+ 1789 00da FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1790              	.LVL138:
+ 373:Src/sysexprocessor.c ****   return true;
+ 1791              		.loc 1 373 3 view .LVU544
+ 373:Src/sysexprocessor.c ****   return true;
+ 1792              		.loc 1 373 10 is_stmt 0 view .LVU545
+ 1793 00de 0120     		movs	r0, #1
+ 1794              	.L110:
+ 374:Src/sysexprocessor.c **** }
+ 1795              		.loc 1 374 1 view .LVU546
+ 1796 00e0 0DF5237D 		add	sp, sp, #652
+ 1797              	.LCFI28:
+ 1798              		.cfi_def_cfa_offset 20
+ 1799              		@ sp needed
+ 1800 00e4 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1801              	.LVL139:
+ 1802              	.L120:
+ 374:Src/sysexprocessor.c **** }
+ 1803              		.loc 1 374 1 view .LVU547
+ 1804 00e6 00BF     		.align	2
+ 1805              	.L119:
+ 1806 00e8 00000000 		.word	config
+ 1807 00ec 00000000 		.word	USB_Tx_State
+ 1808              		.cfi_endproc
+ 1809              	.LFE143:
+ 1811              		.section	.text.Sysex_DumpCalibration,"ax",%progbits
+ 1812              		.align	1
+ 1813              		.global	Sysex_DumpCalibration
+ 1814              		.syntax unified
+ 1815              		.thumb
+ 1816              		.thumb_func
+ 1817              		.fpu fpv4-sp-d16
+ 1819              	Sysex_DumpCalibration:
+ 1820              	.LFB144:
+ 378:Src/sysexprocessor.c **** bool Sysex_DumpCalibration() {
+ 1821              		.loc 1 378 30 is_stmt 1 view -0
+ 1822              		.cfi_startproc
+ 1823              		@ args = 0, pretend = 0, frame = 48
+ 1824              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1825 0000 30B5     		push	{r4, r5, lr}
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 45
+
+
+ 1826              	.LCFI29:
+ 1827              		.cfi_def_cfa_offset 12
+ 1828              		.cfi_offset 4, -12
+ 1829              		.cfi_offset 5, -8
+ 1830              		.cfi_offset 14, -4
+ 1831 0002 8DB0     		sub	sp, sp, #52
+ 1832              	.LCFI30:
+ 1833              		.cfi_def_cfa_offset 64
+ 379:Src/sysexprocessor.c ****   uint8_t bufferoutput[40+2];
+ 1834              		.loc 1 379 3 view .LVU549
+ 380:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 1835              		.loc 1 380 3 view .LVU550
+ 380:Src/sysexprocessor.c ****   int bufferindex = 0;
+ 1836              		.loc 1 380 7 is_stmt 0 view .LVU551
+ 1837 0004 0024     		movs	r4, #0
+ 1838 0006 0094     		str	r4, [sp]
+ 382:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 1839              		.loc 1 382 3 is_stmt 1 view .LVU552
+ 382:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF0;
+ 1840              		.loc 1 382 29 is_stmt 0 view .LVU553
+ 1841 0008 F023     		movs	r3, #240
+ 1842 000a 8DF80430 		strb	r3, [sp, #4]
+ 383:Src/sysexprocessor.c ****   bufferindex++;
+ 1843              		.loc 1 383 3 is_stmt 1 view .LVU554
+ 383:Src/sysexprocessor.c ****   bufferindex++;
+ 1844              		.loc 1 383 14 is_stmt 0 view .LVU555
+ 1845 000e 0123     		movs	r3, #1
+ 1846 0010 0093     		str	r3, [sp]
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1847              		.loc 1 384 3 is_stmt 1 view .LVU556
+ 1848              	.LBB57:
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1849              		.loc 1 384 8 view .LVU557
+ 1850              	.LVL140:
+ 1851              	.L122:
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1852              		.loc 1 384 22 discriminator 1 view .LVU558
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1853              		.loc 1 384 3 is_stmt 0 discriminator 1 view .LVU559
+ 1854 0012 032C     		cmp	r4, #3
+ 1855 0014 15D8     		bhi	.L132
+ 385:Src/sysexprocessor.c ****     FloatToMidiBytes(dac.voltlow[i], bufferoutput, &bufferindex);
+ 1856              		.loc 1 385 5 is_stmt 1 discriminator 3 view .LVU560
+ 1857 0016 274D     		ldr	r5, .L135
+ 1858 0018 A31D     		adds	r3, r4, #6
+ 1859 001a 05EB8303 		add	r3, r5, r3, lsl #2
+ 1860 001e 6946     		mov	r1, sp
+ 1861 0020 01A8     		add	r0, sp, #4
+ 1862 0022 93ED010A 		vldr.32	s0, [r3, #4]
+ 1863 0026 FFF7FEFF 		bl	FloatToMidiBytes
+ 1864              	.LVL141:
+ 386:Src/sysexprocessor.c ****     FloatToMidiBytes(dac.volthigh[i], bufferoutput, &bufferindex);
+ 1865              		.loc 1 386 5 discriminator 3 view .LVU561
+ 1866 002a 04F10A03 		add	r3, r4, #10
+ 1867 002e 05EB8305 		add	r5, r5, r3, lsl #2
+ 1868 0032 6946     		mov	r1, sp
+ 1869 0034 01A8     		add	r0, sp, #4
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 46
+
+
+ 1870 0036 95ED010A 		vldr.32	s0, [r5, #4]
+ 1871 003a FFF7FEFF 		bl	FloatToMidiBytes
+ 1872              	.LVL142:
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1873              		.loc 1 384 29 discriminator 3 view .LVU562
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1874              		.loc 1 384 30 is_stmt 0 discriminator 3 view .LVU563
+ 1875 003e 0134     		adds	r4, r4, #1
+ 1876              	.LVL143:
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1877              		.loc 1 384 30 discriminator 3 view .LVU564
+ 1878 0040 E7E7     		b	.L122
+ 1879              	.L132:
+ 384:Src/sysexprocessor.c ****   for (size_t i = 0; i < 4; i++) {
+ 1880              		.loc 1 384 30 discriminator 3 view .LVU565
+ 1881              	.LBE57:
+ 388:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1882              		.loc 1 388 3 is_stmt 1 view .LVU566
+ 388:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1883              		.loc 1 388 15 is_stmt 0 view .LVU567
+ 1884 0042 009B     		ldr	r3, [sp]
+ 388:Src/sysexprocessor.c ****   bufferoutput[bufferindex] = 0xF7;
+ 1885              		.loc 1 388 29 view .LVU568
+ 1886 0044 0CAA     		add	r2, sp, #48
+ 1887 0046 1344     		add	r3, r3, r2
+ 1888 0048 F722     		movs	r2, #247
+ 1889 004a 03F82C2C 		strb	r2, [r3, #-44]
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1890              		.loc 1 390 3 is_stmt 1 view .LVU569
+ 1891              	.LBB58:
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1892              		.loc 1 390 8 view .LVU570
+ 1893              	.LVL144:
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1894              		.loc 1 390 15 is_stmt 0 view .LVU571
+ 1895 004e 0025     		movs	r5, #0
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1896              		.loc 1 390 3 view .LVU572
+ 1897 0050 02E0     		b	.L124
+ 1898              	.LVL145:
+ 1899              	.L134:
+ 1900              	.LBB59:
+ 1901              	.LBB60:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1902              		.loc 1 155 10 view .LVU573
+ 1903 0052 0120     		movs	r0, #1
+ 1904              	.L126:
+ 1905              	.LVL146:
+ 155:Src/sysexprocessor.c ****   return true;
+ 1906              		.loc 1 155 10 view .LVU574
+ 1907              	.LBE60:
+ 1908              	.LBE59:
+ 393:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 1909              		.loc 1 393 7 view .LVU575
+ 1910 0054 58B3     		cbz	r0, .L128
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1911              		.loc 1 390 30 is_stmt 1 discriminator 2 view .LVU576
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 47
+
+
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1912              		.loc 1 390 31 is_stmt 0 discriminator 2 view .LVU577
+ 1913 0056 0135     		adds	r5, r5, #1
+ 1914              	.LVL147:
+ 1915              	.L124:
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1916              		.loc 1 390 22 is_stmt 1 discriminator 1 view .LVU578
+ 390:Src/sysexprocessor.c ****   for (size_t i = 0; i < 13; i++)
+ 1917              		.loc 1 390 3 is_stmt 0 discriminator 1 view .LVU579
+ 1918 0058 0C2D     		cmp	r5, #12
+ 1919 005a 1ED8     		bhi	.L133
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 1920              		.loc 1 392 5 is_stmt 1 view .LVU580
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 1921              		.loc 1 392 47 is_stmt 0 view .LVU581
+ 1922 005c 05EB4503 		add	r3, r5, r5, lsl #1
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 1923              		.loc 1 392 68 view .LVU582
+ 1924 0060 5A1C     		adds	r2, r3, #1
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 1925              		.loc 1 392 89 view .LVU583
+ 1926 0062 981C     		adds	r0, r3, #2
+ 392:Src/sysexprocessor.c ****     Sysex_SendMidiMessage(0x04, bufferoutput[i*3], bufferoutput[i*3+1], bufferoutput[i*3+2]);
+ 1927              		.loc 1 392 5 view .LVU584
+ 1928 0064 0CA9     		add	r1, sp, #48
+ 1929 0066 0844     		add	r0, r0, r1
+ 1930 0068 0A44     		add	r2, r2, r1
+ 1931 006a 1944     		add	r1, r1, r3
+ 1932 006c 10F82C3C 		ldrb	r3, [r0, #-44]	@ zero_extendqisi2
+ 1933 0070 12F82C2C 		ldrb	r2, [r2, #-44]	@ zero_extendqisi2
+ 1934 0074 11F82C1C 		ldrb	r1, [r1, #-44]	@ zero_extendqisi2
+ 1935 0078 0420     		movs	r0, #4
+ 1936 007a FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1937              	.LVL148:
+ 393:Src/sysexprocessor.c ****     if(Sysex_UsbTimeout() == false) {
+ 1938              		.loc 1 393 5 is_stmt 1 view .LVU585
+ 1939              	.LBB62:
+ 1940              	.LBI59:
+ 148:Src/sysexprocessor.c **** inline bool Sysex_UsbTimeout() {
+ 1941              		.loc 1 148 13 view .LVU586
+ 1942              	.LBB61:
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1943              		.loc 1 149 3 view .LVU587
+ 149:Src/sysexprocessor.c ****   uint32_t timeouttick = HAL_GetTick();
+ 1944              		.loc 1 149 26 is_stmt 0 view .LVU588
+ 1945 007e FFF7FEFF 		bl	HAL_GetTick
+ 1946              	.LVL149:
+ 1947 0082 0446     		mov	r4, r0
+ 1948              	.LVL150:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1949              		.loc 1 150 3 is_stmt 1 view .LVU589
+ 1950              	.L125:
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1951              		.loc 1 150 8 view .LVU590
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1952              		.loc 1 150 9 is_stmt 0 view .LVU591
+ 1953 0084 0C4B     		ldr	r3, .L135+4
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 48
+
+
+ 1954 0086 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:Src/sysexprocessor.c ****   while(USB_Tx_State) {
+ 1955              		.loc 1 150 8 view .LVU592
+ 1956 0088 002B     		cmp	r3, #0
+ 1957 008a E2D0     		beq	.L134
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1958              		.loc 1 151 5 is_stmt 1 view .LVU593
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1959              		.loc 1 151 8 is_stmt 0 view .LVU594
+ 1960 008c FFF7FEFF 		bl	HAL_GetTick
+ 1961              	.LVL151:
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1962              		.loc 1 151 22 view .LVU595
+ 1963 0090 001B     		subs	r0, r0, r4
+ 151:Src/sysexprocessor.c ****     if(HAL_GetTick() - timeouttick > 3) {
+ 1964              		.loc 1 151 7 view .LVU596
+ 1965 0092 0328     		cmp	r0, #3
+ 1966 0094 F6D9     		bls	.L125
+ 152:Src/sysexprocessor.c ****       return false;
+ 1967              		.loc 1 152 14 view .LVU597
+ 1968 0096 0020     		movs	r0, #0
+ 1969 0098 DCE7     		b	.L126
+ 1970              	.LVL152:
+ 1971              	.L133:
+ 152:Src/sysexprocessor.c ****       return false;
+ 1972              		.loc 1 152 14 view .LVU598
+ 1973              	.LBE61:
+ 1974              	.LBE62:
+ 1975              	.LBE58:
+ 397:Src/sysexprocessor.c ****   Sysex_SendMidiMessage(0x07, bufferoutput[39], bufferoutput[40], bufferoutput[41]);
+ 1976              		.loc 1 397 3 is_stmt 1 view .LVU599
+ 1977 009a 9DF82D30 		ldrb	r3, [sp, #45]	@ zero_extendqisi2
+ 1978 009e 9DF82C20 		ldrb	r2, [sp, #44]	@ zero_extendqisi2
+ 1979 00a2 9DF82B10 		ldrb	r1, [sp, #43]	@ zero_extendqisi2
+ 1980 00a6 0720     		movs	r0, #7
+ 1981 00a8 FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 1982              	.LVL153:
+ 398:Src/sysexprocessor.c ****   return true;
+ 1983              		.loc 1 398 3 view .LVU600
+ 398:Src/sysexprocessor.c ****   return true;
+ 1984              		.loc 1 398 10 is_stmt 0 view .LVU601
+ 1985 00ac 0120     		movs	r0, #1
+ 1986              	.L128:
+ 399:Src/sysexprocessor.c **** }
+ 1987              		.loc 1 399 1 view .LVU602
+ 1988 00ae 0DB0     		add	sp, sp, #52
+ 1989              	.LCFI31:
+ 1990              		.cfi_def_cfa_offset 12
+ 1991              		@ sp needed
+ 1992 00b0 30BD     		pop	{r4, r5, pc}
+ 1993              	.LVL154:
+ 1994              	.L136:
+ 399:Src/sysexprocessor.c **** }
+ 1995              		.loc 1 399 1 view .LVU603
+ 1996 00b2 00BF     		.align	2
+ 1997              	.L135:
+ 1998 00b4 00000000 		.word	dac
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 49
+
+
+ 1999 00b8 00000000 		.word	USB_Tx_State
+ 2000              		.cfi_endproc
+ 2001              	.LFE144:
+ 2003              		.section	.text.Sysex_Process,"ax",%progbits
+ 2004              		.align	1
+ 2005              		.global	Sysex_Process
+ 2006              		.syntax unified
+ 2007              		.thumb
+ 2008              		.thumb_func
+ 2009              		.fpu fpv4-sp-d16
+ 2011              	Sysex_Process:
+ 2012              	.LVL155:
+ 2013              	.LFB140:
+ 209:Src/sysexprocessor.c **** void Sysex_Process(uint8_t input) {
+ 2014              		.loc 1 209 35 is_stmt 1 view -0
+ 2015              		.cfi_startproc
+ 2016              		@ args = 0, pretend = 0, frame = 0
+ 2017              		@ frame_needed = 0, uses_anonymous_args = 0
+ 212:Src/sysexprocessor.c ****   if(input == 0xF0) {
+ 2018              		.loc 1 212 3 view .LVU605
+ 212:Src/sysexprocessor.c ****   if(input == 0xF0) {
+ 2019              		.loc 1 212 5 is_stmt 0 view .LVU606
+ 2020 0000 F028     		cmp	r0, #240
+ 2021 0002 10D0     		beq	.L166
+ 209:Src/sysexprocessor.c **** void Sysex_Process(uint8_t input) {
+ 2022              		.loc 1 209 35 view .LVU607
+ 2023 0004 10B5     		push	{r4, lr}
+ 2024              	.LCFI32:
+ 2025              		.cfi_def_cfa_offset 8
+ 2026              		.cfi_offset 4, -8
+ 2027              		.cfi_offset 14, -4
+ 2028 0006 0446     		mov	r4, r0
+ 219:Src/sysexprocessor.c ****   } else if(input == 0xF7) { // Could also check for sysexstatus_ == finished for correct upload of
+ 2029              		.loc 1 219 10 is_stmt 1 view .LVU608
+ 219:Src/sysexprocessor.c ****   } else if(input == 0xF7) { // Could also check for sysexstatus_ == finished for correct upload of
+ 2030              		.loc 1 219 12 is_stmt 0 view .LVU609
+ 2031 0008 F728     		cmp	r0, #247
+ 2032 000a 1AD0     		beq	.L167
+ 231:Src/sysexprocessor.c ****   else if(input <= 127) 
+ 2033              		.loc 1 231 8 is_stmt 1 view .LVU610
+ 231:Src/sysexprocessor.c ****   else if(input <= 127) 
+ 2034              		.loc 1 231 10 is_stmt 0 view .LVU611
+ 2035 000c 10F0800F 		tst	r0, #128
+ 2036 0010 24D1     		bne	.L137
+ 233:Src/sysexprocessor.c ****     switch(sysexstatus) {
+ 2037              		.loc 1 233 5 is_stmt 1 view .LVU612
+ 2038 0012 5D4B     		ldr	r3, .L183
+ 2039 0014 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 2040 0016 013B     		subs	r3, r3, #1
+ 2041 0018 052B     		cmp	r3, #5
+ 2042 001a 1FD8     		bhi	.L137
+ 2043 001c DFE803F0 		tbb	[pc, r3]
+ 2044              	.L145:
+ 2045 0020 29       		.byte	(.L149-.L145)/2
+ 2046 0021 3D       		.byte	(.L148-.L145)/2
+ 2047 0022 B0       		.byte	(.L147-.L145)/2
+ 2048 0023 AD       		.byte	(.L146-.L145)/2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 50
+
+
+ 2049 0024 AA       		.byte	(.L144-.L145)/2
+ 2050 0025 AA       		.byte	(.L144-.L145)/2
+ 2051              		.p2align 1
+ 2052              	.L166:
+ 2053              	.LCFI33:
+ 2054              		.cfi_def_cfa_offset 0
+ 2055              		.cfi_restore 4
+ 2056              		.cfi_restore 14
+ 213:Src/sysexprocessor.c ****     if(sysexstatus == Off) {
+ 2057              		.loc 1 213 5 view .LVU613
+ 213:Src/sysexprocessor.c ****     if(sysexstatus == Off) {
+ 2058              		.loc 1 213 20 is_stmt 0 view .LVU614
+ 2059 0026 584B     		ldr	r3, .L183
+ 2060 0028 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 213:Src/sysexprocessor.c ****     if(sysexstatus == Off) {
+ 2061              		.loc 1 213 7 view .LVU615
+ 2062 002a 33B9     		cbnz	r3, .L139
+ 214:Src/sysexprocessor.c ****       sysexstatus = Initialization;
+ 2063              		.loc 1 214 7 is_stmt 1 view .LVU616
+ 214:Src/sysexprocessor.c ****       sysexstatus = Initialization;
+ 2064              		.loc 1 214 19 is_stmt 0 view .LVU617
+ 2065 002c 564B     		ldr	r3, .L183
+ 2066 002e 0122     		movs	r2, #1
+ 2067 0030 1A70     		strb	r2, [r3]
+ 215:Src/sysexprocessor.c ****       sysexverifyindex = 0;
+ 2068              		.loc 1 215 7 is_stmt 1 view .LVU618
+ 215:Src/sysexprocessor.c ****       sysexverifyindex = 0;
+ 2069              		.loc 1 215 24 is_stmt 0 view .LVU619
+ 2070 0032 564B     		ldr	r3, .L183+4
+ 2071 0034 0022     		movs	r2, #0
+ 2072 0036 1A70     		strb	r2, [r3]
+ 2073 0038 7047     		bx	lr
+ 2074              	.L139:
+ 217:Src/sysexprocessor.c ****       sysexstatus = Failed;
+ 2075              		.loc 1 217 7 is_stmt 1 view .LVU620
+ 217:Src/sysexprocessor.c ****       sysexstatus = Failed;
+ 2076              		.loc 1 217 19 is_stmt 0 view .LVU621
+ 2077 003a 534B     		ldr	r3, .L183
+ 2078 003c 0822     		movs	r2, #8
+ 2079 003e 1A70     		strb	r2, [r3]
+ 2080 0040 7047     		bx	lr
+ 2081              	.L167:
+ 2082              	.LCFI34:
+ 2083              		.cfi_def_cfa_offset 8
+ 2084              		.cfi_offset 4, -8
+ 2085              		.cfi_offset 14, -4
+ 220:Src/sysexprocessor.c ****     if(sysexstatus == EndUpdate) {
+ 2086              		.loc 1 220 5 is_stmt 1 view .LVU622
+ 220:Src/sysexprocessor.c ****     if(sysexstatus == EndUpdate) {
+ 2087              		.loc 1 220 20 is_stmt 0 view .LVU623
+ 2088 0042 514B     		ldr	r3, .L183
+ 2089 0044 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 220:Src/sysexprocessor.c ****     if(sysexstatus == EndUpdate) {
+ 2090              		.loc 1 220 7 view .LVU624
+ 2091 0046 062B     		cmp	r3, #6
+ 2092 0048 09D0     		beq	.L168
+ 2093              	.LVL156:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 51
+
+
+ 2094              	.L142:
+ 226:Src/sysexprocessor.c ****     if(sysexstatus == Configure || sysexstatus == Calibrate) {
+ 2095              		.loc 1 226 5 is_stmt 1 view .LVU625
+ 226:Src/sysexprocessor.c ****     if(sysexstatus == Configure || sysexstatus == Calibrate) {
+ 2096              		.loc 1 226 33 is_stmt 0 view .LVU626
+ 2097 004a 4F4B     		ldr	r3, .L183
+ 2098 004c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 2099 004e 033B     		subs	r3, r3, #3
+ 2100 0050 DBB2     		uxtb	r3, r3
+ 226:Src/sysexprocessor.c ****     if(sysexstatus == Configure || sysexstatus == Calibrate) {
+ 2101              		.loc 1 226 7 view .LVU627
+ 2102 0052 012B     		cmp	r3, #1
+ 2103 0054 0AD9     		bls	.L169
+ 2104              	.L143:
+ 229:Src/sysexprocessor.c ****     sysexstatus = Off;
+ 2105              		.loc 1 229 5 is_stmt 1 view .LVU628
+ 229:Src/sysexprocessor.c ****     sysexstatus = Off;
+ 2106              		.loc 1 229 17 is_stmt 0 view .LVU629
+ 2107 0056 4C4B     		ldr	r3, .L183
+ 2108 0058 0022     		movs	r2, #0
+ 2109 005a 1A70     		strb	r2, [r3]
+ 2110              	.L137:
+ 318:Src/sysexprocessor.c **** }
+ 2111              		.loc 1 318 1 view .LVU630
+ 2112 005c 10BD     		pop	{r4, pc}
+ 2113              	.LVL157:
+ 2114              	.L168:
+ 221:Src/sysexprocessor.c ****       Config_FlashEndWriteApp();
+ 2115              		.loc 1 221 7 is_stmt 1 view .LVU631
+ 2116 005e FFF7FEFF 		bl	Config_FlashEndWriteApp
+ 2117              	.LVL158:
+ 222:Src/sysexprocessor.c ****       LED_SwitchUpload();
+ 2118              		.loc 1 222 7 view .LVU632
+ 2119 0062 FFF7FEFF 		bl	LED_SwitchUpload
+ 2120              	.LVL159:
+ 223:Src/sysexprocessor.c ****       Sysex_VerifyApp();
+ 2121              		.loc 1 223 7 view .LVU633
+ 2122 0066 FFF7FEFF 		bl	Sysex_VerifyApp
+ 2123              	.LVL160:
+ 2124 006a EEE7     		b	.L142
+ 2125              	.L169:
+ 227:Src/sysexprocessor.c ****       Config_Configure();
+ 2126              		.loc 1 227 7 view .LVU634
+ 2127 006c FFF7FEFF 		bl	Config_Configure
+ 2128              	.LVL161:
+ 2129 0070 F1E7     		b	.L143
+ 2130              	.LVL162:
+ 2131              	.L149:
+ 235:Src/sysexprocessor.c ****         if(sysexverify[sysexverifyindex] == input) {
+ 2132              		.loc 1 235 9 view .LVU635
+ 235:Src/sysexprocessor.c ****         if(sysexverify[sysexverifyindex] == input) {
+ 2133              		.loc 1 235 23 is_stmt 0 view .LVU636
+ 2134 0072 464B     		ldr	r3, .L183+4
+ 2135 0074 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 2136 0076 464A     		ldr	r2, .L183+8
+ 2137 0078 D25C     		ldrb	r2, [r2, r3]	@ zero_extendqisi2
+ 235:Src/sysexprocessor.c ****         if(sysexverify[sysexverifyindex] == input) {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 52
+
+
+ 2138              		.loc 1 235 11 view .LVU637
+ 2139 007a 8242     		cmp	r2, r0
+ 2140 007c 03D0     		beq	.L170
+ 241:Src/sysexprocessor.c ****           sysexstatus = Failed;
+ 2141              		.loc 1 241 11 is_stmt 1 view .LVU638
+ 241:Src/sysexprocessor.c ****           sysexstatus = Failed;
+ 2142              		.loc 1 241 23 is_stmt 0 view .LVU639
+ 2143 007e 424B     		ldr	r3, .L183
+ 2144 0080 0822     		movs	r2, #8
+ 2145 0082 1A70     		strb	r2, [r3]
+ 2146 0084 EAE7     		b	.L137
+ 2147              	.L170:
+ 236:Src/sysexprocessor.c ****           sysexverifyindex++;
+ 2148              		.loc 1 236 11 is_stmt 1 view .LVU640
+ 236:Src/sysexprocessor.c ****           sysexverifyindex++;
+ 2149              		.loc 1 236 27 is_stmt 0 view .LVU641
+ 2150 0086 0133     		adds	r3, r3, #1
+ 2151 0088 DBB2     		uxtb	r3, r3
+ 2152 008a 404A     		ldr	r2, .L183+4
+ 2153 008c 1370     		strb	r3, [r2]
+ 237:Src/sysexprocessor.c ****           if(sysexverifyindex == 5) {
+ 2154              		.loc 1 237 11 is_stmt 1 view .LVU642
+ 237:Src/sysexprocessor.c ****           if(sysexverifyindex == 5) {
+ 2155              		.loc 1 237 13 is_stmt 0 view .LVU643
+ 2156 008e 052B     		cmp	r3, #5
+ 2157 0090 E4D1     		bne	.L137
+ 238:Src/sysexprocessor.c ****             sysexstatus = MessageType;
+ 2158              		.loc 1 238 13 is_stmt 1 view .LVU644
+ 238:Src/sysexprocessor.c ****             sysexstatus = MessageType;
+ 2159              		.loc 1 238 25 is_stmt 0 view .LVU645
+ 2160 0092 3D4B     		ldr	r3, .L183
+ 2161 0094 0222     		movs	r2, #2
+ 2162 0096 1A70     		strb	r2, [r3]
+ 2163 0098 E0E7     		b	.L137
+ 2164              	.L148:
+ 246:Src/sysexprocessor.c ****         if(input == 0x00) { // Am i alive ?
+ 2165              		.loc 1 246 9 is_stmt 1 view .LVU646
+ 246:Src/sysexprocessor.c ****         if(input == 0x00) { // Am i alive ?
+ 2166              		.loc 1 246 11 is_stmt 0 view .LVU647
+ 2167 009a E8B1     		cbz	r0, .L171
+ 2168              	.LVL163:
+ 2169              	.L151:
+ 250:Src/sysexprocessor.c ****         if(input == 0x74) { // ConfigurePush
+ 2170              		.loc 1 250 9 is_stmt 1 view .LVU648
+ 250:Src/sysexprocessor.c ****         if(input == 0x74) { // ConfigurePush
+ 2171              		.loc 1 250 11 is_stmt 0 view .LVU649
+ 2172 009c 742C     		cmp	r4, #116
+ 2173 009e 25D0     		beq	.L172
+ 2174              	.L152:
+ 254:Src/sysexprocessor.c ****         if(input == 0x75) { // ConfigurePush
+ 2175              		.loc 1 254 9 is_stmt 1 view .LVU650
+ 254:Src/sysexprocessor.c ****         if(input == 0x75) { // ConfigurePush
+ 2176              		.loc 1 254 11 is_stmt 0 view .LVU651
+ 2177 00a0 752C     		cmp	r4, #117
+ 2178 00a2 29D0     		beq	.L173
+ 2179              	.L153:
+ 259:Src/sysexprocessor.c ****         if(input == 0x76) { // CalibratePush
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 53
+
+
+ 2180              		.loc 1 259 9 is_stmt 1 view .LVU652
+ 259:Src/sysexprocessor.c ****         if(input == 0x76) { // CalibratePush
+ 2181              		.loc 1 259 11 is_stmt 0 view .LVU653
+ 2182 00a4 762C     		cmp	r4, #118
+ 2183 00a6 2FD0     		beq	.L174
+ 2184              	.L154:
+ 263:Src/sysexprocessor.c ****         if(input == 0x77) { 
+ 2185              		.loc 1 263 9 is_stmt 1 view .LVU654
+ 263:Src/sysexprocessor.c ****         if(input == 0x77) { 
+ 2186              		.loc 1 263 11 is_stmt 0 view .LVU655
+ 2187 00a8 772C     		cmp	r4, #119
+ 2188 00aa 33D0     		beq	.L175
+ 2189              	.L155:
+ 267:Src/sysexprocessor.c ****         if(input == 0x78) {
+ 2190              		.loc 1 267 9 is_stmt 1 view .LVU656
+ 267:Src/sysexprocessor.c ****         if(input == 0x78) {
+ 2191              		.loc 1 267 11 is_stmt 0 view .LVU657
+ 2192 00ac 782C     		cmp	r4, #120
+ 2193 00ae 37D0     		beq	.L176
+ 2194              	.L156:
+ 270:Src/sysexprocessor.c ****         if(input == 0x79) {
+ 2195              		.loc 1 270 9 is_stmt 1 view .LVU658
+ 270:Src/sysexprocessor.c ****         if(input == 0x79) {
+ 2196              		.loc 1 270 11 is_stmt 0 view .LVU659
+ 2197 00b0 792C     		cmp	r4, #121
+ 2198 00b2 39D0     		beq	.L177
+ 2199              	.L157:
+ 274:Src/sysexprocessor.c ****         if(input == 0x7A) { // Write To Start Update App
+ 2200              		.loc 1 274 9 is_stmt 1 view .LVU660
+ 274:Src/sysexprocessor.c ****         if(input == 0x7A) { // Write To Start Update App
+ 2201              		.loc 1 274 11 is_stmt 0 view .LVU661
+ 2202 00b4 7A2C     		cmp	r4, #122
+ 2203 00b6 3DD0     		beq	.L178
+ 2204              	.L158:
+ 279:Src/sysexprocessor.c ****         if(input == 0x7B) { // Load Current Program
+ 2205              		.loc 1 279 9 is_stmt 1 view .LVU662
+ 279:Src/sysexprocessor.c ****         if(input == 0x7B) { // Load Current Program
+ 2206              		.loc 1 279 11 is_stmt 0 view .LVU663
+ 2207 00b8 7B2C     		cmp	r4, #123
+ 2208 00ba 43D0     		beq	.L179
+ 2209              	.L159:
+ 283:Src/sysexprocessor.c ****         if(input == 0x7C) { // Configure outputs off, set dac value to low
+ 2210              		.loc 1 283 9 is_stmt 1 view .LVU664
+ 283:Src/sysexprocessor.c ****         if(input == 0x7C) { // Configure outputs off, set dac value to low
+ 2211              		.loc 1 283 11 is_stmt 0 view .LVU665
+ 2212 00bc 7C2C     		cmp	r4, #124
+ 2213 00be 47D0     		beq	.L180
+ 2214              	.L160:
+ 287:Src/sysexprocessor.c ****         if(input == 0x7D) { // Configure outputs off, set dac value to low
+ 2215              		.loc 1 287 9 is_stmt 1 view .LVU666
+ 287:Src/sysexprocessor.c ****         if(input == 0x7D) { // Configure outputs off, set dac value to low
+ 2216              		.loc 1 287 11 is_stmt 0 view .LVU667
+ 2217 00c0 7D2C     		cmp	r4, #125
+ 2218 00c2 4BD0     		beq	.L181
+ 2219              	.L161:
+ 291:Src/sysexprocessor.c ****         if(input == 0x7E ) { // Request Configuration Data
+ 2220              		.loc 1 291 9 is_stmt 1 view .LVU668
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 54
+
+
+ 291:Src/sysexprocessor.c ****         if(input == 0x7E ) { // Request Configuration Data
+ 2221              		.loc 1 291 11 is_stmt 0 view .LVU669
+ 2222 00c4 7E2C     		cmp	r4, #126
+ 2223 00c6 4FD0     		beq	.L182
+ 2224              	.L162:
+ 295:Src/sysexprocessor.c ****         if(input == 0x7F) { // Request Calibration Data
+ 2225              		.loc 1 295 9 is_stmt 1 view .LVU670
+ 295:Src/sysexprocessor.c ****         if(input == 0x7F) { // Request Calibration Data
+ 2226              		.loc 1 295 11 is_stmt 0 view .LVU671
+ 2227 00c8 7F2C     		cmp	r4, #127
+ 2228 00ca C7D1     		bne	.L137
+ 296:Src/sysexprocessor.c ****           Sysex_DumpCalibration();
+ 2229              		.loc 1 296 11 is_stmt 1 view .LVU672
+ 2230 00cc FFF7FEFF 		bl	Sysex_DumpCalibration
+ 2231              	.LVL164:
+ 297:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2232              		.loc 1 297 11 view .LVU673
+ 297:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2233              		.loc 1 297 23 is_stmt 0 view .LVU674
+ 2234 00d0 2D4B     		ldr	r3, .L183
+ 2235 00d2 0722     		movs	r2, #7
+ 2236 00d4 1A70     		strb	r2, [r3]
+ 2237 00d6 C1E7     		b	.L137
+ 2238              	.LVL165:
+ 2239              	.L171:
+ 247:Src/sysexprocessor.c ****           Sysex_SendMidiMessage(0x04,0xF0,kFIRMWARE_VERSION,0xF7);
+ 2240              		.loc 1 247 11 is_stmt 1 view .LVU675
+ 2241 00d8 F723     		movs	r3, #247
+ 2242 00da 0222     		movs	r2, #2
+ 2243 00dc F021     		movs	r1, #240
+ 2244 00de 0420     		movs	r0, #4
+ 2245              	.LVL166:
+ 247:Src/sysexprocessor.c ****           Sysex_SendMidiMessage(0x04,0xF0,kFIRMWARE_VERSION,0xF7);
+ 2246              		.loc 1 247 11 is_stmt 0 view .LVU676
+ 2247 00e0 FFF7FEFF 		bl	Sysex_SendMidiMessage
+ 2248              	.LVL167:
+ 248:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2249              		.loc 1 248 11 is_stmt 1 view .LVU677
+ 248:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2250              		.loc 1 248 23 is_stmt 0 view .LVU678
+ 2251 00e4 284B     		ldr	r3, .L183
+ 2252 00e6 0722     		movs	r2, #7
+ 2253 00e8 1A70     		strb	r2, [r3]
+ 2254 00ea D7E7     		b	.L151
+ 2255              	.L172:
+ 251:Src/sysexprocessor.c ****           Config_WriteUserData();
+ 2256              		.loc 1 251 11 is_stmt 1 view .LVU679
+ 2257 00ec FFF7FEFF 		bl	Config_WriteUserData
+ 2258              	.LVL168:
+ 252:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2259              		.loc 1 252 11 view .LVU680
+ 252:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2260              		.loc 1 252 23 is_stmt 0 view .LVU681
+ 2261 00f0 254B     		ldr	r3, .L183
+ 2262 00f2 0722     		movs	r2, #7
+ 2263 00f4 1A70     		strb	r2, [r3]
+ 2264 00f6 D3E7     		b	.L152
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 55
+
+
+ 2265              	.L173:
+ 255:Src/sysexprocessor.c ****           Sysex_ConfigCalibInit();
+ 2266              		.loc 1 255 11 is_stmt 1 view .LVU682
+ 2267 00f8 FFF7FEFF 		bl	Sysex_ConfigCalibInit
+ 2268              	.LVL169:
+ 256:Src/sysexprocessor.c ****           Config_DisableOutput();
+ 2269              		.loc 1 256 11 view .LVU683
+ 2270 00fc FFF7FEFF 		bl	Config_DisableOutput
+ 2271              	.LVL170:
+ 257:Src/sysexprocessor.c ****           sysexstatus = Configure;
+ 2272              		.loc 1 257 11 view .LVU684
+ 257:Src/sysexprocessor.c ****           sysexstatus = Configure;
+ 2273              		.loc 1 257 23 is_stmt 0 view .LVU685
+ 2274 0100 214B     		ldr	r3, .L183
+ 2275 0102 0322     		movs	r2, #3
+ 2276 0104 1A70     		strb	r2, [r3]
+ 2277 0106 CDE7     		b	.L153
+ 2278              	.L174:
+ 260:Src/sysexprocessor.c ****           Sysex_ConfigCalibInit();
+ 2279              		.loc 1 260 11 is_stmt 1 view .LVU686
+ 2280 0108 FFF7FEFF 		bl	Sysex_ConfigCalibInit
+ 2281              	.LVL171:
+ 261:Src/sysexprocessor.c ****           sysexstatus = Calibrate;
+ 2282              		.loc 1 261 11 view .LVU687
+ 261:Src/sysexprocessor.c ****           sysexstatus = Calibrate;
+ 2283              		.loc 1 261 23 is_stmt 0 view .LVU688
+ 2284 010c 1E4B     		ldr	r3, .L183
+ 2285 010e 0422     		movs	r2, #4
+ 2286 0110 1A70     		strb	r2, [r3]
+ 2287 0112 C9E7     		b	.L154
+ 2288              	.L175:
+ 264:Src/sysexprocessor.c ****           Config_FlashSetAppBit();
+ 2289              		.loc 1 264 11 is_stmt 1 view .LVU689
+ 2290 0114 FFF7FEFF 		bl	Config_FlashSetAppBit
+ 2291              	.LVL172:
+ 265:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2292              		.loc 1 265 11 view .LVU690
+ 265:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2293              		.loc 1 265 23 is_stmt 0 view .LVU691
+ 2294 0118 1B4B     		ldr	r3, .L183
+ 2295 011a 0722     		movs	r2, #7
+ 2296 011c 1A70     		strb	r2, [r3]
+ 2297 011e C5E7     		b	.L155
+ 2298              	.L176:
+ 268:Src/sysexprocessor.c ****           sysexstatus = EndUpdate;
+ 2299              		.loc 1 268 11 is_stmt 1 view .LVU692
+ 268:Src/sysexprocessor.c ****           sysexstatus = EndUpdate;
+ 2300              		.loc 1 268 23 is_stmt 0 view .LVU693
+ 2301 0120 194B     		ldr	r3, .L183
+ 2302 0122 0622     		movs	r2, #6
+ 2303 0124 1A70     		strb	r2, [r3]
+ 2304 0126 C3E7     		b	.L156
+ 2305              	.L177:
+ 271:Src/sysexprocessor.c ****           LED_UploadIncrement();
+ 2306              		.loc 1 271 11 is_stmt 1 view .LVU694
+ 2307 0128 FFF7FEFF 		bl	LED_UploadIncrement
+ 2308              	.LVL173:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 56
+
+
+ 272:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 2309              		.loc 1 272 11 view .LVU695
+ 272:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 2310              		.loc 1 272 23 is_stmt 0 view .LVU696
+ 2311 012c 164B     		ldr	r3, .L183
+ 2312 012e 0522     		movs	r2, #5
+ 2313 0130 1A70     		strb	r2, [r3]
+ 2314 0132 BFE7     		b	.L157
+ 2315              	.L178:
+ 275:Src/sysexprocessor.c ****           Config_FlashInitWriteApp();
+ 2316              		.loc 1 275 11 is_stmt 1 view .LVU697
+ 2317 0134 FFF7FEFF 		bl	Config_FlashInitWriteApp
+ 2318              	.LVL174:
+ 276:Src/sysexprocessor.c ****           LED_UploadIncrement();
+ 2319              		.loc 1 276 11 view .LVU698
+ 2320 0138 FFF7FEFF 		bl	LED_UploadIncrement
+ 2321              	.LVL175:
+ 277:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 2322              		.loc 1 277 11 view .LVU699
+ 277:Src/sysexprocessor.c ****           sysexstatus = Update;
+ 2323              		.loc 1 277 23 is_stmt 0 view .LVU700
+ 2324 013c 124B     		ldr	r3, .L183
+ 2325 013e 0522     		movs	r2, #5
+ 2326 0140 1A70     		strb	r2, [r3]
+ 2327 0142 B9E7     		b	.L158
+ 2328              	.L179:
+ 280:Src/sysexprocessor.c ****           Config_Configure();
+ 2329              		.loc 1 280 11 is_stmt 1 view .LVU701
+ 2330 0144 FFF7FEFF 		bl	Config_Configure
+ 2331              	.LVL176:
+ 281:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2332              		.loc 1 281 11 view .LVU702
+ 281:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2333              		.loc 1 281 23 is_stmt 0 view .LVU703
+ 2334 0148 0F4B     		ldr	r3, .L183
+ 2335 014a 0722     		movs	r2, #7
+ 2336 014c 1A70     		strb	r2, [r3]
+ 2337 014e B5E7     		b	.L159
+ 2338              	.L180:
+ 284:Src/sysexprocessor.c ****           Sysex_CalibrationLow();
+ 2339              		.loc 1 284 11 is_stmt 1 view .LVU704
+ 2340 0150 FFF7FEFF 		bl	Sysex_CalibrationLow
+ 2341              	.LVL177:
+ 285:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2342              		.loc 1 285 11 view .LVU705
+ 285:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2343              		.loc 1 285 23 is_stmt 0 view .LVU706
+ 2344 0154 0C4B     		ldr	r3, .L183
+ 2345 0156 0722     		movs	r2, #7
+ 2346 0158 1A70     		strb	r2, [r3]
+ 2347 015a B1E7     		b	.L160
+ 2348              	.L181:
+ 288:Src/sysexprocessor.c ****           Sysex_CalibrationHigh();
+ 2349              		.loc 1 288 11 is_stmt 1 view .LVU707
+ 2350 015c FFF7FEFF 		bl	Sysex_CalibrationHigh
+ 2351              	.LVL178:
+ 289:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 57
+
+
+ 2352              		.loc 1 289 11 view .LVU708
+ 289:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2353              		.loc 1 289 23 is_stmt 0 view .LVU709
+ 2354 0160 094B     		ldr	r3, .L183
+ 2355 0162 0722     		movs	r2, #7
+ 2356 0164 1A70     		strb	r2, [r3]
+ 2357 0166 ADE7     		b	.L161
+ 2358              	.L182:
+ 292:Src/sysexprocessor.c ****           Sysex_DumpConfiguration();
+ 2359              		.loc 1 292 11 is_stmt 1 view .LVU710
+ 2360 0168 FFF7FEFF 		bl	Sysex_DumpConfiguration
+ 2361              	.LVL179:
+ 293:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2362              		.loc 1 293 11 view .LVU711
+ 293:Src/sysexprocessor.c ****           sysexstatus = Finished;
+ 2363              		.loc 1 293 23 is_stmt 0 view .LVU712
+ 2364 016c 064B     		ldr	r3, .L183
+ 2365 016e 0722     		movs	r2, #7
+ 2366 0170 1A70     		strb	r2, [r3]
+ 2367 0172 A9E7     		b	.L162
+ 2368              	.LVL180:
+ 2369              	.L144:
+ 303:Src/sysexprocessor.c ****         Sysex_FlashUpdate(input);
+ 2370              		.loc 1 303 9 is_stmt 1 view .LVU713
+ 2371 0174 FFF7FEFF 		bl	Sysex_FlashUpdate
+ 2372              	.LVL181:
+ 304:Src/sysexprocessor.c ****         break;
+ 2373              		.loc 1 304 9 view .LVU714
+ 2374 0178 70E7     		b	.L137
+ 2375              	.LVL182:
+ 2376              	.L146:
+ 307:Src/sysexprocessor.c ****         Sysex_CalibrationUpdate(input);
+ 2377              		.loc 1 307 9 view .LVU715
+ 2378 017a FFF7FEFF 		bl	Sysex_CalibrationUpdate
+ 2379              	.LVL183:
+ 308:Src/sysexprocessor.c ****         break;
+ 2380              		.loc 1 308 9 view .LVU716
+ 2381 017e 6DE7     		b	.L137
+ 2382              	.LVL184:
+ 2383              	.L147:
+ 311:Src/sysexprocessor.c ****         Sysex_ConfigUpdate(input);
+ 2384              		.loc 1 311 9 view .LVU717
+ 2385 0180 FFF7FEFF 		bl	Sysex_ConfigUpdate
+ 2386              	.LVL185:
+ 312:Src/sysexprocessor.c ****         break;
+ 2387              		.loc 1 312 9 view .LVU718
+ 318:Src/sysexprocessor.c **** }
+ 2388              		.loc 1 318 1 is_stmt 0 view .LVU719
+ 2389 0184 6AE7     		b	.L137
+ 2390              	.L184:
+ 2391 0186 00BF     		.align	2
+ 2392              	.L183:
+ 2393 0188 00000000 		.word	.LANCHOR3
+ 2394 018c 00000000 		.word	.LANCHOR4
+ 2395 0190 00000000 		.word	.LANCHOR5
+ 2396              		.cfi_endproc
+ 2397              	.LFE140:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 58
+
+
+ 2399              		.global	sysexconfigupdate
+ 2400              		.global	sysexflashbufindex
+ 2401              		.global	sysexflashbuf
+ 2402              		.global	sysexverifyindex
+ 2403              		.global	sysexverify
+ 2404              		.global	sysexstatus
+ 2405              		.section	.bss.sysexconfigupdate,"aw",%nobits
+ 2406              		.align	2
+ 2407              		.set	.LANCHOR2,. + 0
+ 2410              	sysexconfigupdate:
+ 2411 0000 00000000 		.space	4
+ 2412              		.section	.bss.sysexflashbuf,"aw",%nobits
+ 2413              		.align	2
+ 2414              		.set	.LANCHOR1,. + 0
+ 2417              	sysexflashbuf:
+ 2418 0000 00000000 		.space	5
+ 2418      00
+ 2419              		.section	.bss.sysexflashbufindex,"aw",%nobits
+ 2420              		.align	2
+ 2421              		.set	.LANCHOR0,. + 0
+ 2424              	sysexflashbufindex:
+ 2425 0000 00000000 		.space	4
+ 2426              		.section	.bss.sysexstatus,"aw",%nobits
+ 2427              		.set	.LANCHOR3,. + 0
+ 2430              	sysexstatus:
+ 2431 0000 00       		.space	1
+ 2432              		.section	.bss.sysexverifyindex,"aw",%nobits
+ 2433              		.set	.LANCHOR4,. + 0
+ 2436              	sysexverifyindex:
+ 2437 0000 00       		.space	1
+ 2438              		.section	.rodata.sysexverify,"a"
+ 2439              		.align	2
+ 2440              		.set	.LANCHOR5,. + 0
+ 2443              	sysexverify:
+ 2444 0000 00464757 		.ascii	"\000FGW\000"
+ 2444      00
+ 2445              		.text
+ 2446              	.Letext0:
+ 2447              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 2448              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 2449              		.file 4 "Inc/dac.h"
+ 2450              		.file 5 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 2451              		.file 6 "Inc/midisetting.h"
+ 2452              		.file 7 "Inc/configuration.h"
+ 2453              		.file 8 "Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ 2454              		.file 9 "Inc/usb_device.h"
+ 2455              		.file 10 "Middlewares/USBMIDI/Inc/usbd_midi.h"
+ 2456              		.file 11 "Inc/led.h"
+ 2457              		.file 12 "Inc/usbd_midi_if.h"
+ 2458              		.file 13 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 59
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sysexprocessor.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:18     .text.MidiBytestoByte:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:26     .text.MidiBytestoByte:0000000000000000 MidiBytestoByte
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:65     .text.MidiBytestoHalfWord:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:72     .text.MidiBytestoHalfWord:0000000000000000 MidiBytestoHalfWord
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:118    .text.MidiBytestoWord:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:125    .text.MidiBytestoWord:0000000000000000 MidiBytestoWord
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:190    .text.MidiBytestoFloat:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:197    .text.MidiBytestoFloat:0000000000000000 MidiBytestoFloat
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:266    .text.BytetoMidiBytes:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:273    .text.BytetoMidiBytes:0000000000000000 BytetoMidiBytes
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:310    .text.HalfWordtoMidiBytes:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:317    .text.HalfWordtoMidiBytes:0000000000000000 HalfWordtoMidiBytes
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:364    .text.WordtoMidiBytes:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:371    .text.WordtoMidiBytes:0000000000000000 WordtoMidiBytes
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:447    .text.FloatToMidiBytes:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:454    .text.FloatToMidiBytes:0000000000000000 FloatToMidiBytes
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:539    .text.Sysex_FlashUpdate:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:546    .text.Sysex_FlashUpdate:0000000000000000 Sysex_FlashUpdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:609    .text.Sysex_FlashUpdate:000000000000002c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:615    .text.Sysex_ConfigUpdate:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:622    .text.Sysex_ConfigUpdate:0000000000000000 Sysex_ConfigUpdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:752    .text.Sysex_ConfigUpdate:000000000000008c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:761    .text.Sysex_CalibrationUpdate:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:768    .text.Sysex_CalibrationUpdate:0000000000000000 Sysex_CalibrationUpdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:880    .text.Sysex_CalibrationUpdate:0000000000000068 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:888    .text.Sysex_ConfigCalibInit:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:895    .text.Sysex_ConfigCalibInit:0000000000000000 Sysex_ConfigCalibInit
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:916    .text.Sysex_ConfigCalibInit:000000000000000c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:922    .text.Sysex_CalibrationLow:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:929    .text.Sysex_CalibrationLow:0000000000000000 Sysex_CalibrationLow
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:983    .text.Sysex_CalibrationLow:000000000000002c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:988    .text.Sysex_CalibrationHigh:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:995    .text.Sysex_CalibrationHigh:0000000000000000 Sysex_CalibrationHigh
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1049   .text.Sysex_CalibrationHigh:000000000000002c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1054   .text.Sysex_SendMidiMessage:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1061   .text.Sysex_SendMidiMessage:0000000000000000 Sysex_SendMidiMessage
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1129   .text.Sysex_SendMidiMessage:0000000000000034 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1134   .text.Sysex_VerifyApp:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1141   .text.Sysex_VerifyApp:0000000000000000 Sysex_VerifyApp
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1523   .text.Sysex_VerifyApp:0000000000000164 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1528   .text.Sysex_DumpConfiguration:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1535   .text.Sysex_DumpConfiguration:0000000000000000 Sysex_DumpConfiguration
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1806   .text.Sysex_DumpConfiguration:00000000000000e8 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1812   .text.Sysex_DumpCalibration:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1819   .text.Sysex_DumpCalibration:0000000000000000 Sysex_DumpCalibration
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:1998   .text.Sysex_DumpCalibration:00000000000000b4 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2004   .text.Sysex_Process:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2011   .text.Sysex_Process:0000000000000000 Sysex_Process
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2045   .text.Sysex_Process:0000000000000020 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2051   .text.Sysex_Process:0000000000000026 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2393   .text.Sysex_Process:0000000000000188 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2410   .bss.sysexconfigupdate:0000000000000000 sysexconfigupdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2424   .bss.sysexflashbufindex:0000000000000000 sysexflashbufindex
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2417   .bss.sysexflashbuf:0000000000000000 sysexflashbuf
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2436   .bss.sysexverifyindex:0000000000000000 sysexverifyindex
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s 			page 60
+
+
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2443   .rodata.sysexverify:0000000000000000 sysexverify
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2430   .bss.sysexstatus:0000000000000000 sysexstatus
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2406   .bss.sysexconfigupdate:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2413   .bss.sysexflashbuf:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2420   .bss.sysexflashbufindex:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2431   .bss.sysexstatus:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2437   .bss.sysexverifyindex:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccgO8MrX.s:2439   .rodata.sysexverify:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+Config_FlashWriteAppWord
+config
+DAC_Refresh
+dac
+Config_DisableOutput
+LED_ChangeMode
+LED_Color
+MIDI_DataTx
+USBD_MIDI_SendPacket
+hUsbDeviceFS
+LED_UploadIncrement
+Config_ReadWord
+HAL_GetTick
+HAL_Delay
+USB_Tx_State
+Config_FlashEndWriteApp
+LED_SwitchUpload
+Config_Configure
+Config_WriteUserData
+Config_FlashSetAppBit
+Config_FlashInitWriteApp

@@ -2,6 +2,8 @@
 #include "analog.h"
 
 
+Poly_t poly[2];
+
 void Poly_CheckVoices(Poly_t *p){
   uint8_t maxpoly = 0;
   if(p->id == 0) {

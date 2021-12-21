@@ -1,0 +1,721 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"midiprocessor.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.MIDI_InputMessage,"ax",%progbits
+  18              		.align	1
+  19              		.global	MIDI_InputMessage
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	MIDI_InputMessage:
+  27              	.LVL0:
+  28              	.LFB126:
+  29              		.file 1 "Src/midiprocessor.c"
+   1:Src/midiprocessor.c **** #include "midiprocessor.h"
+   2:Src/midiprocessor.c **** #include "sysexprocessor.h"
+   3:Src/midiprocessor.c **** #include "main.h"
+   4:Src/midiprocessor.c **** #include "dac.h"
+   5:Src/midiprocessor.c **** #include "led.h"
+   6:Src/midiprocessor.c **** #include "digital.h"
+   7:Src/midiprocessor.c **** #include "analog.h"
+   8:Src/midiprocessor.c **** #include "configuration.h"
+   9:Src/midiprocessor.c **** 
+  10:Src/midiprocessor.c **** void MIDI_InputMessage(uint32_t input) {
+  30              		.loc 1 10 40 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 8
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 10 40 is_stmt 0 view .LVU1
+  35 0000 10B5     		push	{r4, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 4, -8
+  39              		.cfi_offset 14, -4
+  40 0002 82B0     		sub	sp, sp, #8
+  41              	.LCFI1:
+  42              		.cfi_def_cfa_offset 16
+  43 0004 0346     		mov	r3, r0
+  11:Src/midiprocessor.c ****   
+  12:Src/midiprocessor.c ****   MidiMessage midimessage;
+  44              		.loc 1 12 3 is_stmt 1 view .LVU2
+  13:Src/midiprocessor.c ****   // uint32_t comes in "wrong" endian format
+  14:Src/midiprocessor.c ****   midimessage.messagetype = input & 0x0F;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 2
+
+
+  45              		.loc 1 14 3 view .LVU3
+  46              		.loc 1 14 35 is_stmt 0 view .LVU4
+  47 0006 00F00F02 		and	r2, r0, #15
+  48              		.loc 1 14 27 view .LVU5
+  49 000a 8DF80120 		strb	r2, [sp, #1]
+  15:Src/midiprocessor.c ****   midimessage.cablenum = (input >> 4) & 0x0F;
+  50              		.loc 1 15 3 is_stmt 1 view .LVU6
+  51              		.loc 1 15 39 is_stmt 0 view .LVU7
+  52 000e C0F30311 		ubfx	r1, r0, #4, #4
+  53              		.loc 1 15 24 view .LVU8
+  54 0012 8DF80010 		strb	r1, [sp]
+  16:Src/midiprocessor.c ****   midimessage.byte1 = (input >> 8) & 0xFF;
+  55              		.loc 1 16 3 is_stmt 1 view .LVU9
+  56              		.loc 1 16 21 is_stmt 0 view .LVU10
+  57 0016 C0F30720 		ubfx	r0, r0, #8, #8
+  58              	.LVL1:
+  59              		.loc 1 16 21 view .LVU11
+  60 001a 8DF80200 		strb	r0, [sp, #2]
+  17:Src/midiprocessor.c ****   midimessage.byte2 = (input >> 16) & 0xFF;
+  61              		.loc 1 17 3 is_stmt 1 view .LVU12
+  62              		.loc 1 17 21 is_stmt 0 view .LVU13
+  63 001e C3F30741 		ubfx	r1, r3, #16, #8
+  64 0022 8DF80410 		strb	r1, [sp, #4]
+  18:Src/midiprocessor.c ****   midimessage.byte3 = (input >> 24) & 0xFF;
+  65              		.loc 1 18 3 is_stmt 1 view .LVU14
+  66              		.loc 1 18 30 is_stmt 0 view .LVU15
+  67 0026 1B0E     		lsrs	r3, r3, #24
+  68              	.LVL2:
+  69              		.loc 1 18 21 view .LVU16
+  70 0028 8DF80530 		strb	r3, [sp, #5]
+  19:Src/midiprocessor.c ****   midimessage.midichannel = midimessage.byte1 & 0x0F;
+  71              		.loc 1 19 3 is_stmt 1 view .LVU17
+  72              		.loc 1 19 47 is_stmt 0 view .LVU18
+  73 002c 00F00F03 		and	r3, r0, #15
+  74              		.loc 1 19 27 view .LVU19
+  75 0030 8DF80330 		strb	r3, [sp, #3]
+  20:Src/midiprocessor.c ****   
+  21:Src/midiprocessor.c ****   switch(midimessage.messagetype) {
+  76              		.loc 1 21 3 is_stmt 1 view .LVU20
+  77 0034 131F     		subs	r3, r2, #4
+  78 0036 0B2B     		cmp	r3, #11
+  79 0038 11D8     		bhi	.L1
+  80 003a DFE803F0 		tbb	[pc, r3]
+  81              	.L4:
+  82 003e 06       		.byte	(.L14-.L4)/2
+  83 003f 12       		.byte	(.L13-.L4)/2
+  84 0040 17       		.byte	(.L12-.L4)/2
+  85 0041 1E       		.byte	(.L11-.L4)/2
+  86 0042 3E       		.byte	(.L28-.L4)/2
+  87 0043 55       		.byte	(.L29-.L4)/2
+  88 0044 10       		.byte	(.L1-.L4)/2
+  89 0045 57       		.byte	(.L8-.L4)/2
+  90 0046 9B       		.byte	(.L7-.L4)/2
+  91 0047 AC       		.byte	(.L30-.L4)/2
+  92 0048 BA       		.byte	(.L31-.L4)/2
+  93 0049 D1       		.byte	(.L32-.L4)/2
+  94              		.p2align 1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 3
+
+
+  95              	.L14:
+  22:Src/midiprocessor.c ****     // case 0x0:
+  23:Src/midiprocessor.c ****     // case 0x1:
+  24:Src/midiprocessor.c ****     //   break;
+  25:Src/midiprocessor.c **** 
+  26:Src/midiprocessor.c ****     // case 0x2: //MTC SongSelect
+  27:Src/midiprocessor.c ****     //   break;
+  28:Src/midiprocessor.c ****     
+  29:Src/midiprocessor.c ****     // case 0x3: //SSP
+  30:Src/midiprocessor.c ****     //   break; 
+  31:Src/midiprocessor.c **** 
+  32:Src/midiprocessor.c ****     case 0x4: // SysEx starts or continues
+  33:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte1);
+  96              		.loc 1 33 7 view .LVU21
+  97 004a FFF7FEFF 		bl	Sysex_Process
+  98              	.LVL3:
+  34:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte2);
+  99              		.loc 1 34 7 view .LVU22
+ 100 004e 9DF80400 		ldrb	r0, [sp, #4]	@ zero_extendqisi2
+ 101 0052 FFF7FEFF 		bl	Sysex_Process
+ 102              	.LVL4:
+  35:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte3);
+ 103              		.loc 1 35 7 view .LVU23
+ 104 0056 9DF80500 		ldrb	r0, [sp, #5]	@ zero_extendqisi2
+ 105 005a FFF7FEFF 		bl	Sysex_Process
+ 106              	.LVL5:
+  36:Src/midiprocessor.c ****       break;
+ 107              		.loc 1 36 7 view .LVU24
+ 108              	.L1:
+  37:Src/midiprocessor.c **** 
+  38:Src/midiprocessor.c **** 
+  39:Src/midiprocessor.c ****     case 0x5: // Single-byte System Common Message or SysEx ends with following single byte.
+  40:Src/midiprocessor.c ****       if(midimessage.byte1 == 0xF7) {
+  41:Src/midiprocessor.c ****         Sysex_Process(midimessage.byte1);
+  42:Src/midiprocessor.c ****       }
+  43:Src/midiprocessor.c ****       else { // Process the single byte System Common Message
+  44:Src/midiprocessor.c **** 
+  45:Src/midiprocessor.c ****       }
+  46:Src/midiprocessor.c ****       break;
+  47:Src/midiprocessor.c **** 
+  48:Src/midiprocessor.c ****     case 0x6: // SysEx ends with following two bytes
+  49:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte1);
+  50:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte2);
+  51:Src/midiprocessor.c ****       break;
+  52:Src/midiprocessor.c ****       
+  53:Src/midiprocessor.c ****     case 0x7: // SysEx ends with following three bytes.
+  54:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte1);
+  55:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte2);
+  56:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte3);
+  57:Src/midiprocessor.c ****       break;
+  58:Src/midiprocessor.c **** 
+  59:Src/midiprocessor.c ****     case 0x8: // Note Off
+  60:Src/midiprocessor.c ****       for (size_t i = 0; i < 4; i++) {
+  61:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+  62:Src/midiprocessor.c ****         Digital_NoteOff(&midimessage,&digital[i]);
+  63:Src/midiprocessor.c ****       }
+  64:Src/midiprocessor.c ****       break;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 4
+
+
+  65:Src/midiprocessor.c **** 
+  66:Src/midiprocessor.c ****     case 0x9: // Note On
+  67:Src/midiprocessor.c ****       for (size_t i = 0; i < 4; i++) {
+  68:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+  69:Src/midiprocessor.c ****         Digital_NoteOn(&midimessage,&digital[i]);
+  70:Src/midiprocessor.c ****       }
+  71:Src/midiprocessor.c ****       break;
+  72:Src/midiprocessor.c **** 
+  73:Src/midiprocessor.c ****     case 0xA: // Poly-KeyPress
+  74:Src/midiprocessor.c ****       break;
+  75:Src/midiprocessor.c **** 
+  76:Src/midiprocessor.c ****     case 0xB: // CC
+  77:Src/midiprocessor.c ****       if(midimessage.byte2 == 0) {
+  78:Src/midiprocessor.c ****         break;
+  79:Src/midiprocessor.c ****       } 
+  80:Src/midiprocessor.c ****       else if(midimessage.byte2 < 120) {
+  81:Src/midiprocessor.c ****           if(midimessage.byte2 == 64) {
+  82:Src/midiprocessor.c ****             for (size_t i = 0; i < 4; i++) {
+  83:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+  84:Src/midiprocessor.c ****               Digital_Pedal(&midimessage,&digital[i]);
+  85:Src/midiprocessor.c ****             }
+  86:Src/midiprocessor.c ****           }
+  87:Src/midiprocessor.c ****           for (size_t i = 0; i < 4; i++) {
+  88:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+  89:Src/midiprocessor.c ****           }
+  90:Src/midiprocessor.c ****       } else if(midimessage.byte2 < 124 && midimessage.byte2 != 122){
+  91:Src/midiprocessor.c ****         for (size_t i = 0; i < 4; i++) {
+  92:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+  93:Src/midiprocessor.c ****           Analog_Reset(&analog[i]);
+  94:Src/midiprocessor.c ****         }
+  95:Src/midiprocessor.c ****       }
+  96:Src/midiprocessor.c ****       
+  97:Src/midiprocessor.c ****       break;
+  98:Src/midiprocessor.c **** 
+  99:Src/midiprocessor.c ****     case 0xC: // Program Change
+ 100:Src/midiprocessor.c ****       Config_ProgramChange(midimessage.byte2 & 0x7F);
+ 101:Src/midiprocessor.c ****       break;
+ 102:Src/midiprocessor.c ****     
+ 103:Src/midiprocessor.c ****     case 0xD: // Channel Pressure
+ 104:Src/midiprocessor.c ****       for (size_t i = 0; i < 4; i++) {
+ 105:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 106:Src/midiprocessor.c ****       }
+ 107:Src/midiprocessor.c ****       break;
+ 108:Src/midiprocessor.c **** 
+ 109:Src/midiprocessor.c ****     case 0xE: // Pitchbend
+ 110:Src/midiprocessor.c ****       for (size_t i = 0; i < 4; i++) {
+ 111:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 112:Src/midiprocessor.c ****       }
+ 113:Src/midiprocessor.c ****       break;
+ 114:Src/midiprocessor.c **** 
+ 115:Src/midiprocessor.c **** 
+ 116:Src/midiprocessor.c ****     case 0xF: // SingleByte System Real Time Messages
+ 117:Src/midiprocessor.c ****       for (size_t i = 0; i < 4; i++){
+ 118:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 119:Src/midiprocessor.c ****         Digital_Clock(&midimessage,&digital[i]);
+ 120:Src/midiprocessor.c ****       }
+ 121:Src/midiprocessor.c ****       break;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 5
+
+
+ 122:Src/midiprocessor.c ****     default: 
+ 123:Src/midiprocessor.c ****       break;
+ 124:Src/midiprocessor.c ****   }
+ 125:Src/midiprocessor.c **** }
+ 109              		.loc 1 125 1 is_stmt 0 view .LVU25
+ 110 005e 02B0     		add	sp, sp, #8
+ 111              	.LCFI2:
+ 112              		.cfi_remember_state
+ 113              		.cfi_def_cfa_offset 8
+ 114              		@ sp needed
+ 115 0060 10BD     		pop	{r4, pc}
+ 116              	.L13:
+ 117              	.LCFI3:
+ 118              		.cfi_restore_state
+  40:Src/midiprocessor.c ****         Sysex_Process(midimessage.byte1);
+ 119              		.loc 1 40 7 is_stmt 1 view .LVU26
+  40:Src/midiprocessor.c ****         Sysex_Process(midimessage.byte1);
+ 120              		.loc 1 40 9 is_stmt 0 view .LVU27
+ 121 0062 F728     		cmp	r0, #247
+ 122 0064 FBD1     		bne	.L1
+  41:Src/midiprocessor.c ****       }
+ 123              		.loc 1 41 9 is_stmt 1 view .LVU28
+ 124 0066 FFF7FEFF 		bl	Sysex_Process
+ 125              	.LVL6:
+ 126 006a F8E7     		b	.L1
+ 127              	.L12:
+  49:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte2);
+ 128              		.loc 1 49 7 view .LVU29
+ 129 006c FFF7FEFF 		bl	Sysex_Process
+ 130              	.LVL7:
+  50:Src/midiprocessor.c ****       break;
+ 131              		.loc 1 50 7 view .LVU30
+ 132 0070 9DF80400 		ldrb	r0, [sp, #4]	@ zero_extendqisi2
+ 133 0074 FFF7FEFF 		bl	Sysex_Process
+ 134              	.LVL8:
+  51:Src/midiprocessor.c ****       
+ 135              		.loc 1 51 7 view .LVU31
+ 136 0078 F1E7     		b	.L1
+ 137              	.L11:
+  54:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte2);
+ 138              		.loc 1 54 7 view .LVU32
+ 139 007a FFF7FEFF 		bl	Sysex_Process
+ 140              	.LVL9:
+  55:Src/midiprocessor.c ****       Sysex_Process(midimessage.byte3);
+ 141              		.loc 1 55 7 view .LVU33
+ 142 007e 9DF80400 		ldrb	r0, [sp, #4]	@ zero_extendqisi2
+ 143 0082 FFF7FEFF 		bl	Sysex_Process
+ 144              	.LVL10:
+  56:Src/midiprocessor.c ****       break;
+ 145              		.loc 1 56 7 view .LVU34
+ 146 0086 9DF80500 		ldrb	r0, [sp, #5]	@ zero_extendqisi2
+ 147 008a FFF7FEFF 		bl	Sysex_Process
+ 148              	.LVL11:
+  57:Src/midiprocessor.c **** 
+ 149              		.loc 1 57 7 view .LVU35
+ 150 008e E6E7     		b	.L1
+ 151              	.LVL12:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 6
+
+
+ 152              	.L15:
+ 153              	.LBB2:
+  61:Src/midiprocessor.c ****         Digital_NoteOff(&midimessage,&digital[i]);
+ 154              		.loc 1 61 9 discriminator 3 view .LVU36
+ 155 0090 04EB0411 		add	r1, r4, r4, lsl #4
+ 156 0094 534B     		ldr	r3, .L37
+ 157 0096 03EBC101 		add	r1, r3, r1, lsl #3
+ 158 009a 6846     		mov	r0, sp
+ 159 009c FFF7FEFF 		bl	Analog_NoteOff
+ 160              	.LVL13:
+  62:Src/midiprocessor.c ****       }
+ 161              		.loc 1 62 9 discriminator 3 view .LVU37
+ 162 00a0 04EB4403 		add	r3, r4, r4, lsl #1
+ 163 00a4 04EB8303 		add	r3, r4, r3, lsl #2
+ 164 00a8 4F49     		ldr	r1, .L37+4
+ 165 00aa 1944     		add	r1, r1, r3
+ 166 00ac 6846     		mov	r0, sp
+ 167 00ae FFF7FEFF 		bl	Digital_NoteOff
+ 168              	.LVL14:
+  60:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+ 169              		.loc 1 60 33 discriminator 3 view .LVU38
+  60:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+ 170              		.loc 1 60 34 is_stmt 0 discriminator 3 view .LVU39
+ 171 00b2 0134     		adds	r4, r4, #1
+ 172              	.LVL15:
+ 173              	.L10:
+  60:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+ 174              		.loc 1 60 26 is_stmt 1 discriminator 1 view .LVU40
+  60:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+ 175              		.loc 1 60 7 is_stmt 0 discriminator 1 view .LVU41
+ 176 00b4 032C     		cmp	r4, #3
+ 177 00b6 EBD9     		bls	.L15
+ 178 00b8 D1E7     		b	.L1
+ 179              	.LVL16:
+ 180              	.L28:
+  60:Src/midiprocessor.c ****         Analog_NoteOff(&midimessage,&analog[i]);
+ 181              		.loc 1 60 7 discriminator 1 view .LVU42
+ 182              	.LBE2:
+  19:Src/midiprocessor.c ****   
+ 183              		.loc 1 19 27 view .LVU43
+ 184 00ba 0024     		movs	r4, #0
+ 185 00bc FAE7     		b	.L10
+ 186              	.LVL17:
+ 187              	.L16:
+ 188              	.LBB3:
+  68:Src/midiprocessor.c ****         Digital_NoteOn(&midimessage,&digital[i]);
+ 189              		.loc 1 68 9 is_stmt 1 discriminator 3 view .LVU44
+ 190 00be 04EB0411 		add	r1, r4, r4, lsl #4
+ 191 00c2 484B     		ldr	r3, .L37
+ 192 00c4 03EBC101 		add	r1, r3, r1, lsl #3
+ 193 00c8 6846     		mov	r0, sp
+ 194 00ca FFF7FEFF 		bl	Analog_NoteOn
+ 195              	.LVL18:
+  69:Src/midiprocessor.c ****       }
+ 196              		.loc 1 69 9 discriminator 3 view .LVU45
+ 197 00ce 04EB4403 		add	r3, r4, r4, lsl #1
+ 198 00d2 04EB8303 		add	r3, r4, r3, lsl #2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 7
+
+
+ 199 00d6 4449     		ldr	r1, .L37+4
+ 200 00d8 1944     		add	r1, r1, r3
+ 201 00da 6846     		mov	r0, sp
+ 202 00dc FFF7FEFF 		bl	Digital_NoteOn
+ 203              	.LVL19:
+  67:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+ 204              		.loc 1 67 33 discriminator 3 view .LVU46
+  67:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+ 205              		.loc 1 67 34 is_stmt 0 discriminator 3 view .LVU47
+ 206 00e0 0134     		adds	r4, r4, #1
+ 207              	.LVL20:
+ 208              	.L9:
+  67:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+ 209              		.loc 1 67 26 is_stmt 1 discriminator 1 view .LVU48
+  67:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+ 210              		.loc 1 67 7 is_stmt 0 discriminator 1 view .LVU49
+ 211 00e2 032C     		cmp	r4, #3
+ 212 00e4 EBD9     		bls	.L16
+ 213 00e6 BAE7     		b	.L1
+ 214              	.LVL21:
+ 215              	.L29:
+  67:Src/midiprocessor.c ****         Analog_NoteOn(&midimessage,&analog[i]);
+ 216              		.loc 1 67 7 discriminator 1 view .LVU50
+ 217              	.LBE3:
+  19:Src/midiprocessor.c ****   
+ 218              		.loc 1 19 27 view .LVU51
+ 219 00e8 0024     		movs	r4, #0
+ 220 00ea FAE7     		b	.L9
+ 221              	.L8:
+  77:Src/midiprocessor.c ****         break;
+ 222              		.loc 1 77 7 is_stmt 1 view .LVU52
+  77:Src/midiprocessor.c ****         break;
+ 223              		.loc 1 77 9 is_stmt 0 view .LVU53
+ 224 00ec 0029     		cmp	r1, #0
+ 225 00ee B6D0     		beq	.L1
+  80:Src/midiprocessor.c ****           if(midimessage.byte2 == 64) {
+ 226              		.loc 1 80 12 is_stmt 1 view .LVU54
+  80:Src/midiprocessor.c ****           if(midimessage.byte2 == 64) {
+ 227              		.loc 1 80 14 is_stmt 0 view .LVU55
+ 228 00f0 7729     		cmp	r1, #119
+ 229 00f2 26D8     		bhi	.L17
+  81:Src/midiprocessor.c ****             for (size_t i = 0; i < 4; i++) {
+ 230              		.loc 1 81 11 is_stmt 1 view .LVU56
+  81:Src/midiprocessor.c ****             for (size_t i = 0; i < 4; i++) {
+ 231              		.loc 1 81 13 is_stmt 0 view .LVU57
+ 232 00f4 4029     		cmp	r1, #64
+ 233 00f6 16D0     		beq	.L36
+ 234              	.L19:
+ 235              	.LBB4:
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 236              		.loc 1 82 25 discriminator 1 view .LVU58
+ 237 00f8 0024     		movs	r4, #0
+ 238 00fa 1FE0     		b	.L21
+ 239              	.LVL22:
+ 240              	.L20:
+  83:Src/midiprocessor.c ****               Digital_Pedal(&midimessage,&digital[i]);
+ 241              		.loc 1 83 15 is_stmt 1 discriminator 3 view .LVU59
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 8
+
+
+ 242 00fc 04EB0411 		add	r1, r4, r4, lsl #4
+ 243 0100 384B     		ldr	r3, .L37
+ 244 0102 03EBC101 		add	r1, r3, r1, lsl #3
+ 245 0106 6846     		mov	r0, sp
+ 246 0108 FFF7FEFF 		bl	Analog_Pedal
+ 247              	.LVL23:
+  84:Src/midiprocessor.c ****             }
+ 248              		.loc 1 84 15 discriminator 3 view .LVU60
+ 249 010c 04EB4403 		add	r3, r4, r4, lsl #1
+ 250 0110 04EB8303 		add	r3, r4, r3, lsl #2
+ 251 0114 3449     		ldr	r1, .L37+4
+ 252 0116 1944     		add	r1, r1, r3
+ 253 0118 6846     		mov	r0, sp
+ 254 011a FFF7FEFF 		bl	Digital_Pedal
+ 255              	.LVL24:
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 256              		.loc 1 82 39 discriminator 3 view .LVU61
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 257              		.loc 1 82 40 is_stmt 0 discriminator 3 view .LVU62
+ 258 011e 0134     		adds	r4, r4, #1
+ 259              	.LVL25:
+ 260              	.L18:
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 261              		.loc 1 82 32 is_stmt 1 discriminator 1 view .LVU63
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 262              		.loc 1 82 13 is_stmt 0 discriminator 1 view .LVU64
+ 263 0120 032C     		cmp	r4, #3
+ 264 0122 EBD9     		bls	.L20
+ 265 0124 E8E7     		b	.L19
+ 266              	.LVL26:
+ 267              	.L36:
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 268              		.loc 1 82 25 view .LVU65
+ 269 0126 0024     		movs	r4, #0
+ 270 0128 FAE7     		b	.L18
+ 271              	.LVL27:
+ 272              	.L22:
+  82:Src/midiprocessor.c ****               Analog_Pedal(&midimessage,&analog[i]);
+ 273              		.loc 1 82 25 view .LVU66
+ 274              	.LBE4:
+ 275              	.LBB5:
+  88:Src/midiprocessor.c ****           }
+ 276              		.loc 1 88 13 is_stmt 1 discriminator 3 view .LVU67
+ 277 012a 04EB0411 		add	r1, r4, r4, lsl #4
+ 278 012e 2D4B     		ldr	r3, .L37
+ 279 0130 03EBC101 		add	r1, r3, r1, lsl #3
+ 280 0134 6846     		mov	r0, sp
+ 281 0136 FFF7FEFF 		bl	Analog_CC
+ 282              	.LVL28:
+  87:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+ 283              		.loc 1 87 37 discriminator 3 view .LVU68
+  87:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+ 284              		.loc 1 87 38 is_stmt 0 discriminator 3 view .LVU69
+ 285 013a 0134     		adds	r4, r4, #1
+ 286              	.LVL29:
+ 287              	.L21:
+  87:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 9
+
+
+ 288              		.loc 1 87 30 is_stmt 1 discriminator 1 view .LVU70
+  87:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+ 289              		.loc 1 87 11 is_stmt 0 discriminator 1 view .LVU71
+ 290 013c 032C     		cmp	r4, #3
+ 291 013e F4D9     		bls	.L22
+ 292 0140 8DE7     		b	.L1
+ 293              	.LVL30:
+ 294              	.L17:
+  87:Src/midiprocessor.c ****             Analog_CC(&midimessage,&analog[i]);
+ 295              		.loc 1 87 11 discriminator 1 view .LVU72
+ 296              	.LBE5:
+  90:Src/midiprocessor.c ****         for (size_t i = 0; i < 4; i++) {
+ 297              		.loc 1 90 14 is_stmt 1 view .LVU73
+  90:Src/midiprocessor.c ****         for (size_t i = 0; i < 4; i++) {
+ 298              		.loc 1 90 16 is_stmt 0 view .LVU74
+ 299 0142 7B29     		cmp	r1, #123
+ 300 0144 8BD8     		bhi	.L1
+  90:Src/midiprocessor.c ****         for (size_t i = 0; i < 4; i++) {
+ 301              		.loc 1 90 41 discriminator 1 view .LVU75
+ 302 0146 7A29     		cmp	r1, #122
+ 303 0148 89D0     		beq	.L1
+ 304              	.LBB6:
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 305              		.loc 1 91 21 view .LVU76
+ 306 014a 0024     		movs	r4, #0
+ 307 014c 0FE0     		b	.L23
+ 308              	.LVL31:
+ 309              	.L24:
+  92:Src/midiprocessor.c ****           Analog_Reset(&analog[i]);
+ 310              		.loc 1 92 11 is_stmt 1 discriminator 3 view .LVU77
+ 311 014e 04EB4403 		add	r3, r4, r4, lsl #1
+ 312 0152 04EB8303 		add	r3, r4, r3, lsl #2
+ 313 0156 2448     		ldr	r0, .L37+4
+ 314 0158 1844     		add	r0, r0, r3
+ 315 015a FFF7FEFF 		bl	Digital_Reset
+ 316              	.LVL32:
+  93:Src/midiprocessor.c ****         }
+ 317              		.loc 1 93 11 discriminator 3 view .LVU78
+ 318 015e 04EB0410 		add	r0, r4, r4, lsl #4
+ 319 0162 204B     		ldr	r3, .L37
+ 320 0164 03EBC000 		add	r0, r3, r0, lsl #3
+ 321 0168 FFF7FEFF 		bl	Analog_Reset
+ 322              	.LVL33:
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 323              		.loc 1 91 35 discriminator 3 view .LVU79
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 324              		.loc 1 91 36 is_stmt 0 discriminator 3 view .LVU80
+ 325 016c 0134     		adds	r4, r4, #1
+ 326              	.LVL34:
+ 327              	.L23:
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 328              		.loc 1 91 28 is_stmt 1 discriminator 1 view .LVU81
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 329              		.loc 1 91 9 is_stmt 0 discriminator 1 view .LVU82
+ 330 016e 032C     		cmp	r4, #3
+ 331 0170 EDD9     		bls	.L24
+ 332 0172 74E7     		b	.L1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 10
+
+
+ 333              	.LVL35:
+ 334              	.L7:
+  91:Src/midiprocessor.c ****           Digital_Reset(&digital[i]);
+ 335              		.loc 1 91 9 discriminator 1 view .LVU83
+ 336              	.LBE6:
+ 100:Src/midiprocessor.c ****       break;
+ 337              		.loc 1 100 7 is_stmt 1 view .LVU84
+ 338 0174 01F07F00 		and	r0, r1, #127
+ 339 0178 FFF7FEFF 		bl	Config_ProgramChange
+ 340              	.LVL36:
+ 101:Src/midiprocessor.c ****     
+ 341              		.loc 1 101 7 view .LVU85
+ 342 017c 6FE7     		b	.L1
+ 343              	.LVL37:
+ 344              	.L25:
+ 345              	.LBB7:
+ 105:Src/midiprocessor.c ****       }
+ 346              		.loc 1 105 9 discriminator 3 view .LVU86
+ 347 017e 04EB0411 		add	r1, r4, r4, lsl #4
+ 348 0182 184B     		ldr	r3, .L37
+ 349 0184 03EBC101 		add	r1, r3, r1, lsl #3
+ 350 0188 6846     		mov	r0, sp
+ 351 018a FFF7FEFF 		bl	Analog_Aftertouch
+ 352              	.LVL38:
+ 104:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 353              		.loc 1 104 33 discriminator 3 view .LVU87
+ 104:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 354              		.loc 1 104 34 is_stmt 0 discriminator 3 view .LVU88
+ 355 018e 0134     		adds	r4, r4, #1
+ 356              	.LVL39:
+ 357              	.L6:
+ 104:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 358              		.loc 1 104 26 is_stmt 1 discriminator 1 view .LVU89
+ 104:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 359              		.loc 1 104 7 is_stmt 0 discriminator 1 view .LVU90
+ 360 0190 032C     		cmp	r4, #3
+ 361 0192 F4D9     		bls	.L25
+ 362 0194 63E7     		b	.L1
+ 363              	.LVL40:
+ 364              	.L30:
+ 104:Src/midiprocessor.c ****         Analog_Aftertouch(&midimessage, &analog[i]);
+ 365              		.loc 1 104 7 discriminator 1 view .LVU91
+ 366              	.LBE7:
+  19:Src/midiprocessor.c ****   
+ 367              		.loc 1 19 27 view .LVU92
+ 368 0196 0024     		movs	r4, #0
+ 369 0198 FAE7     		b	.L6
+ 370              	.LVL41:
+ 371              	.L26:
+ 372              	.LBB8:
+ 111:Src/midiprocessor.c ****       }
+ 373              		.loc 1 111 9 is_stmt 1 discriminator 3 view .LVU93
+ 374 019a 04EB0411 		add	r1, r4, r4, lsl #4
+ 375 019e 114B     		ldr	r3, .L37
+ 376 01a0 03EBC101 		add	r1, r3, r1, lsl #3
+ 377 01a4 6846     		mov	r0, sp
+ 378 01a6 FFF7FEFF 		bl	Analog_Pitchbend
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 11
+
+
+ 379              	.LVL42:
+ 110:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 380              		.loc 1 110 33 discriminator 3 view .LVU94
+ 110:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 381              		.loc 1 110 34 is_stmt 0 discriminator 3 view .LVU95
+ 382 01aa 0134     		adds	r4, r4, #1
+ 383              	.LVL43:
+ 384              	.L5:
+ 110:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 385              		.loc 1 110 26 is_stmt 1 discriminator 1 view .LVU96
+ 110:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 386              		.loc 1 110 7 is_stmt 0 discriminator 1 view .LVU97
+ 387 01ac 032C     		cmp	r4, #3
+ 388 01ae F4D9     		bls	.L26
+ 389 01b0 55E7     		b	.L1
+ 390              	.LVL44:
+ 391              	.L31:
+ 110:Src/midiprocessor.c ****         Analog_Pitchbend(&midimessage, &analog[i]);
+ 392              		.loc 1 110 7 discriminator 1 view .LVU98
+ 393              	.LBE8:
+  19:Src/midiprocessor.c ****   
+ 394              		.loc 1 19 27 view .LVU99
+ 395 01b2 0024     		movs	r4, #0
+ 396 01b4 FAE7     		b	.L5
+ 397              	.LVL45:
+ 398              	.L27:
+ 399              	.LBB9:
+ 118:Src/midiprocessor.c ****         Digital_Clock(&midimessage,&digital[i]);
+ 400              		.loc 1 118 9 is_stmt 1 discriminator 3 view .LVU100
+ 401 01b6 04EB0411 		add	r1, r4, r4, lsl #4
+ 402 01ba 0A4B     		ldr	r3, .L37
+ 403 01bc 03EBC101 		add	r1, r3, r1, lsl #3
+ 404 01c0 6846     		mov	r0, sp
+ 405 01c2 FFF7FEFF 		bl	Analog_Clock
+ 406              	.LVL46:
+ 119:Src/midiprocessor.c ****       }
+ 407              		.loc 1 119 9 discriminator 3 view .LVU101
+ 408 01c6 04EB4403 		add	r3, r4, r4, lsl #1
+ 409 01ca 04EB8303 		add	r3, r4, r3, lsl #2
+ 410 01ce 0649     		ldr	r1, .L37+4
+ 411 01d0 1944     		add	r1, r1, r3
+ 412 01d2 6846     		mov	r0, sp
+ 413 01d4 FFF7FEFF 		bl	Digital_Clock
+ 414              	.LVL47:
+ 117:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 415              		.loc 1 117 33 discriminator 3 view .LVU102
+ 117:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 416              		.loc 1 117 34 is_stmt 0 discriminator 3 view .LVU103
+ 417 01d8 0134     		adds	r4, r4, #1
+ 418              	.LVL48:
+ 419              	.L3:
+ 117:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 420              		.loc 1 117 26 is_stmt 1 discriminator 1 view .LVU104
+ 117:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 421              		.loc 1 117 7 is_stmt 0 discriminator 1 view .LVU105
+ 422 01da 032C     		cmp	r4, #3
+ 423 01dc EBD9     		bls	.L27
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 12
+
+
+ 424 01de 3EE7     		b	.L1
+ 425              	.LVL49:
+ 426              	.L32:
+ 117:Src/midiprocessor.c ****         Analog_Clock(&midimessage,&analog[i]);
+ 427              		.loc 1 117 7 discriminator 1 view .LVU106
+ 428              	.LBE9:
+  19:Src/midiprocessor.c ****   
+ 429              		.loc 1 19 27 view .LVU107
+ 430 01e0 0024     		movs	r4, #0
+ 431 01e2 FAE7     		b	.L3
+ 432              	.L38:
+ 433              		.align	2
+ 434              	.L37:
+ 435 01e4 00000000 		.word	analog
+ 436 01e8 00000000 		.word	digital
+ 437              		.cfi_endproc
+ 438              	.LFE126:
+ 440              		.text
+ 441              	.Letext0:
+ 442              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 443              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 444              		.file 4 "Inc/midimessage.h"
+ 445              		.file 5 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 446              		.file 6 "Inc/midisetting.h"
+ 447              		.file 7 "Inc/digital.h"
+ 448              		.file 8 "Inc/note_stack.h"
+ 449              		.file 9 "Inc/analog.h"
+ 450              		.file 10 "Inc/sysexprocessor.h"
+ 451              		.file 11 "Inc/configuration.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 midiprocessor.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s:18     .text.MIDI_InputMessage:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s:26     .text.MIDI_InputMessage:0000000000000000 MIDI_InputMessage
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s:82     .text.MIDI_InputMessage:000000000000003e $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s:94     .text.MIDI_InputMessage:000000000000004a $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//cc6S4CuP.s:435    .text.MIDI_InputMessage:00000000000001e4 $d
+
+UNDEFINED SYMBOLS
+Sysex_Process
+Analog_NoteOff
+Digital_NoteOff
+Analog_NoteOn
+Digital_NoteOn
+Analog_Pedal
+Digital_Pedal
+Analog_CC
+Digital_Reset
+Analog_Reset
+Config_ProgramChange
+Analog_Aftertouch
+Analog_Pitchbend
+Analog_Clock
+Digital_Clock
+analog
+digital

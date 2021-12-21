@@ -1,0 +1,1520 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"digital.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.Digital_ChangeValue,"ax",%progbits
+  18              		.align	1
+  19              		.global	Digital_ChangeValue
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	Digital_ChangeValue:
+  27              	.LVL0:
+  28              	.LFB131:
+  29              		.file 1 "Src/digital.c"
+   1:Src/digital.c **** #include "digital.h"
+   2:Src/digital.c **** #include "gpio.h"
+   3:Src/digital.c **** #include "analog.h"
+   4:Src/digital.c **** 
+   5:Src/digital.c **** 
+   6:Src/digital.c **** Digital_t digital[kDIGITAL_AMOUNT];
+   7:Src/digital.c **** 
+   8:Src/digital.c **** 
+   9:Src/digital.c **** 
+  10:Src/digital.c **** void Digital_Init() {
+  11:Src/digital.c ****   digital[0].gpiopin = GPIO_PIN_3;
+  12:Src/digital.c ****   digital[0].id = 0;
+  13:Src/digital.c ****   digital[1].gpiopin = GPIO_PIN_5;
+  14:Src/digital.c ****   digital[1].id = 1;
+  15:Src/digital.c ****   digital[2].gpiopin = GPIO_PIN_2;
+  16:Src/digital.c ****   digital[2].id = 2;
+  17:Src/digital.c ****   digital[3].gpiopin = GPIO_PIN_1;
+  18:Src/digital.c ****   digital[3].id = 3;
+  19:Src/digital.c ****   for (size_t i = 0; i < kDIGITAL_AMOUNT; i++)
+  20:Src/digital.c ****   {
+  21:Src/digital.c ****     Digital_Reset(&digital[i]);
+  22:Src/digital.c ****   }
+  23:Src/digital.c ****   
+  24:Src/digital.c **** }
+  25:Src/digital.c **** 
+  26:Src/digital.c **** void Digital_Reset(Digital_t *dig) {
+  27:Src/digital.c ****   dig->trigger = 0;
+  28:Src/digital.c ****   dig->voice = false;
+  29:Src/digital.c ****   dig->random = false;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 2
+
+
+  30:Src/digital.c ****   dig->pedal = 0;
+  31:Src/digital.c ****   dig->state = false;
+  32:Src/digital.c ****   Digital_ChangeValue(false,false,dig);
+  33:Src/digital.c **** 
+  34:Src/digital.c ****   switch (dig->mode) {
+  35:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+  36:Src/digital.c ****     case DIGITAL_VOICE_TRIGGER:
+  37:Src/digital.c ****       dig->voice = true;
+  38:Src/digital.c ****       break;
+  39:Src/digital.c ****     case DIGITAL_RANDOM:
+  40:Src/digital.c ****       dig->random = true;
+  41:Src/digital.c **** 
+  42:Src/digital.c ****     default:
+  43:Src/digital.c ****       break;
+  44:Src/digital.c ****   }
+  45:Src/digital.c **** }
+  46:Src/digital.c **** 
+  47:Src/digital.c **** void Digital_Configure(Digital_t *dig, Digital_Settings mode, MidiSetting *midiset){
+  48:Src/digital.c ****   dig->mode = mode;
+  49:Src/digital.c ****   dig->settings.byte2 = midiset->byte2;
+  50:Src/digital.c ****   dig->settings.byte3 = midiset->byte3;
+  51:Src/digital.c ****   dig->settings.midichannel = midiset->midichannel;
+  52:Src/digital.c **** 
+  53:Src/digital.c ****   Digital_Reset(dig);
+  54:Src/digital.c **** }
+  55:Src/digital.c **** 
+  56:Src/digital.c **** void Digital_NoteOn(MidiMessage *message, Digital_t *dig) {
+  57:Src/digital.c ****   switch (dig->mode) {
+  58:Src/digital.c ****     case DIGITAL_TRIGGER:
+  59:Src/digital.c ****       if(message->midichannel == dig->settings.midichannel || dig->settings.midichannel == 255) {
+  60:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+  61:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+  62:Src/digital.c ****         }
+  63:Src/digital.c ****       }
+  64:Src/digital.c ****       break;
+  65:Src/digital.c ****     
+  66:Src/digital.c ****     case DIGITAL_GATE:
+  67:Src/digital.c ****       if(message->midichannel == dig->settings.midichannel || dig->settings.midichannel == 255) {
+  68:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+  69:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+  70:Src/digital.c ****         }
+  71:Src/digital.c ****       }
+  72:Src/digital.c ****       break;
+  73:Src/digital.c ****       
+  74:Src/digital.c ****     default:
+  75:Src/digital.c ****       break;
+  76:Src/digital.c ****   }
+  77:Src/digital.c **** }
+  78:Src/digital.c **** 
+  79:Src/digital.c **** void Digital_NoteOff(MidiMessage *message, Digital_t *dig) {
+  80:Src/digital.c ****   switch (dig->mode) {    
+  81:Src/digital.c ****     case DIGITAL_GATE:
+  82:Src/digital.c ****       if(message->midichannel == dig->settings.midichannel || dig->settings.midichannel == 255) {
+  83:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+  84:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+  85:Src/digital.c ****         }
+  86:Src/digital.c ****       }
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 3
+
+
+  87:Src/digital.c ****     break;
+  88:Src/digital.c **** 
+  89:Src/digital.c ****     default:
+  90:Src/digital.c ****       break;
+  91:Src/digital.c ****   }
+  92:Src/digital.c **** }
+  93:Src/digital.c **** 
+  94:Src/digital.c **** void Digital_ChangeValue(bool state, bool trigger, Digital_t *dig) {
+  30              		.loc 1 94 68 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 94 68 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  40 0002 1346     		mov	r3, r2
+  95:Src/digital.c ****   if(trigger) {
+  41              		.loc 1 95 3 is_stmt 1 view .LVU2
+  42              		.loc 1 95 5 is_stmt 0 view .LVU3
+  43 0004 49B1     		cbz	r1, .L2
+  96:Src/digital.c ****     dig->trigger = (kSAMPLE_RATE/1000);
+  44              		.loc 1 96 5 is_stmt 1 view .LVU4
+  45              		.loc 1 96 18 is_stmt 0 view .LVU5
+  46 0006 0B22     		movs	r2, #11
+  47              	.LVL1:
+  48              		.loc 1 96 18 view .LVU6
+  49 0008 1A72     		strb	r2, [r3, #8]
+  50              	.L3:
+  97:Src/digital.c ****   } else {
+  98:Src/digital.c ****     dig->trigger = 0;
+  99:Src/digital.c ****   }
+ 100:Src/digital.c ****   dig->state = state;
+  51              		.loc 1 100 3 is_stmt 1 view .LVU7
+  52              		.loc 1 100 14 is_stmt 0 view .LVU8
+  53 000a 1870     		strb	r0, [r3]
+ 101:Src/digital.c ****   HAL_GPIO_WritePin(GPIOA,dig->gpiopin,state);
+  54              		.loc 1 101 3 is_stmt 1 view .LVU9
+  55 000c 0246     		mov	r2, r0
+  56 000e 597A     		ldrb	r1, [r3, #9]	@ zero_extendqisi2
+  57              	.LVL2:
+  58              		.loc 1 101 3 is_stmt 0 view .LVU10
+  59 0010 4FF09040 		mov	r0, #1207959552
+  60              	.LVL3:
+  61              		.loc 1 101 3 view .LVU11
+  62 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  63              	.LVL4:
+ 102:Src/digital.c **** }
+  64              		.loc 1 102 1 view .LVU12
+  65 0018 08BD     		pop	{r3, pc}
+  66              	.LVL5:
+  67              	.L2:
+  98:Src/digital.c ****   }
+  68              		.loc 1 98 5 is_stmt 1 view .LVU13
+  98:Src/digital.c ****   }
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 4
+
+
+  69              		.loc 1 98 18 is_stmt 0 view .LVU14
+  70 001a 0022     		movs	r2, #0
+  71              	.LVL6:
+  98:Src/digital.c ****   }
+  72              		.loc 1 98 18 view .LVU15
+  73 001c 1A72     		strb	r2, [r3, #8]
+  74 001e F4E7     		b	.L3
+  75              		.cfi_endproc
+  76              	.LFE131:
+  78              		.section	.text.Digital_Reset,"ax",%progbits
+  79              		.align	1
+  80              		.global	Digital_Reset
+  81              		.syntax unified
+  82              		.thumb
+  83              		.thumb_func
+  84              		.fpu fpv4-sp-d16
+  86              	Digital_Reset:
+  87              	.LVL7:
+  88              	.LFB127:
+  26:Src/digital.c ****   dig->trigger = 0;
+  89              		.loc 1 26 36 is_stmt 1 view -0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 0
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+  26:Src/digital.c ****   dig->trigger = 0;
+  93              		.loc 1 26 36 is_stmt 0 view .LVU17
+  94 0000 10B5     		push	{r4, lr}
+  95              	.LCFI1:
+  96              		.cfi_def_cfa_offset 8
+  97              		.cfi_offset 4, -8
+  98              		.cfi_offset 14, -4
+  99 0002 0446     		mov	r4, r0
+  27:Src/digital.c ****   dig->voice = false;
+ 100              		.loc 1 27 3 is_stmt 1 view .LVU18
+  27:Src/digital.c ****   dig->voice = false;
+ 101              		.loc 1 27 16 is_stmt 0 view .LVU19
+ 102 0004 0020     		movs	r0, #0
+ 103              	.LVL8:
+  27:Src/digital.c ****   dig->voice = false;
+ 104              		.loc 1 27 16 view .LVU20
+ 105 0006 2072     		strb	r0, [r4, #8]
+  28:Src/digital.c ****   dig->random = false;
+ 106              		.loc 1 28 3 is_stmt 1 view .LVU21
+  28:Src/digital.c ****   dig->random = false;
+ 107              		.loc 1 28 14 is_stmt 0 view .LVU22
+ 108 0008 6070     		strb	r0, [r4, #1]
+  29:Src/digital.c ****   dig->pedal = 0;
+ 109              		.loc 1 29 3 is_stmt 1 view .LVU23
+  29:Src/digital.c ****   dig->pedal = 0;
+ 110              		.loc 1 29 15 is_stmt 0 view .LVU24
+ 111 000a A070     		strb	r0, [r4, #2]
+  30:Src/digital.c ****   dig->state = false;
+ 112              		.loc 1 30 3 is_stmt 1 view .LVU25
+  30:Src/digital.c ****   dig->state = false;
+ 113              		.loc 1 30 14 is_stmt 0 view .LVU26
+ 114 000c 2073     		strb	r0, [r4, #12]
+  31:Src/digital.c ****   Digital_ChangeValue(false,false,dig);
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 5
+
+
+ 115              		.loc 1 31 3 is_stmt 1 view .LVU27
+  31:Src/digital.c ****   Digital_ChangeValue(false,false,dig);
+ 116              		.loc 1 31 14 is_stmt 0 view .LVU28
+ 117 000e 2070     		strb	r0, [r4]
+  32:Src/digital.c **** 
+ 118              		.loc 1 32 3 is_stmt 1 view .LVU29
+ 119 0010 2246     		mov	r2, r4
+ 120 0012 0146     		mov	r1, r0
+ 121 0014 FFF7FEFF 		bl	Digital_ChangeValue
+ 122              	.LVL9:
+  34:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+ 123              		.loc 1 34 3 view .LVU30
+  34:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+ 124              		.loc 1 34 14 is_stmt 0 view .LVU31
+ 125 0018 E379     		ldrb	r3, [r4, #7]	@ zero_extendqisi2
+  34:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+ 126              		.loc 1 34 3 view .LVU32
+ 127 001a 072B     		cmp	r3, #7
+ 128 001c 04D9     		bls	.L11
+ 129 001e FF2B     		cmp	r3, #255
+ 130 0020 04D1     		bne	.L5
+  40:Src/digital.c **** 
+ 131              		.loc 1 40 7 is_stmt 1 view .LVU33
+  40:Src/digital.c **** 
+ 132              		.loc 1 40 19 is_stmt 0 view .LVU34
+ 133 0022 0123     		movs	r3, #1
+ 134 0024 A370     		strb	r3, [r4, #2]
+  45:Src/digital.c **** 
+ 135              		.loc 1 45 1 view .LVU35
+ 136 0026 01E0     		b	.L5
+ 137              	.L11:
+  34:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+ 138              		.loc 1 34 3 view .LVU36
+ 139 0028 062B     		cmp	r3, #6
+ 140 002a 00D2     		bcs	.L12
+ 141              	.L5:
+  45:Src/digital.c **** 
+ 142              		.loc 1 45 1 view .LVU37
+ 143 002c 10BD     		pop	{r4, pc}
+ 144              	.LVL10:
+ 145              	.L12:
+  37:Src/digital.c ****       break;
+ 146              		.loc 1 37 7 is_stmt 1 view .LVU38
+  37:Src/digital.c ****       break;
+ 147              		.loc 1 37 18 is_stmt 0 view .LVU39
+ 148 002e 0123     		movs	r3, #1
+ 149 0030 6370     		strb	r3, [r4, #1]
+  38:Src/digital.c ****     case DIGITAL_RANDOM:
+ 150              		.loc 1 38 7 is_stmt 1 view .LVU40
+ 151 0032 FBE7     		b	.L5
+ 152              		.cfi_endproc
+ 153              	.LFE127:
+ 155              		.section	.text.Digital_Init,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	Digital_Init
+ 158              		.syntax unified
+ 159              		.thumb
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 6
+
+
+ 160              		.thumb_func
+ 161              		.fpu fpv4-sp-d16
+ 163              	Digital_Init:
+ 164              	.LFB126:
+  10:Src/digital.c ****   digital[0].gpiopin = GPIO_PIN_3;
+ 165              		.loc 1 10 21 view -0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+ 169 0000 10B5     		push	{r4, lr}
+ 170              	.LCFI2:
+ 171              		.cfi_def_cfa_offset 8
+ 172              		.cfi_offset 4, -8
+ 173              		.cfi_offset 14, -4
+  11:Src/digital.c ****   digital[0].id = 0;
+ 174              		.loc 1 11 3 view .LVU42
+  11:Src/digital.c ****   digital[0].id = 0;
+ 175              		.loc 1 11 22 is_stmt 0 view .LVU43
+ 176 0002 104B     		ldr	r3, .L17
+ 177 0004 0822     		movs	r2, #8
+ 178 0006 5A72     		strb	r2, [r3, #9]
+  12:Src/digital.c ****   digital[1].gpiopin = GPIO_PIN_5;
+ 179              		.loc 1 12 3 is_stmt 1 view .LVU44
+  12:Src/digital.c ****   digital[1].gpiopin = GPIO_PIN_5;
+ 180              		.loc 1 12 17 is_stmt 0 view .LVU45
+ 181 0008 0024     		movs	r4, #0
+ 182 000a 9C72     		strb	r4, [r3, #10]
+  13:Src/digital.c ****   digital[1].id = 1;
+ 183              		.loc 1 13 3 is_stmt 1 view .LVU46
+  13:Src/digital.c ****   digital[1].id = 1;
+ 184              		.loc 1 13 22 is_stmt 0 view .LVU47
+ 185 000c 2022     		movs	r2, #32
+ 186 000e 9A75     		strb	r2, [r3, #22]
+  14:Src/digital.c ****   digital[2].gpiopin = GPIO_PIN_2;
+ 187              		.loc 1 14 3 is_stmt 1 view .LVU48
+  14:Src/digital.c ****   digital[2].gpiopin = GPIO_PIN_2;
+ 188              		.loc 1 14 17 is_stmt 0 view .LVU49
+ 189 0010 0122     		movs	r2, #1
+ 190 0012 DA75     		strb	r2, [r3, #23]
+  15:Src/digital.c ****   digital[2].id = 2;
+ 191              		.loc 1 15 3 is_stmt 1 view .LVU50
+  15:Src/digital.c ****   digital[2].id = 2;
+ 192              		.loc 1 15 22 is_stmt 0 view .LVU51
+ 193 0014 0422     		movs	r2, #4
+ 194 0016 83F82320 		strb	r2, [r3, #35]
+  16:Src/digital.c ****   digital[3].gpiopin = GPIO_PIN_1;
+ 195              		.loc 1 16 3 is_stmt 1 view .LVU52
+  16:Src/digital.c ****   digital[3].gpiopin = GPIO_PIN_1;
+ 196              		.loc 1 16 17 is_stmt 0 view .LVU53
+ 197 001a 0222     		movs	r2, #2
+ 198 001c 83F82420 		strb	r2, [r3, #36]
+  17:Src/digital.c ****   digital[3].id = 3;
+ 199              		.loc 1 17 3 is_stmt 1 view .LVU54
+  17:Src/digital.c ****   digital[3].id = 3;
+ 200              		.loc 1 17 22 is_stmt 0 view .LVU55
+ 201 0020 83F83020 		strb	r2, [r3, #48]
+  18:Src/digital.c ****   for (size_t i = 0; i < kDIGITAL_AMOUNT; i++)
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 7
+
+
+ 202              		.loc 1 18 3 is_stmt 1 view .LVU56
+  18:Src/digital.c ****   for (size_t i = 0; i < kDIGITAL_AMOUNT; i++)
+ 203              		.loc 1 18 17 is_stmt 0 view .LVU57
+ 204 0024 0322     		movs	r2, #3
+ 205 0026 83F83120 		strb	r2, [r3, #49]
+  19:Src/digital.c ****   {
+ 206              		.loc 1 19 3 is_stmt 1 view .LVU58
+ 207              	.LBB2:
+  19:Src/digital.c ****   {
+ 208              		.loc 1 19 8 view .LVU59
+ 209              	.LVL11:
+  19:Src/digital.c ****   {
+ 210              		.loc 1 19 3 is_stmt 0 view .LVU60
+ 211 002a 08E0     		b	.L14
+ 212              	.LVL12:
+ 213              	.L15:
+  21:Src/digital.c ****   }
+ 214              		.loc 1 21 5 is_stmt 1 discriminator 3 view .LVU61
+ 215 002c 04EB4403 		add	r3, r4, r4, lsl #1
+ 216 0030 04EB8303 		add	r3, r4, r3, lsl #2
+ 217 0034 0348     		ldr	r0, .L17
+ 218 0036 1844     		add	r0, r0, r3
+ 219 0038 FFF7FEFF 		bl	Digital_Reset
+ 220              	.LVL13:
+  19:Src/digital.c ****   {
+ 221              		.loc 1 19 43 discriminator 3 view .LVU62
+  19:Src/digital.c ****   {
+ 222              		.loc 1 19 44 is_stmt 0 discriminator 3 view .LVU63
+ 223 003c 0134     		adds	r4, r4, #1
+ 224              	.LVL14:
+ 225              	.L14:
+  19:Src/digital.c ****   {
+ 226              		.loc 1 19 22 is_stmt 1 discriminator 1 view .LVU64
+  19:Src/digital.c ****   {
+ 227              		.loc 1 19 3 is_stmt 0 discriminator 1 view .LVU65
+ 228 003e 032C     		cmp	r4, #3
+ 229 0040 F4D9     		bls	.L15
+ 230              	.LBE2:
+  24:Src/digital.c **** 
+ 231              		.loc 1 24 1 view .LVU66
+ 232 0042 10BD     		pop	{r4, pc}
+ 233              	.LVL15:
+ 234              	.L18:
+  24:Src/digital.c **** 
+ 235              		.loc 1 24 1 view .LVU67
+ 236              		.align	2
+ 237              	.L17:
+ 238 0044 00000000 		.word	.LANCHOR0
+ 239              		.cfi_endproc
+ 240              	.LFE126:
+ 242              		.section	.text.Digital_Configure,"ax",%progbits
+ 243              		.align	1
+ 244              		.global	Digital_Configure
+ 245              		.syntax unified
+ 246              		.thumb
+ 247              		.thumb_func
+ 248              		.fpu fpv4-sp-d16
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 8
+
+
+ 250              	Digital_Configure:
+ 251              	.LVL16:
+ 252              	.LFB128:
+  47:Src/digital.c ****   dig->mode = mode;
+ 253              		.loc 1 47 84 is_stmt 1 view -0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 0
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+  47:Src/digital.c ****   dig->mode = mode;
+ 257              		.loc 1 47 84 is_stmt 0 view .LVU69
+ 258 0000 08B5     		push	{r3, lr}
+ 259              	.LCFI3:
+ 260              		.cfi_def_cfa_offset 8
+ 261              		.cfi_offset 3, -8
+ 262              		.cfi_offset 14, -4
+  48:Src/digital.c ****   dig->settings.byte2 = midiset->byte2;
+ 263              		.loc 1 48 3 is_stmt 1 view .LVU70
+  48:Src/digital.c ****   dig->settings.byte2 = midiset->byte2;
+ 264              		.loc 1 48 13 is_stmt 0 view .LVU71
+ 265 0002 C171     		strb	r1, [r0, #7]
+  49:Src/digital.c ****   dig->settings.byte3 = midiset->byte3;
+ 266              		.loc 1 49 3 is_stmt 1 view .LVU72
+  49:Src/digital.c ****   dig->settings.byte3 = midiset->byte3;
+ 267              		.loc 1 49 32 is_stmt 0 view .LVU73
+ 268 0004 5178     		ldrb	r1, [r2, #1]	@ zero_extendqisi2
+ 269              	.LVL17:
+  49:Src/digital.c ****   dig->settings.byte3 = midiset->byte3;
+ 270              		.loc 1 49 23 view .LVU74
+ 271 0006 4171     		strb	r1, [r0, #5]
+  50:Src/digital.c ****   dig->settings.midichannel = midiset->midichannel;
+ 272              		.loc 1 50 3 is_stmt 1 view .LVU75
+  50:Src/digital.c ****   dig->settings.midichannel = midiset->midichannel;
+ 273              		.loc 1 50 32 is_stmt 0 view .LVU76
+ 274 0008 9178     		ldrb	r1, [r2, #2]	@ zero_extendqisi2
+  50:Src/digital.c ****   dig->settings.midichannel = midiset->midichannel;
+ 275              		.loc 1 50 23 view .LVU77
+ 276 000a 8171     		strb	r1, [r0, #6]
+  51:Src/digital.c **** 
+ 277              		.loc 1 51 3 is_stmt 1 view .LVU78
+  51:Src/digital.c **** 
+ 278              		.loc 1 51 38 is_stmt 0 view .LVU79
+ 279 000c 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 280              	.LVL18:
+  51:Src/digital.c **** 
+ 281              		.loc 1 51 29 view .LVU80
+ 282 000e 0271     		strb	r2, [r0, #4]
+  53:Src/digital.c **** }
+ 283              		.loc 1 53 3 is_stmt 1 view .LVU81
+ 284 0010 FFF7FEFF 		bl	Digital_Reset
+ 285              	.LVL19:
+  54:Src/digital.c **** 
+ 286              		.loc 1 54 1 is_stmt 0 view .LVU82
+ 287 0014 08BD     		pop	{r3, pc}
+ 288              		.cfi_endproc
+ 289              	.LFE128:
+ 291              		.section	.text.Digital_ChangeValuePedal,"ax",%progbits
+ 292              		.align	1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 9
+
+
+ 293              		.global	Digital_ChangeValuePedal
+ 294              		.syntax unified
+ 295              		.thumb
+ 296              		.thumb_func
+ 297              		.fpu fpv4-sp-d16
+ 299              	Digital_ChangeValuePedal:
+ 300              	.LVL20:
+ 301              	.LFB132:
+ 103:Src/digital.c **** 
+ 104:Src/digital.c **** void Digital_ChangeValuePedal(bool state, bool trigger, Digital_t *dig) {
+ 302              		.loc 1 104 73 is_stmt 1 view -0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		.loc 1 104 73 is_stmt 0 view .LVU84
+ 307 0000 08B5     		push	{r3, lr}
+ 308              	.LCFI4:
+ 309              		.cfi_def_cfa_offset 8
+ 310              		.cfi_offset 3, -8
+ 311              		.cfi_offset 14, -4
+ 312 0002 1346     		mov	r3, r2
+ 105:Src/digital.c ****   if(trigger) {
+ 313              		.loc 1 105 3 is_stmt 1 view .LVU85
+ 314              		.loc 1 105 5 is_stmt 0 view .LVU86
+ 315 0004 71B1     		cbz	r1, .L22
+ 106:Src/digital.c ****     dig->trigger = (kSAMPLE_RATE/1000);
+ 316              		.loc 1 106 5 is_stmt 1 view .LVU87
+ 317              		.loc 1 106 18 is_stmt 0 view .LVU88
+ 318 0006 0B22     		movs	r2, #11
+ 319              	.LVL21:
+ 320              		.loc 1 106 18 view .LVU89
+ 321 0008 1A72     		strb	r2, [r3, #8]
+ 322              	.L23:
+ 107:Src/digital.c ****   } else {
+ 108:Src/digital.c ****     dig->trigger = 0;
+ 109:Src/digital.c ****   }
+ 110:Src/digital.c ****   if(dig->state == true && state == false) {
+ 323              		.loc 1 110 3 is_stmt 1 view .LVU90
+ 324              		.loc 1 110 9 is_stmt 0 view .LVU91
+ 325 000a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 326              		.loc 1 110 5 view .LVU92
+ 327 000c 6AB1     		cbz	r2, .L24
+ 328              		.loc 1 110 25 discriminator 1 view .LVU93
+ 329 000e 60B9     		cbnz	r0, .L24
+ 111:Src/digital.c ****     dig->state = state;
+ 330              		.loc 1 111 5 is_stmt 1 view .LVU94
+ 331              		.loc 1 111 16 is_stmt 0 view .LVU95
+ 332 0010 1870     		strb	r0, [r3]
+ 112:Src/digital.c ****     if(dig->pedal == false){
+ 333              		.loc 1 112 5 is_stmt 1 view .LVU96
+ 334              		.loc 1 112 11 is_stmt 0 view .LVU97
+ 335 0012 1A7B     		ldrb	r2, [r3, #12]	@ zero_extendqisi2
+ 336              		.loc 1 112 7 view .LVU98
+ 337 0014 82B9     		cbnz	r2, .L21
+ 113:Src/digital.c ****       HAL_GPIO_WritePin(GPIOA,dig->gpiopin,state);
+ 338              		.loc 1 113 7 is_stmt 1 view .LVU99
+ 339 0016 0246     		mov	r2, r0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 10
+
+
+ 340 0018 597A     		ldrb	r1, [r3, #9]	@ zero_extendqisi2
+ 341              	.LVL22:
+ 342              		.loc 1 113 7 is_stmt 0 view .LVU100
+ 343 001a 4FF09040 		mov	r0, #1207959552
+ 344              	.LVL23:
+ 345              		.loc 1 113 7 view .LVU101
+ 346 001e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 347              	.LVL24:
+ 348              		.loc 1 113 7 view .LVU102
+ 349 0022 09E0     		b	.L21
+ 350              	.LVL25:
+ 351              	.L22:
+ 108:Src/digital.c ****   }
+ 352              		.loc 1 108 5 is_stmt 1 view .LVU103
+ 108:Src/digital.c ****   }
+ 353              		.loc 1 108 18 is_stmt 0 view .LVU104
+ 354 0024 0022     		movs	r2, #0
+ 355              	.LVL26:
+ 108:Src/digital.c ****   }
+ 356              		.loc 1 108 18 view .LVU105
+ 357 0026 1A72     		strb	r2, [r3, #8]
+ 358 0028 EFE7     		b	.L23
+ 359              	.L24:
+ 114:Src/digital.c ****     }
+ 115:Src/digital.c ****   } else{
+ 116:Src/digital.c ****     dig->state = state;
+ 360              		.loc 1 116 5 is_stmt 1 view .LVU106
+ 361              		.loc 1 116 16 is_stmt 0 view .LVU107
+ 362 002a 1870     		strb	r0, [r3]
+ 117:Src/digital.c ****     HAL_GPIO_WritePin(GPIOA,dig->gpiopin,state);
+ 363              		.loc 1 117 5 is_stmt 1 view .LVU108
+ 364 002c 0246     		mov	r2, r0
+ 365 002e 597A     		ldrb	r1, [r3, #9]	@ zero_extendqisi2
+ 366              	.LVL27:
+ 367              		.loc 1 117 5 is_stmt 0 view .LVU109
+ 368 0030 4FF09040 		mov	r0, #1207959552
+ 369              	.LVL28:
+ 370              		.loc 1 117 5 view .LVU110
+ 371 0034 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 372              	.LVL29:
+ 373              	.L21:
+ 118:Src/digital.c ****   }
+ 119:Src/digital.c **** }
+ 374              		.loc 1 119 1 view .LVU111
+ 375 0038 08BD     		pop	{r3, pc}
+ 376              		.cfi_endproc
+ 377              	.LFE132:
+ 379              		.section	.text.Digital_NoteOn,"ax",%progbits
+ 380              		.align	1
+ 381              		.global	Digital_NoteOn
+ 382              		.syntax unified
+ 383              		.thumb
+ 384              		.thumb_func
+ 385              		.fpu fpv4-sp-d16
+ 387              	Digital_NoteOn:
+ 388              	.LVL30:
+ 389              	.LFB129:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 11
+
+
+  56:Src/digital.c ****   switch (dig->mode) {
+ 390              		.loc 1 56 59 is_stmt 1 view -0
+ 391              		.cfi_startproc
+ 392              		@ args = 0, pretend = 0, frame = 0
+ 393              		@ frame_needed = 0, uses_anonymous_args = 0
+  56:Src/digital.c ****   switch (dig->mode) {
+ 394              		.loc 1 56 59 is_stmt 0 view .LVU113
+ 395 0000 08B5     		push	{r3, lr}
+ 396              	.LCFI5:
+ 397              		.cfi_def_cfa_offset 8
+ 398              		.cfi_offset 3, -8
+ 399              		.cfi_offset 14, -4
+  57:Src/digital.c ****     case DIGITAL_TRIGGER:
+ 400              		.loc 1 57 3 is_stmt 1 view .LVU114
+  57:Src/digital.c ****     case DIGITAL_TRIGGER:
+ 401              		.loc 1 57 14 is_stmt 0 view .LVU115
+ 402 0002 CB79     		ldrb	r3, [r1, #7]	@ zero_extendqisi2
+  57:Src/digital.c ****     case DIGITAL_TRIGGER:
+ 403              		.loc 1 57 3 view .LVU116
+ 404 0004 012B     		cmp	r3, #1
+ 405 0006 14D0     		beq	.L28
+ 406 0008 022B     		cmp	r3, #2
+ 407 000a 05D1     		bne	.L27
+  59:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 408              		.loc 1 59 7 is_stmt 1 view .LVU117
+  59:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 409              		.loc 1 59 17 is_stmt 0 view .LVU118
+ 410 000c C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+  59:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 411              		.loc 1 59 47 view .LVU119
+ 412 000e 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+  59:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 413              		.loc 1 59 9 view .LVU120
+ 414 0010 9A42     		cmp	r2, r3
+ 415 0012 02D0     		beq	.L30
+  59:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 416              		.loc 1 59 60 discriminator 1 view .LVU121
+ 417 0014 FF2B     		cmp	r3, #255
+ 418 0016 00D0     		beq	.L30
+ 419              	.LVL31:
+ 420              	.L27:
+  77:Src/digital.c **** 
+ 421              		.loc 1 77 1 view .LVU122
+ 422 0018 08BD     		pop	{r3, pc}
+ 423              	.LVL32:
+ 424              	.L30:
+  60:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 425              		.loc 1 60 9 is_stmt 1 view .LVU123
+  60:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 426              		.loc 1 60 25 is_stmt 0 view .LVU124
+ 427 001a 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+  60:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 428              		.loc 1 60 42 view .LVU125
+ 429 001c 0279     		ldrb	r2, [r0, #4]	@ zero_extendqisi2
+  60:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 430              		.loc 1 60 11 view .LVU126
+ 431 001e 9342     		cmp	r3, r2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 12
+
+
+ 432 0020 01D0     		beq	.L31
+  60:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 433              		.loc 1 60 50 discriminator 1 view .LVU127
+ 434 0022 FF2B     		cmp	r3, #255
+ 435 0024 F8D1     		bne	.L27
+ 436              	.L31:
+  61:Src/digital.c ****         }
+ 437              		.loc 1 61 11 is_stmt 1 view .LVU128
+ 438 0026 0A46     		mov	r2, r1
+ 439 0028 0121     		movs	r1, #1
+ 440              	.LVL33:
+  61:Src/digital.c ****         }
+ 441              		.loc 1 61 11 is_stmt 0 view .LVU129
+ 442 002a 0846     		mov	r0, r1
+ 443              	.LVL34:
+  61:Src/digital.c ****         }
+ 444              		.loc 1 61 11 view .LVU130
+ 445 002c FFF7FEFF 		bl	Digital_ChangeValue
+ 446              	.LVL35:
+  61:Src/digital.c ****         }
+ 447              		.loc 1 61 11 view .LVU131
+ 448 0030 F2E7     		b	.L27
+ 449              	.LVL36:
+ 450              	.L28:
+  67:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 451              		.loc 1 67 7 is_stmt 1 view .LVU132
+  67:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 452              		.loc 1 67 17 is_stmt 0 view .LVU133
+ 453 0032 C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+  67:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 454              		.loc 1 67 47 view .LVU134
+ 455 0034 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+  67:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 456              		.loc 1 67 9 view .LVU135
+ 457 0036 9A42     		cmp	r2, r3
+ 458 0038 01D0     		beq	.L32
+  67:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 459              		.loc 1 67 60 discriminator 1 view .LVU136
+ 460 003a FF2B     		cmp	r3, #255
+ 461 003c ECD1     		bne	.L27
+ 462              	.L32:
+  68:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+ 463              		.loc 1 68 9 is_stmt 1 view .LVU137
+  68:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+ 464              		.loc 1 68 25 is_stmt 0 view .LVU138
+ 465 003e 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+  68:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+ 466              		.loc 1 68 42 view .LVU139
+ 467 0040 0279     		ldrb	r2, [r0, #4]	@ zero_extendqisi2
+  68:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+ 468              		.loc 1 68 11 view .LVU140
+ 469 0042 9342     		cmp	r3, r2
+ 470 0044 01D0     		beq	.L33
+  68:Src/digital.c ****           Digital_ChangeValuePedal(true,false,dig);
+ 471              		.loc 1 68 50 discriminator 1 view .LVU141
+ 472 0046 FF2B     		cmp	r3, #255
+ 473 0048 E6D1     		bne	.L27
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 13
+
+
+ 474              	.L33:
+  69:Src/digital.c ****         }
+ 475              		.loc 1 69 11 is_stmt 1 view .LVU142
+ 476 004a 0A46     		mov	r2, r1
+ 477 004c 0021     		movs	r1, #0
+ 478              	.LVL37:
+  69:Src/digital.c ****         }
+ 479              		.loc 1 69 11 is_stmt 0 view .LVU143
+ 480 004e 0120     		movs	r0, #1
+ 481              	.LVL38:
+  69:Src/digital.c ****         }
+ 482              		.loc 1 69 11 view .LVU144
+ 483 0050 FFF7FEFF 		bl	Digital_ChangeValuePedal
+ 484              	.LVL39:
+  77:Src/digital.c **** 
+ 485              		.loc 1 77 1 view .LVU145
+ 486 0054 E0E7     		b	.L27
+ 487              		.cfi_endproc
+ 488              	.LFE129:
+ 490              		.section	.text.Digital_NoteOff,"ax",%progbits
+ 491              		.align	1
+ 492              		.global	Digital_NoteOff
+ 493              		.syntax unified
+ 494              		.thumb
+ 495              		.thumb_func
+ 496              		.fpu fpv4-sp-d16
+ 498              	Digital_NoteOff:
+ 499              	.LVL40:
+ 500              	.LFB130:
+  79:Src/digital.c ****   switch (dig->mode) {    
+ 501              		.loc 1 79 60 is_stmt 1 view -0
+ 502              		.cfi_startproc
+ 503              		@ args = 0, pretend = 0, frame = 0
+ 504              		@ frame_needed = 0, uses_anonymous_args = 0
+  79:Src/digital.c ****   switch (dig->mode) {    
+ 505              		.loc 1 79 60 is_stmt 0 view .LVU147
+ 506 0000 08B5     		push	{r3, lr}
+ 507              	.LCFI6:
+ 508              		.cfi_def_cfa_offset 8
+ 509              		.cfi_offset 3, -8
+ 510              		.cfi_offset 14, -4
+  80:Src/digital.c ****     case DIGITAL_GATE:
+ 511              		.loc 1 80 3 is_stmt 1 view .LVU148
+  80:Src/digital.c ****     case DIGITAL_GATE:
+ 512              		.loc 1 80 14 is_stmt 0 view .LVU149
+ 513 0002 CB79     		ldrb	r3, [r1, #7]	@ zero_extendqisi2
+  80:Src/digital.c ****     case DIGITAL_GATE:
+ 514              		.loc 1 80 3 view .LVU150
+ 515 0004 012B     		cmp	r3, #1
+ 516 0006 00D0     		beq	.L40
+ 517              	.LVL41:
+ 518              	.L35:
+  92:Src/digital.c **** 
+ 519              		.loc 1 92 1 view .LVU151
+ 520 0008 08BD     		pop	{r3, pc}
+ 521              	.LVL42:
+ 522              	.L40:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 14
+
+
+  82:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 523              		.loc 1 82 7 is_stmt 1 view .LVU152
+  82:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 524              		.loc 1 82 17 is_stmt 0 view .LVU153
+ 525 000a C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+  82:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 526              		.loc 1 82 47 view .LVU154
+ 527 000c 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+  82:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 528              		.loc 1 82 9 view .LVU155
+ 529 000e 9A42     		cmp	r2, r3
+ 530 0010 01D0     		beq	.L37
+  82:Src/digital.c ****         if(dig->settings.byte2 == message->byte2 || dig->settings.byte2 == 255) {
+ 531              		.loc 1 82 60 discriminator 1 view .LVU156
+ 532 0012 FF2B     		cmp	r3, #255
+ 533 0014 F8D1     		bne	.L35
+ 534              	.L37:
+  83:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+ 535              		.loc 1 83 9 is_stmt 1 view .LVU157
+  83:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+ 536              		.loc 1 83 25 is_stmt 0 view .LVU158
+ 537 0016 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+  83:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+ 538              		.loc 1 83 42 view .LVU159
+ 539 0018 0279     		ldrb	r2, [r0, #4]	@ zero_extendqisi2
+  83:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+ 540              		.loc 1 83 11 view .LVU160
+ 541 001a 9342     		cmp	r3, r2
+ 542 001c 01D0     		beq	.L38
+  83:Src/digital.c ****           Digital_ChangeValuePedal(false,false,dig);
+ 543              		.loc 1 83 50 discriminator 1 view .LVU161
+ 544 001e FF2B     		cmp	r3, #255
+ 545 0020 F2D1     		bne	.L35
+ 546              	.L38:
+  84:Src/digital.c ****         }
+ 547              		.loc 1 84 11 is_stmt 1 view .LVU162
+ 548 0022 0A46     		mov	r2, r1
+ 549 0024 0021     		movs	r1, #0
+ 550              	.LVL43:
+  84:Src/digital.c ****         }
+ 551              		.loc 1 84 11 is_stmt 0 view .LVU163
+ 552 0026 0846     		mov	r0, r1
+ 553              	.LVL44:
+  84:Src/digital.c ****         }
+ 554              		.loc 1 84 11 view .LVU164
+ 555 0028 FFF7FEFF 		bl	Digital_ChangeValuePedal
+ 556              	.LVL45:
+  92:Src/digital.c **** 
+ 557              		.loc 1 92 1 view .LVU165
+ 558 002c ECE7     		b	.L35
+ 559              		.cfi_endproc
+ 560              	.LFE130:
+ 562              		.section	.text.Digital_Random,"ax",%progbits
+ 563              		.align	1
+ 564              		.global	Digital_Random
+ 565              		.syntax unified
+ 566              		.thumb
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 15
+
+
+ 567              		.thumb_func
+ 568              		.fpu fpv4-sp-d16
+ 570              	Digital_Random:
+ 571              	.LVL46:
+ 572              	.LFB134:
+ 120:Src/digital.c **** 
+ 121:Src/digital.c **** void Digital_TimerUpdate(Digital_t *dig) {
+ 122:Src/digital.c ****   if(dig->trigger) {
+ 123:Src/digital.c ****     dig->trigger--;
+ 124:Src/digital.c ****     if(dig->trigger == 0) {
+ 125:Src/digital.c ****       dig->state = false;
+ 126:Src/digital.c ****       Digital_ChangeValue(false,false,dig);
+ 127:Src/digital.c ****     }
+ 128:Src/digital.c ****   }
+ 129:Src/digital.c ****   if(dig->random) {
+ 130:Src/digital.c ****     if(dig->randomcounter == 0) {
+ 131:Src/digital.c ****       Digital_Random(dig);
+ 132:Src/digital.c ****     }
+ 133:Src/digital.c ****     dig->randomcounter++;
+ 134:Src/digital.c ****     dig->randomcounter %= (kBLOCK_SIZE);
+ 135:Src/digital.c ****   }
+ 136:Src/digital.c **** }
+ 137:Src/digital.c **** 
+ 138:Src/digital.c **** void Digital_Random(Digital_t *dig) {
+ 573              		.loc 1 138 37 is_stmt 1 view -0
+ 574              		.cfi_startproc
+ 575              		@ args = 0, pretend = 0, frame = 0
+ 576              		@ frame_needed = 0, uses_anonymous_args = 0
+ 139:Src/digital.c ****   if(dig->mode == DIGITAL_RANDOM) {
+ 577              		.loc 1 139 3 view .LVU167
+ 578              		.loc 1 139 9 is_stmt 0 view .LVU168
+ 579 0000 C379     		ldrb	r3, [r0, #7]	@ zero_extendqisi2
+ 580              		.loc 1 139 5 view .LVU169
+ 581 0002 FF2B     		cmp	r3, #255
+ 582 0004 00D0     		beq	.L47
+ 583 0006 7047     		bx	lr
+ 584              	.L47:
+ 138:Src/digital.c ****   if(dig->mode == DIGITAL_RANDOM) {
+ 585              		.loc 1 138 37 view .LVU170
+ 586 0008 10B5     		push	{r4, lr}
+ 587              	.LCFI7:
+ 588              		.cfi_def_cfa_offset 8
+ 589              		.cfi_offset 4, -8
+ 590              		.cfi_offset 14, -4
+ 591 000a 0446     		mov	r4, r0
+ 140:Src/digital.c ****     if(customrand() < randomthreshold[dig->id]) {
+ 592              		.loc 1 140 5 is_stmt 1 view .LVU171
+ 593              		.loc 1 140 8 is_stmt 0 view .LVU172
+ 594 000c FFF7FEFF 		bl	customrand
+ 595              	.LVL47:
+ 596              		.loc 1 140 42 view .LVU173
+ 597 0010 A27A     		ldrb	r2, [r4, #10]	@ zero_extendqisi2
+ 598              		.loc 1 140 38 view .LVU174
+ 599 0012 064B     		ldr	r3, .L49
+ 600 0014 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 601              		.loc 1 140 7 view .LVU175
+ 602 0018 9842     		cmp	r0, r3
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 16
+
+
+ 603 001a 00D3     		bcc	.L48
+ 604              	.L41:
+ 141:Src/digital.c ****       Digital_ChangeValue(true,true,dig);
+ 142:Src/digital.c ****     }
+ 143:Src/digital.c ****   }
+ 144:Src/digital.c **** }   
+ 605              		.loc 1 144 1 view .LVU176
+ 606 001c 10BD     		pop	{r4, pc}
+ 607              	.LVL48:
+ 608              	.L48:
+ 141:Src/digital.c ****       Digital_ChangeValue(true,true,dig);
+ 609              		.loc 1 141 7 is_stmt 1 view .LVU177
+ 610 001e 2246     		mov	r2, r4
+ 611 0020 0121     		movs	r1, #1
+ 612 0022 0846     		mov	r0, r1
+ 613 0024 FFF7FEFF 		bl	Digital_ChangeValue
+ 614              	.LVL49:
+ 615              		.loc 1 144 1 is_stmt 0 view .LVU178
+ 616 0028 F8E7     		b	.L41
+ 617              	.L50:
+ 618 002a 00BF     		.align	2
+ 619              	.L49:
+ 620 002c 00000000 		.word	randomthreshold
+ 621              		.cfi_endproc
+ 622              	.LFE134:
+ 624              		.section	.text.Digital_TimerUpdate,"ax",%progbits
+ 625              		.align	1
+ 626              		.global	Digital_TimerUpdate
+ 627              		.syntax unified
+ 628              		.thumb
+ 629              		.thumb_func
+ 630              		.fpu fpv4-sp-d16
+ 632              	Digital_TimerUpdate:
+ 633              	.LVL50:
+ 634              	.LFB133:
+ 121:Src/digital.c ****   if(dig->trigger) {
+ 635              		.loc 1 121 42 is_stmt 1 view -0
+ 636              		.cfi_startproc
+ 637              		@ args = 0, pretend = 0, frame = 0
+ 638              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121:Src/digital.c ****   if(dig->trigger) {
+ 639              		.loc 1 121 42 is_stmt 0 view .LVU180
+ 640 0000 10B5     		push	{r4, lr}
+ 641              	.LCFI8:
+ 642              		.cfi_def_cfa_offset 8
+ 643              		.cfi_offset 4, -8
+ 644              		.cfi_offset 14, -4
+ 645 0002 0446     		mov	r4, r0
+ 122:Src/digital.c ****     dig->trigger--;
+ 646              		.loc 1 122 3 is_stmt 1 view .LVU181
+ 122:Src/digital.c ****     dig->trigger--;
+ 647              		.loc 1 122 9 is_stmt 0 view .LVU182
+ 648 0004 037A     		ldrb	r3, [r0, #8]	@ zero_extendqisi2
+ 122:Src/digital.c ****     dig->trigger--;
+ 649              		.loc 1 122 5 view .LVU183
+ 650 0006 1BB1     		cbz	r3, .L52
+ 123:Src/digital.c ****     if(dig->trigger == 0) {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 17
+
+
+ 651              		.loc 1 123 5 is_stmt 1 view .LVU184
+ 123:Src/digital.c ****     if(dig->trigger == 0) {
+ 652              		.loc 1 123 17 is_stmt 0 view .LVU185
+ 653 0008 013B     		subs	r3, r3, #1
+ 654 000a DBB2     		uxtb	r3, r3
+ 655 000c 0372     		strb	r3, [r0, #8]
+ 124:Src/digital.c ****       dig->state = false;
+ 656              		.loc 1 124 5 is_stmt 1 view .LVU186
+ 124:Src/digital.c ****       dig->state = false;
+ 657              		.loc 1 124 7 is_stmt 0 view .LVU187
+ 658 000e 8BB1     		cbz	r3, .L56
+ 659              	.LVL51:
+ 660              	.L52:
+ 129:Src/digital.c ****     if(dig->randomcounter == 0) {
+ 661              		.loc 1 129 3 is_stmt 1 view .LVU188
+ 129:Src/digital.c ****     if(dig->randomcounter == 0) {
+ 662              		.loc 1 129 9 is_stmt 0 view .LVU189
+ 663 0010 A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 129:Src/digital.c ****     if(dig->randomcounter == 0) {
+ 664              		.loc 1 129 5 view .LVU190
+ 665 0012 73B1     		cbz	r3, .L51
+ 130:Src/digital.c ****       Digital_Random(dig);
+ 666              		.loc 1 130 5 is_stmt 1 view .LVU191
+ 130:Src/digital.c ****       Digital_Random(dig);
+ 667              		.loc 1 130 11 is_stmt 0 view .LVU192
+ 668 0014 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 130:Src/digital.c ****       Digital_Random(dig);
+ 669              		.loc 1 130 7 view .LVU193
+ 670 0016 A3B1     		cbz	r3, .L57
+ 671              	.L54:
+ 133:Src/digital.c ****     dig->randomcounter %= (kBLOCK_SIZE);
+ 672              		.loc 1 133 5 is_stmt 1 view .LVU194
+ 133:Src/digital.c ****     dig->randomcounter %= (kBLOCK_SIZE);
+ 673              		.loc 1 133 8 is_stmt 0 view .LVU195
+ 674 0018 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 133:Src/digital.c ****     dig->randomcounter %= (kBLOCK_SIZE);
+ 675              		.loc 1 133 23 view .LVU196
+ 676 001a 0133     		adds	r3, r3, #1
+ 677 001c DBB2     		uxtb	r3, r3
+ 678 001e E370     		strb	r3, [r4, #3]
+ 134:Src/digital.c ****   }
+ 679              		.loc 1 134 5 is_stmt 1 view .LVU197
+ 134:Src/digital.c ****   }
+ 680              		.loc 1 134 24 is_stmt 0 view .LVU198
+ 681 0020 0A4A     		ldr	r2, .L58
+ 682 0022 A2FB0312 		umull	r1, r2, r2, r3
+ 683 0026 9208     		lsrs	r2, r2, #2
+ 684 0028 02EB4202 		add	r2, r2, r2, lsl #1
+ 685 002c A3EB4203 		sub	r3, r3, r2, lsl #1
+ 686 0030 E370     		strb	r3, [r4, #3]
+ 687              	.L51:
+ 136:Src/digital.c **** 
+ 688              		.loc 1 136 1 view .LVU199
+ 689 0032 10BD     		pop	{r4, pc}
+ 690              	.LVL52:
+ 691              	.L56:
+ 125:Src/digital.c ****       Digital_ChangeValue(false,false,dig);
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 18
+
+
+ 692              		.loc 1 125 7 is_stmt 1 view .LVU200
+ 125:Src/digital.c ****       Digital_ChangeValue(false,false,dig);
+ 693              		.loc 1 125 18 is_stmt 0 view .LVU201
+ 694 0034 0020     		movs	r0, #0
+ 695              	.LVL53:
+ 125:Src/digital.c ****       Digital_ChangeValue(false,false,dig);
+ 696              		.loc 1 125 18 view .LVU202
+ 697 0036 2070     		strb	r0, [r4]
+ 126:Src/digital.c ****     }
+ 698              		.loc 1 126 7 is_stmt 1 view .LVU203
+ 699 0038 2246     		mov	r2, r4
+ 700 003a 0146     		mov	r1, r0
+ 701 003c FFF7FEFF 		bl	Digital_ChangeValue
+ 702              	.LVL54:
+ 703 0040 E6E7     		b	.L52
+ 704              	.L57:
+ 131:Src/digital.c ****     }
+ 705              		.loc 1 131 7 view .LVU204
+ 706 0042 2046     		mov	r0, r4
+ 707 0044 FFF7FEFF 		bl	Digital_Random
+ 708              	.LVL55:
+ 709 0048 E6E7     		b	.L54
+ 710              	.L59:
+ 711 004a 00BF     		.align	2
+ 712              	.L58:
+ 713 004c ABAAAAAA 		.word	-1431655765
+ 714              		.cfi_endproc
+ 715              	.LFE133:
+ 717              		.section	.text.Digital_Clock,"ax",%progbits
+ 718              		.align	1
+ 719              		.global	Digital_Clock
+ 720              		.syntax unified
+ 721              		.thumb
+ 722              		.thumb_func
+ 723              		.fpu fpv4-sp-d16
+ 725              	Digital_Clock:
+ 726              	.LVL56:
+ 727              	.LFB135:
+ 145:Src/digital.c **** 
+ 146:Src/digital.c **** void Digital_Clock(MidiMessage *message, Digital_t *dig) {
+ 728              		.loc 1 146 58 view -0
+ 729              		.cfi_startproc
+ 730              		@ args = 0, pretend = 0, frame = 0
+ 731              		@ frame_needed = 0, uses_anonymous_args = 0
+ 732              		.loc 1 146 58 is_stmt 0 view .LVU206
+ 733 0000 10B5     		push	{r4, lr}
+ 734              	.LCFI9:
+ 735              		.cfi_def_cfa_offset 8
+ 736              		.cfi_offset 4, -8
+ 737              		.cfi_offset 14, -4
+ 738 0002 0C46     		mov	r4, r1
+ 147:Src/digital.c ****   switch (dig->mode)
+ 739              		.loc 1 147 3 is_stmt 1 view .LVU207
+ 740              		.loc 1 147 14 is_stmt 0 view .LVU208
+ 741 0004 CB79     		ldrb	r3, [r1, #7]	@ zero_extendqisi2
+ 742              		.loc 1 147 3 view .LVU209
+ 743 0006 042B     		cmp	r3, #4
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 19
+
+
+ 744 0008 1FD0     		beq	.L61
+ 745 000a 052B     		cmp	r3, #5
+ 746 000c 26D0     		beq	.L62
+ 747 000e 032B     		cmp	r3, #3
+ 748 0010 00D0     		beq	.L68
+ 749              	.LVL57:
+ 750              	.L60:
+ 148:Src/digital.c ****   {
+ 149:Src/digital.c ****     case DIGITAL_CLOCK:
+ 150:Src/digital.c ****       if(message->byte1 == 0xF8) { // Midi message Clock
+ 151:Src/digital.c ****         if(dig->counter == 0) {
+ 152:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 153:Src/digital.c ****         }
+ 154:Src/digital.c ****         dig->counter++;
+ 155:Src/digital.c ****         dig->counter %= dig->settings.byte2;
+ 156:Src/digital.c ****       } else if ( message->byte1 == 0xFA) {
+ 157:Src/digital.c ****         dig->counter = 0;
+ 158:Src/digital.c ****       }
+ 159:Src/digital.c ****       break;
+ 160:Src/digital.c **** 
+ 161:Src/digital.c ****     case DIGITAL_CLOCK_RESET:
+ 162:Src/digital.c ****       if(message->byte1 == 0xFA) { // Midi Message Running
+ 163:Src/digital.c ****         Digital_ChangeValue(true,true,dig);
+ 164:Src/digital.c ****       }
+ 165:Src/digital.c ****       break;
+ 166:Src/digital.c ****     case DIGITAL_CLOCK_RUN:
+ 167:Src/digital.c ****       if(message->byte1 == 0xFA) { // Midi Message Running
+ 168:Src/digital.c ****         Digital_ChangeValue(true,false,dig);
+ 169:Src/digital.c ****       }
+ 170:Src/digital.c ****       else if(message->byte1 == 0xFC) { // Midi Message Running
+ 171:Src/digital.c ****         Digital_ChangeValue(false,false,dig);
+ 172:Src/digital.c ****       }
+ 173:Src/digital.c ****       break;
+ 174:Src/digital.c ****       
+ 175:Src/digital.c ****     default:
+ 176:Src/digital.c ****       break;
+ 177:Src/digital.c ****   }
+ 178:Src/digital.c **** }
+ 751              		.loc 1 178 1 view .LVU210
+ 752 0012 10BD     		pop	{r4, pc}
+ 753              	.LVL58:
+ 754              	.L68:
+ 150:Src/digital.c ****         if(dig->counter == 0) {
+ 755              		.loc 1 150 7 is_stmt 1 view .LVU211
+ 150:Src/digital.c ****         if(dig->counter == 0) {
+ 756              		.loc 1 150 17 is_stmt 0 view .LVU212
+ 757 0014 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 150:Src/digital.c ****         if(dig->counter == 0) {
+ 758              		.loc 1 150 9 view .LVU213
+ 759 0016 F82B     		cmp	r3, #248
+ 760 0018 04D0     		beq	.L69
+ 156:Src/digital.c ****         dig->counter = 0;
+ 761              		.loc 1 156 14 is_stmt 1 view .LVU214
+ 156:Src/digital.c ****         dig->counter = 0;
+ 762              		.loc 1 156 17 is_stmt 0 view .LVU215
+ 763 001a FA2B     		cmp	r3, #250
+ 764 001c F9D1     		bne	.L60
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 20
+
+
+ 157:Src/digital.c ****       }
+ 765              		.loc 1 157 9 is_stmt 1 view .LVU216
+ 157:Src/digital.c ****       }
+ 766              		.loc 1 157 22 is_stmt 0 view .LVU217
+ 767 001e 0023     		movs	r3, #0
+ 768 0020 CB72     		strb	r3, [r1, #11]
+ 769 0022 F6E7     		b	.L60
+ 770              	.L69:
+ 151:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 771              		.loc 1 151 9 is_stmt 1 view .LVU218
+ 151:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 772              		.loc 1 151 15 is_stmt 0 view .LVU219
+ 773 0024 CB7A     		ldrb	r3, [r1, #11]	@ zero_extendqisi2
+ 151:Src/digital.c ****           Digital_ChangeValue(true,true,dig);
+ 774              		.loc 1 151 11 view .LVU220
+ 775 0026 53B1     		cbz	r3, .L70
+ 776              	.LVL59:
+ 777              	.L65:
+ 154:Src/digital.c ****         dig->counter %= dig->settings.byte2;
+ 778              		.loc 1 154 9 is_stmt 1 view .LVU221
+ 154:Src/digital.c ****         dig->counter %= dig->settings.byte2;
+ 779              		.loc 1 154 12 is_stmt 0 view .LVU222
+ 780 0028 E37A     		ldrb	r3, [r4, #11]	@ zero_extendqisi2
+ 154:Src/digital.c ****         dig->counter %= dig->settings.byte2;
+ 781              		.loc 1 154 21 view .LVU223
+ 782 002a 0133     		adds	r3, r3, #1
+ 783 002c DBB2     		uxtb	r3, r3
+ 784 002e E372     		strb	r3, [r4, #11]
+ 155:Src/digital.c ****       } else if ( message->byte1 == 0xFA) {
+ 785              		.loc 1 155 9 is_stmt 1 view .LVU224
+ 155:Src/digital.c ****       } else if ( message->byte1 == 0xFA) {
+ 786              		.loc 1 155 38 is_stmt 0 view .LVU225
+ 787 0030 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 155:Src/digital.c ****       } else if ( message->byte1 == 0xFA) {
+ 788              		.loc 1 155 22 view .LVU226
+ 789 0032 B3FBF2F1 		udiv	r1, r3, r2
+ 790 0036 02FB1133 		mls	r3, r2, r1, r3
+ 791 003a E372     		strb	r3, [r4, #11]
+ 792 003c E9E7     		b	.L60
+ 793              	.LVL60:
+ 794              	.L70:
+ 152:Src/digital.c ****         }
+ 795              		.loc 1 152 11 is_stmt 1 view .LVU227
+ 796 003e 0A46     		mov	r2, r1
+ 797 0040 0121     		movs	r1, #1
+ 798              	.LVL61:
+ 152:Src/digital.c ****         }
+ 799              		.loc 1 152 11 is_stmt 0 view .LVU228
+ 800 0042 0846     		mov	r0, r1
+ 801              	.LVL62:
+ 152:Src/digital.c ****         }
+ 802              		.loc 1 152 11 view .LVU229
+ 803 0044 FFF7FEFF 		bl	Digital_ChangeValue
+ 804              	.LVL63:
+ 805 0048 EEE7     		b	.L65
+ 806              	.LVL64:
+ 807              	.L61:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 21
+
+
+ 162:Src/digital.c ****         Digital_ChangeValue(true,true,dig);
+ 808              		.loc 1 162 7 is_stmt 1 view .LVU230
+ 162:Src/digital.c ****         Digital_ChangeValue(true,true,dig);
+ 809              		.loc 1 162 17 is_stmt 0 view .LVU231
+ 810 004a 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 162:Src/digital.c ****         Digital_ChangeValue(true,true,dig);
+ 811              		.loc 1 162 9 view .LVU232
+ 812 004c FA2B     		cmp	r3, #250
+ 813 004e E0D1     		bne	.L60
+ 163:Src/digital.c ****       }
+ 814              		.loc 1 163 9 is_stmt 1 view .LVU233
+ 815 0050 0A46     		mov	r2, r1
+ 816 0052 0121     		movs	r1, #1
+ 817              	.LVL65:
+ 163:Src/digital.c ****       }
+ 818              		.loc 1 163 9 is_stmt 0 view .LVU234
+ 819 0054 0846     		mov	r0, r1
+ 820              	.LVL66:
+ 163:Src/digital.c ****       }
+ 821              		.loc 1 163 9 view .LVU235
+ 822 0056 FFF7FEFF 		bl	Digital_ChangeValue
+ 823              	.LVL67:
+ 824 005a DAE7     		b	.L60
+ 825              	.LVL68:
+ 826              	.L62:
+ 167:Src/digital.c ****         Digital_ChangeValue(true,false,dig);
+ 827              		.loc 1 167 7 is_stmt 1 view .LVU236
+ 167:Src/digital.c ****         Digital_ChangeValue(true,false,dig);
+ 828              		.loc 1 167 17 is_stmt 0 view .LVU237
+ 829 005c 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 167:Src/digital.c ****         Digital_ChangeValue(true,false,dig);
+ 830              		.loc 1 167 9 view .LVU238
+ 831 005e FA2B     		cmp	r3, #250
+ 832 0060 07D0     		beq	.L71
+ 170:Src/digital.c ****         Digital_ChangeValue(false,false,dig);
+ 833              		.loc 1 170 12 is_stmt 1 view .LVU239
+ 170:Src/digital.c ****         Digital_ChangeValue(false,false,dig);
+ 834              		.loc 1 170 14 is_stmt 0 view .LVU240
+ 835 0062 FC2B     		cmp	r3, #252
+ 836 0064 D5D1     		bne	.L60
+ 171:Src/digital.c ****       }
+ 837              		.loc 1 171 9 is_stmt 1 view .LVU241
+ 838 0066 0A46     		mov	r2, r1
+ 839 0068 0021     		movs	r1, #0
+ 840              	.LVL69:
+ 171:Src/digital.c ****       }
+ 841              		.loc 1 171 9 is_stmt 0 view .LVU242
+ 842 006a 0846     		mov	r0, r1
+ 843              	.LVL70:
+ 171:Src/digital.c ****       }
+ 844              		.loc 1 171 9 view .LVU243
+ 845 006c FFF7FEFF 		bl	Digital_ChangeValue
+ 846              	.LVL71:
+ 847              		.loc 1 178 1 view .LVU244
+ 848 0070 CFE7     		b	.L60
+ 849              	.LVL72:
+ 850              	.L71:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 22
+
+
+ 168:Src/digital.c ****       }
+ 851              		.loc 1 168 9 is_stmt 1 view .LVU245
+ 852 0072 0A46     		mov	r2, r1
+ 853 0074 0021     		movs	r1, #0
+ 854              	.LVL73:
+ 168:Src/digital.c ****       }
+ 855              		.loc 1 168 9 is_stmt 0 view .LVU246
+ 856 0076 0120     		movs	r0, #1
+ 857              	.LVL74:
+ 168:Src/digital.c ****       }
+ 858              		.loc 1 168 9 view .LVU247
+ 859 0078 FFF7FEFF 		bl	Digital_ChangeValue
+ 860              	.LVL75:
+ 861 007c C9E7     		b	.L60
+ 862              		.cfi_endproc
+ 863              	.LFE135:
+ 865              		.section	.text.Digital_Voice,"ax",%progbits
+ 866              		.align	1
+ 867              		.global	Digital_Voice
+ 868              		.syntax unified
+ 869              		.thumb
+ 870              		.thumb_func
+ 871              		.fpu fpv4-sp-d16
+ 873              	Digital_Voice:
+ 874              	.LVL76:
+ 875              	.LFB136:
+ 179:Src/digital.c **** 
+ 180:Src/digital.c **** void Digital_Voice(bool state, Digital_t *dig) {
+ 876              		.loc 1 180 48 is_stmt 1 view -0
+ 877              		.cfi_startproc
+ 878              		@ args = 0, pretend = 0, frame = 0
+ 879              		@ frame_needed = 0, uses_anonymous_args = 0
+ 880              		.loc 1 180 48 is_stmt 0 view .LVU249
+ 881 0000 08B5     		push	{r3, lr}
+ 882              	.LCFI10:
+ 883              		.cfi_def_cfa_offset 8
+ 884              		.cfi_offset 3, -8
+ 885              		.cfi_offset 14, -4
+ 181:Src/digital.c ****   switch (dig->mode)
+ 886              		.loc 1 181 3 is_stmt 1 view .LVU250
+ 887              		.loc 1 181 14 is_stmt 0 view .LVU251
+ 888 0002 CB79     		ldrb	r3, [r1, #7]	@ zero_extendqisi2
+ 889              		.loc 1 181 3 view .LVU252
+ 890 0004 062B     		cmp	r3, #6
+ 891 0006 08D0     		beq	.L73
+ 892 0008 072B     		cmp	r3, #7
+ 893 000a 0AD1     		bne	.L72
+ 182:Src/digital.c ****   {
+ 183:Src/digital.c ****     case DIGITAL_VOICE_TRIGGER:
+ 184:Src/digital.c ****       if(state){ 
+ 894              		.loc 1 184 7 is_stmt 1 view .LVU253
+ 895              		.loc 1 184 9 is_stmt 0 view .LVU254
+ 896 000c 48B1     		cbz	r0, .L72
+ 185:Src/digital.c ****         Digital_ChangeValue(true,true,dig);
+ 897              		.loc 1 185 9 is_stmt 1 view .LVU255
+ 898 000e 0A46     		mov	r2, r1
+ 899 0010 0121     		movs	r1, #1
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 23
+
+
+ 900              	.LVL77:
+ 901              		.loc 1 185 9 is_stmt 0 view .LVU256
+ 902 0012 0846     		mov	r0, r1
+ 903              	.LVL78:
+ 904              		.loc 1 185 9 view .LVU257
+ 905 0014 FFF7FEFF 		bl	Digital_ChangeValue
+ 906              	.LVL79:
+ 907              		.loc 1 185 9 view .LVU258
+ 908 0018 03E0     		b	.L72
+ 909              	.LVL80:
+ 910              	.L73:
+ 186:Src/digital.c ****       }
+ 187:Src/digital.c ****       break;
+ 188:Src/digital.c ****     case DIGITAL_VOICE_GATE:
+ 189:Src/digital.c ****       Digital_ChangeValuePedal(state,false,dig);
+ 911              		.loc 1 189 7 is_stmt 1 view .LVU259
+ 912 001a 0A46     		mov	r2, r1
+ 913 001c 0021     		movs	r1, #0
+ 914              	.LVL81:
+ 915              		.loc 1 189 7 is_stmt 0 view .LVU260
+ 916 001e FFF7FEFF 		bl	Digital_ChangeValuePedal
+ 917              	.LVL82:
+ 190:Src/digital.c ****       break;
+ 918              		.loc 1 190 7 is_stmt 1 view .LVU261
+ 919              	.L72:
+ 191:Src/digital.c ****     
+ 192:Src/digital.c ****     default:
+ 193:Src/digital.c ****       break;
+ 194:Src/digital.c ****   }
+ 195:Src/digital.c **** }
+ 920              		.loc 1 195 1 is_stmt 0 view .LVU262
+ 921 0022 08BD     		pop	{r3, pc}
+ 922              		.cfi_endproc
+ 923              	.LFE136:
+ 925              		.section	.text.Digital_Pedal,"ax",%progbits
+ 926              		.align	1
+ 927              		.global	Digital_Pedal
+ 928              		.syntax unified
+ 929              		.thumb
+ 930              		.thumb_func
+ 931              		.fpu fpv4-sp-d16
+ 933              	Digital_Pedal:
+ 934              	.LVL83:
+ 935              	.LFB137:
+ 196:Src/digital.c **** 
+ 197:Src/digital.c **** void Digital_Pedal(MidiMessage *message, Digital_t *dig) {
+ 936              		.loc 1 197 58 is_stmt 1 view -0
+ 937              		.cfi_startproc
+ 938              		@ args = 0, pretend = 0, frame = 0
+ 939              		@ frame_needed = 0, uses_anonymous_args = 0
+ 940              		.loc 1 197 58 is_stmt 0 view .LVU264
+ 941 0000 08B5     		push	{r3, lr}
+ 942              	.LCFI11:
+ 943              		.cfi_def_cfa_offset 8
+ 944              		.cfi_offset 3, -8
+ 945              		.cfi_offset 14, -4
+ 198:Src/digital.c ****   if(message->midichannel == dig->settings.midichannel || dig->settings.midichannel == 255) {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 24
+
+
+ 946              		.loc 1 198 3 is_stmt 1 view .LVU265
+ 947              		.loc 1 198 13 is_stmt 0 view .LVU266
+ 948 0002 C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+ 949              		.loc 1 198 43 view .LVU267
+ 950 0004 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 951              		.loc 1 198 5 view .LVU268
+ 952 0006 9A42     		cmp	r2, r3
+ 953 0008 02D0     		beq	.L77
+ 954              		.loc 1 198 56 discriminator 1 view .LVU269
+ 955 000a FF2B     		cmp	r3, #255
+ 956 000c 00D0     		beq	.L77
+ 957              	.LVL84:
+ 958              	.L76:
+ 199:Src/digital.c ****     dig->pedal = message->byte3;
+ 200:Src/digital.c ****     switch(dig->mode) {
+ 201:Src/digital.c ****       case DIGITAL_VOICE_GATE:
+ 202:Src/digital.c ****       case DIGITAL_GATE:
+ 203:Src/digital.c ****         if(dig->pedal == 0) {
+ 204:Src/digital.c ****           HAL_GPIO_WritePin(GPIOA,dig->gpiopin,dig->state);
+ 205:Src/digital.c ****         }
+ 206:Src/digital.c ****         break;
+ 207:Src/digital.c ****               
+ 208:Src/digital.c ****       default:
+ 209:Src/digital.c ****         break;
+ 210:Src/digital.c ****     }
+ 211:Src/digital.c ****   }
+ 212:Src/digital.c **** }...
+ 959              		.loc 1 212 1 view .LVU270
+ 960 000e 08BD     		pop	{r3, pc}
+ 961              	.LVL85:
+ 962              	.L77:
+ 199:Src/digital.c ****     dig->pedal = message->byte3;
+ 963              		.loc 1 199 5 is_stmt 1 view .LVU271
+ 199:Src/digital.c ****     dig->pedal = message->byte3;
+ 964              		.loc 1 199 25 is_stmt 0 view .LVU272
+ 965 0010 4279     		ldrb	r2, [r0, #5]	@ zero_extendqisi2
+ 199:Src/digital.c ****     dig->pedal = message->byte3;
+ 966              		.loc 1 199 16 view .LVU273
+ 967 0012 0A73     		strb	r2, [r1, #12]
+ 200:Src/digital.c ****     switch(dig->mode) {
+ 968              		.loc 1 200 5 is_stmt 1 view .LVU274
+ 200:Src/digital.c ****     switch(dig->mode) {
+ 969              		.loc 1 200 15 is_stmt 0 view .LVU275
+ 970 0014 CB79     		ldrb	r3, [r1, #7]	@ zero_extendqisi2
+ 200:Src/digital.c ****     switch(dig->mode) {
+ 971              		.loc 1 200 5 view .LVU276
+ 972 0016 012B     		cmp	r3, #1
+ 973 0018 01D0     		beq	.L79
+ 974 001a 062B     		cmp	r3, #6
+ 975 001c F7D1     		bne	.L76
+ 976              	.L79:
+ 203:Src/digital.c ****         if(dig->pedal == 0) {
+ 977              		.loc 1 203 9 is_stmt 1 view .LVU277
+ 203:Src/digital.c ****         if(dig->pedal == 0) {
+ 978              		.loc 1 203 11 is_stmt 0 view .LVU278
+ 979 001e 002A     		cmp	r2, #0
+ 980 0020 F5D1     		bne	.L76
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 25
+
+
+ 204:Src/digital.c ****           HAL_GPIO_WritePin(GPIOA,dig->gpiopin,dig->state);
+ 981              		.loc 1 204 11 is_stmt 1 view .LVU279
+ 982 0022 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 983 0024 497A     		ldrb	r1, [r1, #9]	@ zero_extendqisi2
+ 984              	.LVL86:
+ 204:Src/digital.c ****           HAL_GPIO_WritePin(GPIOA,dig->gpiopin,dig->state);
+ 985              		.loc 1 204 11 is_stmt 0 view .LVU280
+ 986 0026 4FF09040 		mov	r0, #1207959552
+ 987              	.LVL87:
+ 204:Src/digital.c ****           HAL_GPIO_WritePin(GPIOA,dig->gpiopin,dig->state);
+ 988              		.loc 1 204 11 view .LVU281
+ 989 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 990              	.LVL88:
+ 991              		.loc 1 212 1 view .LVU282
+ 992 002e EEE7     		b	.L76
+ 993              		.cfi_endproc
+ 994              	.LFE137:
+ 996              		.global	digital
+ 997              		.section	.bss.digital,"aw",%nobits
+ 998              		.align	2
+ 999              		.set	.LANCHOR0,. + 0
+ 1002              	digital:
+ 1003 0000 00000000 		.space	52
+ 1003      00000000 
+ 1003      00000000 
+ 1003      00000000 
+ 1003      00000000 
+ 1004              		.text
+ 1005              	.Letext0:
+ 1006              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 1007              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 1008              		.file 4 "Inc/midimessage.h"
+ 1009              		.file 5 "Inc/midisetting.h"
+ 1010              		.file 6 "Inc/digital.h"
+ 1011              		.file 7 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 1012              		.file 8 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 1013              		.file 9 "Inc/analog.h"
+ 1014              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s 			page 26
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 digital.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:18     .text.Digital_ChangeValue:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:26     .text.Digital_ChangeValue:0000000000000000 Digital_ChangeValue
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:79     .text.Digital_Reset:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:86     .text.Digital_Reset:0000000000000000 Digital_Reset
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:156    .text.Digital_Init:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:163    .text.Digital_Init:0000000000000000 Digital_Init
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:238    .text.Digital_Init:0000000000000044 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:243    .text.Digital_Configure:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:250    .text.Digital_Configure:0000000000000000 Digital_Configure
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:292    .text.Digital_ChangeValuePedal:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:299    .text.Digital_ChangeValuePedal:0000000000000000 Digital_ChangeValuePedal
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:380    .text.Digital_NoteOn:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:387    .text.Digital_NoteOn:0000000000000000 Digital_NoteOn
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:491    .text.Digital_NoteOff:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:498    .text.Digital_NoteOff:0000000000000000 Digital_NoteOff
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:563    .text.Digital_Random:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:570    .text.Digital_Random:0000000000000000 Digital_Random
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:620    .text.Digital_Random:000000000000002c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:625    .text.Digital_TimerUpdate:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:632    .text.Digital_TimerUpdate:0000000000000000 Digital_TimerUpdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:713    .text.Digital_TimerUpdate:000000000000004c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:718    .text.Digital_Clock:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:725    .text.Digital_Clock:0000000000000000 Digital_Clock
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:866    .text.Digital_Voice:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:873    .text.Digital_Voice:0000000000000000 Digital_Voice
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:926    .text.Digital_Pedal:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:933    .text.Digital_Pedal:0000000000000000 Digital_Pedal
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:1002   .bss.digital:0000000000000000 digital
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccTqT8i9.s:998    .bss.digital:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+customrand
+randomthreshold

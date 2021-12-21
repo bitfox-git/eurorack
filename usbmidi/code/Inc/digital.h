@@ -46,7 +46,7 @@ typedef struct {
 
 }Digital_t;
 
-Digital_t digital[kDIGITAL_AMOUNT];
+extern Digital_t digital[kDIGITAL_AMOUNT];
 
 void Digital_NoteOn(MidiMessage *message, Digital_t *dig);
 void Digital_NoteOff(MidiMessage *message, Digital_t *dig);

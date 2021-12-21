@@ -141,7 +141,7 @@ int main(void)
   Config_Init();
   HAL_TIM_Base_Start_IT(&htim6);
   uint32_t mididata;
-  Config_Random();
+  Config_Empty();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -156,7 +156,7 @@ int main(void)
       // Main Loop
       while (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) 
       {
-          while(RingbufferPop(&midibuffer,&mididata)) {
+        if(RingbufferPop(&midibuffer,&mididata)) {
           MIDI_InputMessage(mididata);
         }
         TIMER_Update();
@@ -165,7 +165,7 @@ int main(void)
 
       // Disconnected Code
       LED_ChangeMode(LED_Disconnected);
-      Config_Random();
+      Config_Empty();
     }
 
     //Idle Loop
@@ -233,7 +233,6 @@ void TIMER_Update() {
       /* code */
       Digital_TimerUpdate(&digital[i]);
       Analog_TimerUpdate(&analog[i]);
-    
     }
     timerupdate = false;
   }

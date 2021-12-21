@@ -21,8 +21,8 @@ typedef struct {
 
 }Config_t;
 
-Config_t config[16];
-uint8_t configindex;
+extern Config_t config[16];
+extern uint8_t configindex;
 
 
 
@@ -34,7 +34,7 @@ void Config_DisableOutput();
 
 void Config_Configure();
 void Config_ProgramChange(uint8_t index);
-void Config_Random();
+void Config_Empty();
 
 void Config_FlashInitWriteApp();
 void Config_FlashWriteAppWord(uint32_t data);

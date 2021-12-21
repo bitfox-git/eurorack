@@ -9,11 +9,10 @@
 
 
 #define kANALOG_AMOUNT 4
-#define kBLOCK_SIZE 24
-#define kSAMPLE_RATE 24000
+#define kBLOCK_SIZE 6
+#define kSAMPLE_RATE 11000
 //   htim6.Init.Period = 72000000/(kSAMPLE_RATE*4) - 1;
 
-uint32_t randomthreshold[4];
 
 typedef enum  {
   ANALOG_OFF=0x00,
@@ -90,6 +89,7 @@ typedef struct {
   uint8_t pedal;
   bool digitalstate;
 
+  float oschz;
   bool oscillator;
   uint8_t osccounter;
   float phase;
@@ -109,7 +109,9 @@ typedef struct {
 
 } Analog_t;
 
-Analog_t analog[kANALOG_AMOUNT];
+
+extern uint32_t randomthreshold[4];
+extern Analog_t analog[kANALOG_AMOUNT];
 
 void Analog_NoteOn(MidiMessage *message, Analog_t *ana);
 void Analog_NoteOff(MidiMessage *message, Analog_t *ana);

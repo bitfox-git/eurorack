@@ -6,7 +6,8 @@
 #include "stm32f3xx_hal.h"
 #include <string.h>
 
-
+Config_t config[16];
+uint8_t configindex;
 
 void Config_DisableOutput() {
   for (size_t i = 0; i < 4; i++)
@@ -81,15 +82,15 @@ void Config_Configure() {
   }
 }
 
-void Config_Random() {
+void Config_Empty() {
   MidiSetting randomsetting;
   randomsetting.byte2 = 255;
   randomsetting.byte3 = 255;
   randomsetting.midichannel = 255;
 
   for (uint8_t i = 0; i < 4; i++) {
-    Digital_Configure(&digital[i],255,&randomsetting);
-    Analog_Configure(&analog[i],255,&randomsetting);
+    Digital_Configure(&digital[i],DIGITAL_OFF,&randomsetting);
+    Analog_Configure(&analog[i],ANALOG_OFF,&randomsetting);
   }
 }
 

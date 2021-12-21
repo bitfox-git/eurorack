@@ -21,12 +21,12 @@ typedef enum  {
   LED_Fixed
 } LED_ModeEnum;
 
-bool ledupdate;
-uint8_t ledupdatecounter;
-Led_t leds[kNUMBER_OF_LEDS];
+extern bool ledupdate;
+extern uint8_t ledupdatecounter;
+extern Led_t leds[kNUMBER_OF_LEDS];
 
-LED_ModeEnum ledmode;
-uint16_t ledtimeout;
+extern LED_ModeEnum ledmode;
+extern uint16_t ledtimeout;
 
 
 void LED_Gate(uint8_t channel);

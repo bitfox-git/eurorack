@@ -4,6 +4,8 @@
 #include "ringbuffer.h"
 #include "stm32f3xx_it.h"
 
+RingBuffer_t midibuffer;
+
 bool RingbufferPop(RingBuffer_t *b, uint32_t *data) {
   if(!(!b->full && (b->head == b->tail))) { // Check if Ringbuffer is empty 
     *data = b->data[b->tail];

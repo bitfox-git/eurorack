@@ -24,7 +24,9 @@
       "dac.h": "c",
       "array": "c",
       "ringbuffer.h": "c",
-      "analog.h": "c"
+      "analog.h": "c",
+      "limits": "c",
+      "cmath": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.8"
 }

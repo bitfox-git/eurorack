@@ -1,0 +1,1022 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.SystemClock_Config,"ax",%progbits
+  18              		.align	1
+  19              		.global	SystemClock_Config
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	SystemClock_Config:
+  27              	.LFB127:
+  28              		.file 1 "Src/main.c"
+   1:Src/main.c    **** /* USER CODE BEGIN Header */
+   2:Src/main.c    **** /**
+   3:Src/main.c    ****   ******************************************************************************
+   4:Src/main.c    ****   * @file           : main.c
+   5:Src/main.c    ****   * @brief          : Main program body
+   6:Src/main.c    ****   ******************************************************************************
+   7:Src/main.c    ****   * This notice applies to any and all portions of this file
+   8:Src/main.c    ****   * that are not between comment pairs USER CODE BEGIN and
+   9:Src/main.c    ****   * USER CODE END. Other portions of this file, whether 
+  10:Src/main.c    ****   * inserted by the user or by software development tools
+  11:Src/main.c    ****   * are owned by their respective copyright owners.
+  12:Src/main.c    ****   *
+  13:Src/main.c    ****   * Copyright (c) 2020 STMicroelectronics International N.V. 
+  14:Src/main.c    ****   * All rights reserved.
+  15:Src/main.c    ****   *
+  16:Src/main.c    ****   * Redistribution and use in source and binary forms, with or without 
+  17:Src/main.c    ****   * modification, are permitted, provided that the following conditions are met:
+  18:Src/main.c    ****   *
+  19:Src/main.c    ****   * 1. Redistribution of source code must retain the above copyright notice, 
+  20:Src/main.c    ****   *    this list of conditions and the following disclaimer.
+  21:Src/main.c    ****   * 2. Redistributions in binary form must reproduce the above copyright notice,
+  22:Src/main.c    ****   *    this list of conditions and the following disclaimer in the documentation
+  23:Src/main.c    ****   *    and/or other materials provided with the distribution.
+  24:Src/main.c    ****   * 3. Neither the name of STMicroelectronics nor the names of other 
+  25:Src/main.c    ****   *    contributors to this software may be used to endorse or promote products 
+  26:Src/main.c    ****   *    derived from this software without specific written permission.
+  27:Src/main.c    ****   * 4. This software, including modifications and/or derivative works of this 
+  28:Src/main.c    ****   *    software, must execute solely and exclusively on microcontroller or
+  29:Src/main.c    ****   *    microprocessor devices manufactured by or for STMicroelectronics.
+  30:Src/main.c    ****   * 5. Redistribution and use of this software other than as permitted under 
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 2
+
+
+  31:Src/main.c    ****   *    this license is void and will automatically terminate your rights under 
+  32:Src/main.c    ****   *    this license. 
+  33:Src/main.c    ****   *
+  34:Src/main.c    ****   * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
+  35:Src/main.c    ****   * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
+  36:Src/main.c    ****   * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+  37:Src/main.c    ****   * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  38:Src/main.c    ****   * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
+  39:Src/main.c    ****   * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  40:Src/main.c    ****   * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  41:Src/main.c    ****   * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+  42:Src/main.c    ****   * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  43:Src/main.c    ****   * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+  44:Src/main.c    ****   * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  45:Src/main.c    ****   * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  46:Src/main.c    ****   *
+  47:Src/main.c    ****   ******************************************************************************
+  48:Src/main.c    ****   */
+  49:Src/main.c    **** /* USER CODE END Header */
+  50:Src/main.c    **** 
+  51:Src/main.c    **** /* Includes ------------------------------------------------------------------*/
+  52:Src/main.c    **** #include "main.h"
+  53:Src/main.c    **** #include "dma.h"
+  54:Src/main.c    **** #include "spi.h"
+  55:Src/main.c    **** #include "tim.h"
+  56:Src/main.c    **** #include "usb_device.h"
+  57:Src/main.c    **** #include "gpio.h"
+  58:Src/main.c    **** 
+  59:Src/main.c    **** /* Private includes ----------------------------------------------------------*/
+  60:Src/main.c    **** /* USER CODE BEGIN Includes */
+  61:Src/main.c    **** #include "ringbuffer.h"
+  62:Src/main.c    **** #include "midiprocessor.h"
+  63:Src/main.c    **** #include "dac.h"
+  64:Src/main.c    **** #include "led.h"
+  65:Src/main.c    **** #include "stdbool.h"
+  66:Src/main.c    **** #include "digital.h"
+  67:Src/main.c    **** #include "analog.h"
+  68:Src/main.c    **** #include "configuration.h"
+  69:Src/main.c    **** /* USER CODE END Includes */
+  70:Src/main.c    **** 
+  71:Src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  72:Src/main.c    **** /* USER CODE BEGIN PTD */
+  73:Src/main.c    **** 
+  74:Src/main.c    **** /* USER CODE END PTD */
+  75:Src/main.c    **** 
+  76:Src/main.c    **** /* Private define ------------------------------------------------------------*/
+  77:Src/main.c    **** /* USER CODE BEGIN PD */
+  78:Src/main.c    **** 
+  79:Src/main.c    **** /* USER CODE END PD */
+  80:Src/main.c    **** 
+  81:Src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  82:Src/main.c    **** /* USER CODE BEGIN PM */
+  83:Src/main.c    **** 
+  84:Src/main.c    **** /* USER CODE END PM */
+  85:Src/main.c    **** 
+  86:Src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  87:Src/main.c    **** 
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 3
+
+
+  88:Src/main.c    **** /* USER CODE BEGIN PV */
+  89:Src/main.c    **** uint8_t timerupdate;
+  90:Src/main.c    **** void TIMER_Update();
+  91:Src/main.c    **** /* USER CODE END PV */
+  92:Src/main.c    **** 
+  93:Src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+  94:Src/main.c    **** void SystemClock_Config(void);
+  95:Src/main.c    **** /* USER CODE BEGIN PFP */
+  96:Src/main.c    **** /* USER CODE END PFP */
+  97:Src/main.c    **** 
+  98:Src/main.c    **** /* Private user code ---------------------------------------------------------*/
+  99:Src/main.c    **** /* USER CODE BEGIN 0 */
+ 100:Src/main.c    **** 
+ 101:Src/main.c    **** /* USER CODE END 0 */
+ 102:Src/main.c    **** 
+ 103:Src/main.c    **** /**
+ 104:Src/main.c    ****   * @brief  The application entry point.
+ 105:Src/main.c    ****   * @retval int
+ 106:Src/main.c    ****   */
+ 107:Src/main.c    **** int main(void)
+ 108:Src/main.c    **** {
+ 109:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 110:Src/main.c    **** 
+ 111:Src/main.c    ****   /* USER CODE END 1 */
+ 112:Src/main.c    **** 
+ 113:Src/main.c    ****   /* MCU Configuration--------------------------------------------------------*/
+ 114:Src/main.c    **** 
+ 115:Src/main.c    ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ 116:Src/main.c    ****   HAL_Init();
+ 117:Src/main.c    **** 
+ 118:Src/main.c    ****   /* USER CODE BEGIN Init */
+ 119:Src/main.c    ****   /* USER CODE END Init */
+ 120:Src/main.c    **** 
+ 121:Src/main.c    ****   /* Configure the system clock */
+ 122:Src/main.c    ****   SystemClock_Config();
+ 123:Src/main.c    **** 
+ 124:Src/main.c    ****   /* USER CODE BEGIN SysInit */
+ 125:Src/main.c    ****   Config_FlashResetAppBit();
+ 126:Src/main.c    ****   /* USER CODE END SysInit */
+ 127:Src/main.c    **** 
+ 128:Src/main.c    ****   /* Initialize all configured peripherals */
+ 129:Src/main.c    ****   MX_GPIO_Init();
+ 130:Src/main.c    ****   MX_DMA_Init();
+ 131:Src/main.c    ****   MX_SPI2_Init();
+ 132:Src/main.c    ****   MX_TIM3_Init();
+ 133:Src/main.c    ****   MX_TIM4_Init();
+ 134:Src/main.c    ****   MX_USB_DEVICE_Init();
+ 135:Src/main.c    ****   MX_TIM6_Init();
+ 136:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 137:Src/main.c    ****   DAC_Init();
+ 138:Src/main.c    ****   LED_Init();
+ 139:Src/main.c    ****   Digital_Init();
+ 140:Src/main.c    ****   Analog_Init();
+ 141:Src/main.c    ****   Config_Init();
+ 142:Src/main.c    ****   HAL_TIM_Base_Start_IT(&htim6);
+ 143:Src/main.c    ****   uint32_t mididata;
+ 144:Src/main.c    ****   Config_Empty();
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 4
+
+
+ 145:Src/main.c    ****   /* USER CODE END 2 */
+ 146:Src/main.c    **** 
+ 147:Src/main.c    ****   /* Infinite loop */
+ 148:Src/main.c    ****   /* USER CODE BEGIN WHILE */
+ 149:Src/main.c    ****   while (1)
+ 150:Src/main.c    ****   {
+ 151:Src/main.c    ****     if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) {
+ 152:Src/main.c    ****       //Connected LED
+ 153:Src/main.c    ****       Config_Configure();
+ 154:Src/main.c    ****       LED_ChangeMode(LED_Connected);
+ 155:Src/main.c    **** 
+ 156:Src/main.c    ****       // Main Loop
+ 157:Src/main.c    ****       while (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) 
+ 158:Src/main.c    ****       {
+ 159:Src/main.c    ****         if(RingbufferPop(&midibuffer,&mididata)) {
+ 160:Src/main.c    ****           MIDI_InputMessage(mididata);
+ 161:Src/main.c    ****         }
+ 162:Src/main.c    ****         TIMER_Update();
+ 163:Src/main.c    ****         LED_Update();
+ 164:Src/main.c    ****       }
+ 165:Src/main.c    **** 
+ 166:Src/main.c    ****       // Disconnected Code
+ 167:Src/main.c    ****       LED_ChangeMode(LED_Disconnected);
+ 168:Src/main.c    ****       Config_Empty();
+ 169:Src/main.c    ****     }
+ 170:Src/main.c    **** 
+ 171:Src/main.c    ****     //Idle Loop
+ 172:Src/main.c    ****     TIMER_Update();
+ 173:Src/main.c    ****     LED_Update();
+ 174:Src/main.c    **** 
+ 175:Src/main.c    **** 
+ 176:Src/main.c    ****     /* USER CODE END WHILE */
+ 177:Src/main.c    **** 
+ 178:Src/main.c    ****     /* USER CODE BEGIN 3 */
+ 179:Src/main.c    ****   }
+ 180:Src/main.c    ****   /* USER CODE END 3 */
+ 181:Src/main.c    **** }
+ 182:Src/main.c    **** 
+ 183:Src/main.c    **** /**
+ 184:Src/main.c    ****   * @brief System Clock Configuration
+ 185:Src/main.c    ****   * @retval None
+ 186:Src/main.c    ****   */
+ 187:Src/main.c    **** void SystemClock_Config(void)
+ 188:Src/main.c    **** {
+  29              		.loc 1 188 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 104
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 30B5     		push	{r4, r5, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 12
+  36              		.cfi_offset 4, -12
+  37              		.cfi_offset 5, -8
+  38              		.cfi_offset 14, -4
+  39 0002 9BB0     		sub	sp, sp, #108
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 120
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 5
+
+
+ 189:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  42              		.loc 1 189 3 view .LVU1
+  43              		.loc 1 189 22 is_stmt 0 view .LVU2
+  44 0004 2822     		movs	r2, #40
+  45 0006 0021     		movs	r1, #0
+  46 0008 10A8     		add	r0, sp, #64
+  47 000a FFF7FEFF 		bl	memset
+  48              	.LVL0:
+ 190:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  49              		.loc 1 190 3 is_stmt 1 view .LVU3
+  50              		.loc 1 190 22 is_stmt 0 view .LVU4
+  51 000e 0024     		movs	r4, #0
+  52 0010 0B94     		str	r4, [sp, #44]
+  53 0012 0C94     		str	r4, [sp, #48]
+  54 0014 0D94     		str	r4, [sp, #52]
+  55 0016 0E94     		str	r4, [sp, #56]
+  56 0018 0F94     		str	r4, [sp, #60]
+ 191:Src/main.c    ****   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  57              		.loc 1 191 3 is_stmt 1 view .LVU5
+  58              		.loc 1 191 28 is_stmt 0 view .LVU6
+  59 001a 2C22     		movs	r2, #44
+  60 001c 2146     		mov	r1, r4
+  61 001e 6846     		mov	r0, sp
+  62 0020 FFF7FEFF 		bl	memset
+  63              	.LVL1:
+ 192:Src/main.c    **** 
+ 193:Src/main.c    ****   /**Initializes the CPU, AHB and APB busses clocks 
+ 194:Src/main.c    ****   */
+ 195:Src/main.c    ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  64              		.loc 1 195 3 is_stmt 1 view .LVU7
+  65              		.loc 1 195 36 is_stmt 0 view .LVU8
+  66 0024 0122     		movs	r2, #1
+  67 0026 1092     		str	r2, [sp, #64]
+ 196:Src/main.c    ****   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  68              		.loc 1 196 3 is_stmt 1 view .LVU9
+  69              		.loc 1 196 30 is_stmt 0 view .LVU10
+  70 0028 4FF48033 		mov	r3, #65536
+  71 002c 1193     		str	r3, [sp, #68]
+ 197:Src/main.c    ****   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  72              		.loc 1 197 3 is_stmt 1 view .LVU11
+ 198:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  73              		.loc 1 198 3 view .LVU12
+  74              		.loc 1 198 30 is_stmt 0 view .LVU13
+  75 002e 1492     		str	r2, [sp, #80]
+ 199:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  76              		.loc 1 199 3 is_stmt 1 view .LVU14
+  77              		.loc 1 199 34 is_stmt 0 view .LVU15
+  78 0030 0225     		movs	r5, #2
+  79 0032 1795     		str	r5, [sp, #92]
+ 200:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  80              		.loc 1 200 3 is_stmt 1 view .LVU16
+  81              		.loc 1 200 35 is_stmt 0 view .LVU17
+  82 0034 1893     		str	r3, [sp, #96]
+ 201:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  83              		.loc 1 201 3 is_stmt 1 view .LVU18
+  84              		.loc 1 201 32 is_stmt 0 view .LVU19
+  85 0036 4FF4E013 		mov	r3, #1835008
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 6
+
+
+  86 003a 1993     		str	r3, [sp, #100]
+ 202:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  87              		.loc 1 202 3 is_stmt 1 view .LVU20
+  88              		.loc 1 202 7 is_stmt 0 view .LVU21
+  89 003c 10A8     		add	r0, sp, #64
+  90 003e FFF7FEFF 		bl	HAL_RCC_OscConfig
+  91              	.LVL2:
+ 203:Src/main.c    ****   {
+ 204:Src/main.c    ****     Error_Handler();
+ 205:Src/main.c    ****   }
+ 206:Src/main.c    ****   /**Initializes the CPU, AHB and APB busses clocks 
+ 207:Src/main.c    ****   */
+ 208:Src/main.c    ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+  92              		.loc 1 208 3 is_stmt 1 view .LVU22
+  93              		.loc 1 208 31 is_stmt 0 view .LVU23
+  94 0042 0F23     		movs	r3, #15
+  95 0044 0B93     		str	r3, [sp, #44]
+ 209:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 210:Src/main.c    ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  96              		.loc 1 210 3 is_stmt 1 view .LVU24
+  97              		.loc 1 210 34 is_stmt 0 view .LVU25
+  98 0046 0C95     		str	r5, [sp, #48]
+ 211:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  99              		.loc 1 211 3 is_stmt 1 view .LVU26
+ 100              		.loc 1 211 35 is_stmt 0 view .LVU27
+ 101 0048 0D94     		str	r4, [sp, #52]
+ 212:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 102              		.loc 1 212 3 is_stmt 1 view .LVU28
+ 103              		.loc 1 212 36 is_stmt 0 view .LVU29
+ 104 004a 4FF48063 		mov	r3, #1024
+ 105 004e 0E93     		str	r3, [sp, #56]
+ 213:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 106              		.loc 1 213 3 is_stmt 1 view .LVU30
+ 107              		.loc 1 213 36 is_stmt 0 view .LVU31
+ 108 0050 0F94     		str	r4, [sp, #60]
+ 214:Src/main.c    **** 
+ 215:Src/main.c    ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+ 109              		.loc 1 215 3 is_stmt 1 view .LVU32
+ 110              		.loc 1 215 7 is_stmt 0 view .LVU33
+ 111 0052 2946     		mov	r1, r5
+ 112 0054 0BA8     		add	r0, sp, #44
+ 113 0056 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 114              	.LVL3:
+ 216:Src/main.c    ****   {
+ 217:Src/main.c    ****     Error_Handler();
+ 218:Src/main.c    ****   }
+ 219:Src/main.c    ****   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+ 115              		.loc 1 219 3 is_stmt 1 view .LVU34
+ 116              		.loc 1 219 38 is_stmt 0 view .LVU35
+ 117 005a 4FF40033 		mov	r3, #131072
+ 118 005e 0093     		str	r3, [sp]
+ 220:Src/main.c    ****   PeriphClkInit.USBClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+ 119              		.loc 1 220 3 is_stmt 1 view .LVU36
+ 120              		.loc 1 220 35 is_stmt 0 view .LVU37
+ 121 0060 0A94     		str	r4, [sp, #40]
+ 221:Src/main.c    ****   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+ 122              		.loc 1 221 3 is_stmt 1 view .LVU38
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 7
+
+
+ 123              		.loc 1 221 7 is_stmt 0 view .LVU39
+ 124 0062 6846     		mov	r0, sp
+ 125 0064 FFF7FEFF 		bl	HAL_RCCEx_PeriphCLKConfig
+ 126              	.LVL4:
+ 222:Src/main.c    ****   {
+ 223:Src/main.c    ****     Error_Handler();
+ 224:Src/main.c    ****   }
+ 225:Src/main.c    **** }
+ 127              		.loc 1 225 1 view .LVU40
+ 128 0068 1BB0     		add	sp, sp, #108
+ 129              	.LCFI2:
+ 130              		.cfi_def_cfa_offset 12
+ 131              		@ sp needed
+ 132 006a 30BD     		pop	{r4, r5, pc}
+ 133              		.cfi_endproc
+ 134              	.LFE127:
+ 136              		.section	.text.TIMER_Update,"ax",%progbits
+ 137              		.align	1
+ 138              		.global	TIMER_Update
+ 139              		.syntax unified
+ 140              		.thumb
+ 141              		.thumb_func
+ 142              		.fpu fpv4-sp-d16
+ 144              	TIMER_Update:
+ 145              	.LFB128:
+ 226:Src/main.c    **** 
+ 227:Src/main.c    **** /* USER CODE BEGIN 4 */
+ 228:Src/main.c    **** void TIMER_Update() {
+ 146              		.loc 1 228 21 is_stmt 1 view -0
+ 147              		.cfi_startproc
+ 148              		@ args = 0, pretend = 0, frame = 0
+ 149              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229:Src/main.c    ****   if(timerupdate) {
+ 150              		.loc 1 229 3 view .LVU42
+ 151              		.loc 1 229 6 is_stmt 0 view .LVU43
+ 152 0000 0F4B     		ldr	r3, .L11
+ 153 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 154              		.loc 1 229 5 view .LVU44
+ 155 0004 DBB1     		cbz	r3, .L8
+ 228:Src/main.c    ****   if(timerupdate) {
+ 156              		.loc 1 228 21 view .LVU45
+ 157 0006 10B5     		push	{r4, lr}
+ 158              	.LCFI3:
+ 159              		.cfi_def_cfa_offset 8
+ 160              		.cfi_offset 4, -8
+ 161              		.cfi_offset 14, -4
+ 230:Src/main.c    ****     timerupdate--;
+ 162              		.loc 1 230 5 is_stmt 1 view .LVU46
+ 163              		.loc 1 230 16 is_stmt 0 view .LVU47
+ 164 0008 013B     		subs	r3, r3, #1
+ 165 000a 0D4A     		ldr	r2, .L11
+ 166 000c 1370     		strb	r3, [r2]
+ 231:Src/main.c    ****     for (size_t i = 0; i < 4; i++)
+ 167              		.loc 1 231 5 is_stmt 1 view .LVU48
+ 168              	.LBB2:
+ 169              		.loc 1 231 10 view .LVU49
+ 170              	.LVL5:
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 8
+
+
+ 171              		.loc 1 231 17 is_stmt 0 view .LVU50
+ 172 000e 0024     		movs	r4, #0
+ 173              		.loc 1 231 5 view .LVU51
+ 174 0010 0FE0     		b	.L5
+ 175              	.LVL6:
+ 176              	.L6:
+ 232:Src/main.c    ****     {
+ 233:Src/main.c    ****       /* code */
+ 234:Src/main.c    ****       Digital_TimerUpdate(&digital[i]);
+ 177              		.loc 1 234 7 is_stmt 1 discriminator 3 view .LVU52
+ 178 0012 04EB4403 		add	r3, r4, r4, lsl #1
+ 179 0016 04EB8303 		add	r3, r4, r3, lsl #2
+ 180 001a 0A48     		ldr	r0, .L11+4
+ 181 001c 1844     		add	r0, r0, r3
+ 182 001e FFF7FEFF 		bl	Digital_TimerUpdate
+ 183              	.LVL7:
+ 235:Src/main.c    ****       Analog_TimerUpdate(&analog[i]);
+ 184              		.loc 1 235 7 discriminator 3 view .LVU53
+ 185 0022 04EB0412 		add	r2, r4, r4, lsl #4
+ 186 0026 D300     		lsls	r3, r2, #3
+ 187 0028 0748     		ldr	r0, .L11+8
+ 188 002a 1844     		add	r0, r0, r3
+ 189 002c FFF7FEFF 		bl	Analog_TimerUpdate
+ 190              	.LVL8:
+ 231:Src/main.c    ****     for (size_t i = 0; i < 4; i++)
+ 191              		.loc 1 231 31 discriminator 3 view .LVU54
+ 231:Src/main.c    ****     for (size_t i = 0; i < 4; i++)
+ 192              		.loc 1 231 32 is_stmt 0 discriminator 3 view .LVU55
+ 193 0030 0134     		adds	r4, r4, #1
+ 194              	.LVL9:
+ 195              	.L5:
+ 231:Src/main.c    ****     for (size_t i = 0; i < 4; i++)
+ 196              		.loc 1 231 24 is_stmt 1 discriminator 1 view .LVU56
+ 231:Src/main.c    ****     for (size_t i = 0; i < 4; i++)
+ 197              		.loc 1 231 5 is_stmt 0 discriminator 1 view .LVU57
+ 198 0032 032C     		cmp	r4, #3
+ 199 0034 EDD9     		bls	.L6
+ 200              	.LBE2:
+ 236:Src/main.c    ****     }
+ 237:Src/main.c    ****     timerupdate = false;
+ 201              		.loc 1 237 5 is_stmt 1 view .LVU58
+ 202              		.loc 1 237 17 is_stmt 0 view .LVU59
+ 203 0036 024B     		ldr	r3, .L11
+ 204 0038 0022     		movs	r2, #0
+ 205 003a 1A70     		strb	r2, [r3]
+ 238:Src/main.c    ****   }
+ 239:Src/main.c    **** }
+ 206              		.loc 1 239 1 view .LVU60
+ 207 003c 10BD     		pop	{r4, pc}
+ 208              	.LVL10:
+ 209              	.L8:
+ 210              	.LCFI4:
+ 211              		.cfi_def_cfa_offset 0
+ 212              		.cfi_restore 4
+ 213              		.cfi_restore 14
+ 214              		.loc 1 239 1 view .LVU61
+ 215 003e 7047     		bx	lr
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 9
+
+
+ 216              	.L12:
+ 217              		.align	2
+ 218              	.L11:
+ 219 0040 00000000 		.word	.LANCHOR0
+ 220 0044 00000000 		.word	digital
+ 221 0048 00000000 		.word	analog
+ 222              		.cfi_endproc
+ 223              	.LFE128:
+ 225              		.section	.text.main,"ax",%progbits
+ 226              		.align	1
+ 227              		.global	main
+ 228              		.syntax unified
+ 229              		.thumb
+ 230              		.thumb_func
+ 231              		.fpu fpv4-sp-d16
+ 233              	main:
+ 234              	.LFB126:
+ 108:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 235              		.loc 1 108 1 is_stmt 1 view -0
+ 236              		.cfi_startproc
+ 237              		@ Volatile: function does not return.
+ 238              		@ args = 0, pretend = 0, frame = 8
+ 239              		@ frame_needed = 0, uses_anonymous_args = 0
+ 240 0000 00B5     		push	{lr}
+ 241              	.LCFI5:
+ 242              		.cfi_def_cfa_offset 4
+ 243              		.cfi_offset 14, -4
+ 244 0002 83B0     		sub	sp, sp, #12
+ 245              	.LCFI6:
+ 246              		.cfi_def_cfa_offset 16
+ 116:Src/main.c    **** 
+ 247              		.loc 1 116 3 view .LVU63
+ 248 0004 FFF7FEFF 		bl	HAL_Init
+ 249              	.LVL11:
+ 122:Src/main.c    **** 
+ 250              		.loc 1 122 3 view .LVU64
+ 251 0008 FFF7FEFF 		bl	SystemClock_Config
+ 252              	.LVL12:
+ 125:Src/main.c    ****   /* USER CODE END SysInit */
+ 253              		.loc 1 125 3 view .LVU65
+ 254 000c FFF7FEFF 		bl	Config_FlashResetAppBit
+ 255              	.LVL13:
+ 129:Src/main.c    ****   MX_DMA_Init();
+ 256              		.loc 1 129 3 view .LVU66
+ 257 0010 FFF7FEFF 		bl	MX_GPIO_Init
+ 258              	.LVL14:
+ 130:Src/main.c    ****   MX_SPI2_Init();
+ 259              		.loc 1 130 3 view .LVU67
+ 260 0014 FFF7FEFF 		bl	MX_DMA_Init
+ 261              	.LVL15:
+ 131:Src/main.c    ****   MX_TIM3_Init();
+ 262              		.loc 1 131 3 view .LVU68
+ 263 0018 FFF7FEFF 		bl	MX_SPI2_Init
+ 264              	.LVL16:
+ 132:Src/main.c    ****   MX_TIM4_Init();
+ 265              		.loc 1 132 3 view .LVU69
+ 266 001c FFF7FEFF 		bl	MX_TIM3_Init
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 10
+
+
+ 267              	.LVL17:
+ 133:Src/main.c    ****   MX_USB_DEVICE_Init();
+ 268              		.loc 1 133 3 view .LVU70
+ 269 0020 FFF7FEFF 		bl	MX_TIM4_Init
+ 270              	.LVL18:
+ 134:Src/main.c    ****   MX_TIM6_Init();
+ 271              		.loc 1 134 3 view .LVU71
+ 272 0024 FFF7FEFF 		bl	MX_USB_DEVICE_Init
+ 273              	.LVL19:
+ 135:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 274              		.loc 1 135 3 view .LVU72
+ 275 0028 FFF7FEFF 		bl	MX_TIM6_Init
+ 276              	.LVL20:
+ 137:Src/main.c    ****   LED_Init();
+ 277              		.loc 1 137 3 view .LVU73
+ 278 002c FFF7FEFF 		bl	DAC_Init
+ 279              	.LVL21:
+ 138:Src/main.c    ****   Digital_Init();
+ 280              		.loc 1 138 3 view .LVU74
+ 281 0030 FFF7FEFF 		bl	LED_Init
+ 282              	.LVL22:
+ 139:Src/main.c    ****   Analog_Init();
+ 283              		.loc 1 139 3 view .LVU75
+ 284 0034 FFF7FEFF 		bl	Digital_Init
+ 285              	.LVL23:
+ 140:Src/main.c    ****   Config_Init();
+ 286              		.loc 1 140 3 view .LVU76
+ 287 0038 FFF7FEFF 		bl	Analog_Init
+ 288              	.LVL24:
+ 141:Src/main.c    ****   HAL_TIM_Base_Start_IT(&htim6);
+ 289              		.loc 1 141 3 view .LVU77
+ 290 003c FFF7FEFF 		bl	Config_Init
+ 291              	.LVL25:
+ 142:Src/main.c    ****   uint32_t mididata;
+ 292              		.loc 1 142 3 view .LVU78
+ 293 0040 1648     		ldr	r0, .L21
+ 294 0042 FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+ 295              	.LVL26:
+ 143:Src/main.c    ****   Config_Empty();
+ 296              		.loc 1 143 3 view .LVU79
+ 144:Src/main.c    ****   /* USER CODE END 2 */
+ 297              		.loc 1 144 3 view .LVU80
+ 298 0046 FFF7FEFF 		bl	Config_Empty
+ 299              	.LVL27:
+ 300 004a 1BE0     		b	.L18
+ 301              	.L16:
+ 162:Src/main.c    ****         LED_Update();
+ 302              		.loc 1 162 9 view .LVU81
+ 303 004c FFF7FEFF 		bl	TIMER_Update
+ 304              	.LVL28:
+ 163:Src/main.c    ****       }
+ 305              		.loc 1 163 9 view .LVU82
+ 306 0050 FFF7FEFF 		bl	LED_Update
+ 307              	.LVL29:
+ 308              	.L15:
+ 157:Src/main.c    ****       {
+ 309              		.loc 1 157 13 view .LVU83
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 11
+
+
+ 157:Src/main.c    ****       {
+ 310              		.loc 1 157 26 is_stmt 0 view .LVU84
+ 311 0054 124B     		ldr	r3, .L21+4
+ 312 0056 93F8FC31 		ldrb	r3, [r3, #508]	@ zero_extendqisi2
+ 157:Src/main.c    ****       {
+ 313              		.loc 1 157 13 view .LVU85
+ 314 005a 032B     		cmp	r3, #3
+ 315 005c 09D1     		bne	.L20
+ 159:Src/main.c    ****           MIDI_InputMessage(mididata);
+ 316              		.loc 1 159 9 is_stmt 1 view .LVU86
+ 159:Src/main.c    ****           MIDI_InputMessage(mididata);
+ 317              		.loc 1 159 12 is_stmt 0 view .LVU87
+ 318 005e 01A9     		add	r1, sp, #4
+ 319 0060 1048     		ldr	r0, .L21+8
+ 320 0062 FFF7FEFF 		bl	RingbufferPop
+ 321              	.LVL30:
+ 159:Src/main.c    ****           MIDI_InputMessage(mididata);
+ 322              		.loc 1 159 11 view .LVU88
+ 323 0066 0028     		cmp	r0, #0
+ 324 0068 F0D0     		beq	.L16
+ 160:Src/main.c    ****         }
+ 325              		.loc 1 160 11 is_stmt 1 view .LVU89
+ 326 006a 0198     		ldr	r0, [sp, #4]
+ 327 006c FFF7FEFF 		bl	MIDI_InputMessage
+ 328              	.LVL31:
+ 329 0070 ECE7     		b	.L16
+ 330              	.L20:
+ 167:Src/main.c    ****       Config_Empty();
+ 331              		.loc 1 167 7 view .LVU90
+ 332 0072 0320     		movs	r0, #3
+ 333 0074 FFF7FEFF 		bl	LED_ChangeMode
+ 334              	.LVL32:
+ 168:Src/main.c    ****     }
+ 335              		.loc 1 168 7 view .LVU91
+ 336 0078 FFF7FEFF 		bl	Config_Empty
+ 337              	.LVL33:
+ 338              	.L14:
+ 172:Src/main.c    ****     LED_Update();
+ 339              		.loc 1 172 5 view .LVU92
+ 340 007c FFF7FEFF 		bl	TIMER_Update
+ 341              	.LVL34:
+ 173:Src/main.c    **** 
+ 342              		.loc 1 173 5 view .LVU93
+ 343 0080 FFF7FEFF 		bl	LED_Update
+ 344              	.LVL35:
+ 149:Src/main.c    ****   {
+ 345              		.loc 1 149 9 view .LVU94
+ 346              	.L18:
+ 149:Src/main.c    ****   {
+ 347              		.loc 1 149 3 view .LVU95
+ 151:Src/main.c    ****       //Connected LED
+ 348              		.loc 1 151 5 view .LVU96
+ 151:Src/main.c    ****       //Connected LED
+ 349              		.loc 1 151 20 is_stmt 0 view .LVU97
+ 350 0084 064B     		ldr	r3, .L21+4
+ 351 0086 93F8FC31 		ldrb	r3, [r3, #508]	@ zero_extendqisi2
+ 151:Src/main.c    ****       //Connected LED
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 12
+
+
+ 352              		.loc 1 151 7 view .LVU98
+ 353 008a 032B     		cmp	r3, #3
+ 354 008c F6D1     		bne	.L14
+ 153:Src/main.c    ****       LED_ChangeMode(LED_Connected);
+ 355              		.loc 1 153 7 is_stmt 1 view .LVU99
+ 356 008e FFF7FEFF 		bl	Config_Configure
+ 357              	.LVL36:
+ 154:Src/main.c    **** 
+ 358              		.loc 1 154 7 view .LVU100
+ 359 0092 0220     		movs	r0, #2
+ 360 0094 FFF7FEFF 		bl	LED_ChangeMode
+ 361              	.LVL37:
+ 157:Src/main.c    ****       {
+ 362              		.loc 1 157 7 view .LVU101
+ 157:Src/main.c    ****       {
+ 363              		.loc 1 157 13 is_stmt 0 view .LVU102
+ 364 0098 DCE7     		b	.L15
+ 365              	.L22:
+ 366 009a 00BF     		.align	2
+ 367              	.L21:
+ 368 009c 00000000 		.word	htim6
+ 369 00a0 00000000 		.word	hUsbDeviceFS
+ 370 00a4 00000000 		.word	midibuffer
+ 371              		.cfi_endproc
+ 372              	.LFE126:
+ 374              		.section	.text.SysTick_Handler,"ax",%progbits
+ 375              		.align	1
+ 376              		.global	SysTick_Handler
+ 377              		.syntax unified
+ 378              		.thumb
+ 379              		.thumb_func
+ 380              		.fpu fpv4-sp-d16
+ 382              	SysTick_Handler:
+ 383              	.LFB129:
+ 240:Src/main.c    **** 
+ 241:Src/main.c    **** 
+ 242:Src/main.c    **** 
+ 243:Src/main.c    **** void SysTick_Handler(void)
+ 244:Src/main.c    **** {
+ 384              		.loc 1 244 1 is_stmt 1 view -0
+ 385              		.cfi_startproc
+ 386              		@ args = 0, pretend = 0, frame = 0
+ 387              		@ frame_needed = 0, uses_anonymous_args = 0
+ 388 0000 08B5     		push	{r3, lr}
+ 389              	.LCFI7:
+ 390              		.cfi_def_cfa_offset 8
+ 391              		.cfi_offset 3, -8
+ 392              		.cfi_offset 14, -4
+ 245:Src/main.c    ****   /* USER CODE BEGIN SysTick_IRQn 0 */
+ 246:Src/main.c    ****   
+ 247:Src/main.c    ****   /* USER CODE END SysTick_IRQn 0 */
+ 248:Src/main.c    ****   HAL_IncTick();
+ 393              		.loc 1 248 3 view .LVU104
+ 394 0002 FFF7FEFF 		bl	HAL_IncTick
+ 395              	.LVL38:
+ 249:Src/main.c    ****   /* USER CODE BEGIN SysTick_IRQn 1 */
+ 250:Src/main.c    ****   ledupdatecounter++;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 13
+
+
+ 396              		.loc 1 250 3 view .LVU105
+ 397              		.loc 1 250 19 is_stmt 0 view .LVU106
+ 398 0006 0A49     		ldr	r1, .L26
+ 399 0008 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 400 000a 0133     		adds	r3, r3, #1
+ 401 000c DBB2     		uxtb	r3, r3
+ 402 000e 0B70     		strb	r3, [r1]
+ 251:Src/main.c    ****   ledupdatecounter %= 10;
+ 403              		.loc 1 251 3 is_stmt 1 view .LVU107
+ 404              		.loc 1 251 20 is_stmt 0 view .LVU108
+ 405 0010 084A     		ldr	r2, .L26+4
+ 406 0012 A2FB0302 		umull	r0, r2, r2, r3
+ 407 0016 D208     		lsrs	r2, r2, #3
+ 408 0018 02EB8202 		add	r2, r2, r2, lsl #2
+ 409 001c 5000     		lsls	r0, r2, #1
+ 410 001e 1B1A     		subs	r3, r3, r0
+ 411 0020 DBB2     		uxtb	r3, r3
+ 412 0022 0B70     		strb	r3, [r1]
+ 252:Src/main.c    ****   if(ledupdatecounter == 0) {
+ 413              		.loc 1 252 3 is_stmt 1 view .LVU109
+ 414              		.loc 1 252 5 is_stmt 0 view .LVU110
+ 415 0024 13B9     		cbnz	r3, .L23
+ 253:Src/main.c    ****     ledupdate = true;
+ 416              		.loc 1 253 5 is_stmt 1 view .LVU111
+ 417              		.loc 1 253 15 is_stmt 0 view .LVU112
+ 418 0026 044B     		ldr	r3, .L26+8
+ 419 0028 0122     		movs	r2, #1
+ 420 002a 1A70     		strb	r2, [r3]
+ 421              	.L23:
+ 254:Src/main.c    ****   }
+ 255:Src/main.c    ****   /* USER CODE END SysTick_IRQn 1 */
+ 256:Src/main.c    **** }
+ 422              		.loc 1 256 1 view .LVU113
+ 423 002c 08BD     		pop	{r3, pc}
+ 424              	.L27:
+ 425 002e 00BF     		.align	2
+ 426              	.L26:
+ 427 0030 00000000 		.word	ledupdatecounter
+ 428 0034 CDCCCCCC 		.word	-858993459
+ 429 0038 00000000 		.word	ledupdate
+ 430              		.cfi_endproc
+ 431              	.LFE129:
+ 433              		.section	.text.TIM6_DAC1_IRQHandler,"ax",%progbits
+ 434              		.align	1
+ 435              		.global	TIM6_DAC1_IRQHandler
+ 436              		.syntax unified
+ 437              		.thumb
+ 438              		.thumb_func
+ 439              		.fpu fpv4-sp-d16
+ 441              	TIM6_DAC1_IRQHandler:
+ 442              	.LFB130:
+ 257:Src/main.c    **** 
+ 258:Src/main.c    **** void TIM6_DAC1_IRQHandler(void)
+ 259:Src/main.c    **** {
+ 443              		.loc 1 259 1 is_stmt 1 view -0
+ 444              		.cfi_startproc
+ 445              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 14
+
+
+ 446              		@ frame_needed = 0, uses_anonymous_args = 0
+ 447 0000 08B5     		push	{r3, lr}
+ 448              	.LCFI8:
+ 449              		.cfi_def_cfa_offset 8
+ 450              		.cfi_offset 3, -8
+ 451              		.cfi_offset 14, -4
+ 260:Src/main.c    ****   if(__HAL_TIM_GET_ITSTATUS(&htim6,TIM_IT_UPDATE) == RESET) {
+ 452              		.loc 1 260 3 view .LVU115
+ 453              		.loc 1 260 6 is_stmt 0 view .LVU116
+ 454 0002 194B     		ldr	r3, .L34
+ 455 0004 1B68     		ldr	r3, [r3]
+ 456 0006 DA68     		ldr	r2, [r3, #12]
+ 457              		.loc 1 260 5 view .LVU117
+ 458 0008 12F0010F 		tst	r2, #1
+ 459 000c 27D0     		beq	.L28
+ 261:Src/main.c    ****     return;
+ 262:Src/main.c    ****   }
+ 263:Src/main.c    ****   __HAL_TIM_CLEAR_IT(&htim6,TIM_IT_UPDATE);
+ 460              		.loc 1 263 3 is_stmt 1 view .LVU118
+ 461 000e 6FF00102 		mvn	r2, #1
+ 462 0012 1A61     		str	r2, [r3, #16]
+ 264:Src/main.c    **** 
+ 265:Src/main.c    ****   if(analog[dac.current].oscillator || analog[dac.current].envelope) {
+ 463              		.loc 1 265 3 view .LVU119
+ 464              		.loc 1 265 16 is_stmt 0 view .LVU120
+ 465 0014 154B     		ldr	r3, .L34+4
+ 466 0016 93F85C30 		ldrb	r3, [r3, #92]	@ zero_extendqisi2
+ 467              		.loc 1 265 25 view .LVU121
+ 468 001a 03EB0312 		add	r2, r3, r3, lsl #4
+ 469 001e D100     		lsls	r1, r2, #3
+ 470 0020 134A     		ldr	r2, .L34+8
+ 471 0022 0A44     		add	r2, r2, r1
+ 472 0024 127D     		ldrb	r2, [r2, #20]	@ zero_extendqisi2
+ 473              		.loc 1 265 5 view .LVU122
+ 474 0026 1AB9     		cbnz	r2, .L30
+ 475              		.loc 1 265 59 discriminator 1 view .LVU123
+ 476 0028 114A     		ldr	r2, .L34+8
+ 477 002a 0A44     		add	r2, r2, r1
+ 478 002c 127F     		ldrb	r2, [r2, #28]	@ zero_extendqisi2
+ 479              		.loc 1 265 37 discriminator 1 view .LVU124
+ 480 002e BAB1     		cbz	r2, .L31
+ 481              	.L30:
+ 266:Src/main.c    ****     Analog_CycleValue(&analog[dac.current]);
+ 482              		.loc 1 266 5 is_stmt 1 view .LVU125
+ 483 0030 03EB0313 		add	r3, r3, r3, lsl #4
+ 484 0034 DA00     		lsls	r2, r3, #3
+ 485 0036 0E48     		ldr	r0, .L34+8
+ 486 0038 1044     		add	r0, r0, r2
+ 487 003a FFF7FEFF 		bl	Analog_CycleValue
+ 488              	.LVL39:
+ 489              	.L32:
+ 267:Src/main.c    ****   } else {
+ 268:Src/main.c    ****     DAC_Send();
+ 269:Src/main.c    ****   }
+ 270:Src/main.c    **** 
+ 271:Src/main.c    ****   dac.current++;
+ 490              		.loc 1 271 3 view .LVU126
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 15
+
+
+ 491              		.loc 1 271 6 is_stmt 0 view .LVU127
+ 492 003e 0B4A     		ldr	r2, .L34+4
+ 493 0040 92F85C30 		ldrb	r3, [r2, #92]	@ zero_extendqisi2
+ 494              		.loc 1 271 14 view .LVU128
+ 495 0044 0133     		adds	r3, r3, #1
+ 496 0046 DBB2     		uxtb	r3, r3
+ 497 0048 82F85C30 		strb	r3, [r2, #92]
+ 272:Src/main.c    ****   dac.current %= 4;
+ 498              		.loc 1 272 3 is_stmt 1 view .LVU129
+ 499              		.loc 1 272 15 is_stmt 0 view .LVU130
+ 500 004c 03F00303 		and	r3, r3, #3
+ 501 0050 82F85C30 		strb	r3, [r2, #92]
+ 273:Src/main.c    ****   
+ 274:Src/main.c    ****   if(dac.current == 0) {
+ 502              		.loc 1 274 3 is_stmt 1 view .LVU131
+ 503              		.loc 1 274 5 is_stmt 0 view .LVU132
+ 504 0054 1BB9     		cbnz	r3, .L28
+ 275:Src/main.c    ****     timerupdate++;
+ 505              		.loc 1 275 5 is_stmt 1 view .LVU133
+ 506              		.loc 1 275 16 is_stmt 0 view .LVU134
+ 507 0056 074A     		ldr	r2, .L34+12
+ 508 0058 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 509 005a 0133     		adds	r3, r3, #1
+ 510 005c 1370     		strb	r3, [r2]
+ 511              	.L28:
+ 276:Src/main.c    ****   }
+ 277:Src/main.c    **** }
+ 512              		.loc 1 277 1 view .LVU135
+ 513 005e 08BD     		pop	{r3, pc}
+ 514              	.L31:
+ 268:Src/main.c    ****   }
+ 515              		.loc 1 268 5 is_stmt 1 view .LVU136
+ 516 0060 FFF7FEFF 		bl	DAC_Send
+ 517              	.LVL40:
+ 518 0064 EBE7     		b	.L32
+ 519              	.L35:
+ 520 0066 00BF     		.align	2
+ 521              	.L34:
+ 522 0068 00000000 		.word	htim6
+ 523 006c 00000000 		.word	dac
+ 524 0070 00000000 		.word	analog
+ 525 0074 00000000 		.word	.LANCHOR0
+ 526              		.cfi_endproc
+ 527              	.LFE130:
+ 529              		.section	.text.Error_Handler,"ax",%progbits
+ 530              		.align	1
+ 531              		.global	Error_Handler
+ 532              		.syntax unified
+ 533              		.thumb
+ 534              		.thumb_func
+ 535              		.fpu fpv4-sp-d16
+ 537              	Error_Handler:
+ 538              	.LFB131:
+ 278:Src/main.c    **** 
+ 279:Src/main.c    **** /* USER CODE END 4 */
+ 280:Src/main.c    **** 
+ 281:Src/main.c    **** /**
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 16
+
+
+ 282:Src/main.c    ****   * @brief  This function is executed in case of error occurrence.
+ 283:Src/main.c    ****   * @retval None
+ 284:Src/main.c    ****   */
+ 285:Src/main.c    **** void Error_Handler(void)
+ 286:Src/main.c    **** {
+ 539              		.loc 1 286 1 view -0
+ 540              		.cfi_startproc
+ 541              		@ args = 0, pretend = 0, frame = 0
+ 542              		@ frame_needed = 0, uses_anonymous_args = 0
+ 543              		@ link register save eliminated.
+ 287:Src/main.c    ****   /* USER CODE BEGIN Error_Handler_Debug */
+ 288:Src/main.c    ****   /* User can add his own implementation to report the HAL error return state */
+ 289:Src/main.c    **** 
+ 290:Src/main.c    ****   /* USER CODE END Error_Handler_Debug */
+ 291:Src/main.c    **** }
+ 544              		.loc 1 291 1 view .LVU138
+ 545 0000 7047     		bx	lr
+ 546              		.cfi_endproc
+ 547              	.LFE131:
+ 549              		.global	timerupdate
+ 550              		.section	.bss.timerupdate,"aw",%nobits
+ 551              		.set	.LANCHOR0,. + 0
+ 554              	timerupdate:
+ 555 0000 00       		.space	1
+ 556              		.text
+ 557              	.Letext0:
+ 558              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 559              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 560              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 561              		.file 5 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 562              		.file 6 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h"
+ 563              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 564              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h"
+ 565              		.file 9 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc_ex.h"
+ 566              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 567              		.file 11 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
+ 568              		.file 12 "Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ 569              		.file 13 "Inc/tim.h"
+ 570              		.file 14 "Inc/usb_device.h"
+ 571              		.file 15 "Inc/ringbuffer.h"
+ 572              		.file 16 "Inc/dac.h"
+ 573              		.file 17 "Inc/led.h"
+ 574              		.file 18 "Inc/midisetting.h"
+ 575              		.file 19 "Inc/digital.h"
+ 576              		.file 20 "Inc/note_stack.h"
+ 577              		.file 21 "Inc/analog.h"
+ 578              		.file 22 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ 579              		.file 23 "Inc/configuration.h"
+ 580              		.file 24 "Inc/gpio.h"
+ 581              		.file 25 "Inc/dma.h"
+ 582              		.file 26 "Inc/spi.h"
+ 583              		.file 27 "Inc/midiprocessor.h"
+ 584              		.file 28 "<built-in>"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:18     .text.SystemClock_Config:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:26     .text.SystemClock_Config:0000000000000000 SystemClock_Config
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:137    .text.TIMER_Update:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:144    .text.TIMER_Update:0000000000000000 TIMER_Update
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:219    .text.TIMER_Update:0000000000000040 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:226    .text.main:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:233    .text.main:0000000000000000 main
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:368    .text.main:000000000000009c $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:375    .text.SysTick_Handler:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:382    .text.SysTick_Handler:0000000000000000 SysTick_Handler
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:427    .text.SysTick_Handler:0000000000000030 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:434    .text.TIM6_DAC1_IRQHandler:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:441    .text.TIM6_DAC1_IRQHandler:0000000000000000 TIM6_DAC1_IRQHandler
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:522    .text.TIM6_DAC1_IRQHandler:0000000000000068 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:530    .text.Error_Handler:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:537    .text.Error_Handler:0000000000000000 Error_Handler
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:554    .bss.timerupdate:0000000000000000 timerupdate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s:555    .bss.timerupdate:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_RCCEx_PeriphCLKConfig
+Digital_TimerUpdate
+Analog_TimerUpdate
+digital
+analog
+HAL_Init
+Config_FlashResetAppBit
+MX_GPIO_Init
+MX_DMA_Init
+MX_SPI2_Init
+MX_TIM3_Init
+MX_TIM4_Init
+MX_USB_DEVICE_Init
+MX_TIM6_Init
+DAC_Init
+LED_Init
+Digital_Init
+Analog_Init
+Config_Init
+HAL_TIM_Base_Start_IT
+Config_Empty
+LED_Update
+RingbufferPop
+MIDI_InputMessage
+LED_ChangeMode
+Config_Configure
+htim6
+hUsbDeviceFS
+midibuffer
+HAL_IncTick
+ledupdatecounter
+ledupdate
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccR8CA6C.s 			page 18
+
+
+Analog_CycleValue
+DAC_Send
+dac

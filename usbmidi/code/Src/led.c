@@ -5,6 +5,14 @@
 #include "digital.h"
 #include "configuration.h"
 
+bool ledupdate;
+uint8_t ledupdatecounter;
+Led_t leds[kNUMBER_OF_LEDS];
+
+LED_ModeEnum ledmode;
+uint16_t ledtimeout;
+
+
 void LED_Init() {
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);

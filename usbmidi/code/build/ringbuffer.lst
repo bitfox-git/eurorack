@@ -1,0 +1,290 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"ringbuffer.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.RingbufferPop,"ax",%progbits
+  18              		.align	1
+  19              		.global	RingbufferPop
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	RingbufferPop:
+  27              	.LVL0:
+  28              	.LFB0:
+  29              		.file 1 "Src/ringbuffer.c"
+   1:Src/ringbuffer.c **** /* Functional Description: Generic ring buffer library for deeply
+   2:Src/ringbuffer.c ****    embedded system. See the unit tests for usage examples. */
+   3:Src/ringbuffer.c **** 
+   4:Src/ringbuffer.c **** #include "ringbuffer.h"
+   5:Src/ringbuffer.c **** #include "stm32f3xx_it.h"
+   6:Src/ringbuffer.c **** 
+   7:Src/ringbuffer.c **** RingBuffer_t midibuffer;
+   8:Src/ringbuffer.c **** 
+   9:Src/ringbuffer.c **** bool RingbufferPop(RingBuffer_t *b, uint32_t *data) {
+  30              		.loc 1 9 53 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              		.loc 1 9 53 is_stmt 0 view .LVU1
+  36 0000 0346     		mov	r3, r0
+  10:Src/ringbuffer.c ****   if(!(!b->full && (b->head == b->tail))) { // Check if Ringbuffer is empty 
+  37              		.loc 1 10 3 is_stmt 1 view .LVU2
+  38              		.loc 1 10 10 is_stmt 0 view .LVU3
+  39 0002 00F58042 		add	r2, r0, #16384
+  40 0006 9079     		ldrb	r0, [r2, #6]	@ zero_extendqisi2
+  41              	.LVL1:
+  42              		.loc 1 10 5 view .LVU4
+  43 0008 20B9     		cbnz	r0, .L2
+  44              		.loc 1 10 22 discriminator 1 view .LVU5
+  45 000a B2F802C0 		ldrh	ip, [r2, #2]
+  46              		.loc 1 10 33 discriminator 1 view .LVU6
+  47 000e 1288     		ldrh	r2, [r2]
+  48              		.loc 1 10 6 discriminator 1 view .LVU7
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 2
+
+
+  49 0010 9445     		cmp	ip, r2
+  50 0012 0FD0     		beq	.L3
+  51              	.L2:
+  11:Src/ringbuffer.c ****     *data = b->data[b->tail];
+  52              		.loc 1 11 5 is_stmt 1 view .LVU8
+  53              		.loc 1 11 22 is_stmt 0 view .LVU9
+  54 0014 03F58042 		add	r2, r3, #16384
+  55 0018 1088     		ldrh	r0, [r2]
+  56              		.loc 1 11 20 view .LVU10
+  57 001a 53F82030 		ldr	r3, [r3, r0, lsl #2]
+  58              	.LVL2:
+  59              		.loc 1 11 11 view .LVU11
+  60 001e 0B60     		str	r3, [r1]
+  12:Src/ringbuffer.c ****     b->full = false;
+  61              		.loc 1 12 5 is_stmt 1 view .LVU12
+  62              		.loc 1 12 13 is_stmt 0 view .LVU13
+  63 0020 0023     		movs	r3, #0
+  64 0022 9371     		strb	r3, [r2, #6]
+  13:Src/ringbuffer.c ****     b->tail++;
+  65              		.loc 1 13 5 is_stmt 1 view .LVU14
+  66              		.loc 1 13 6 is_stmt 0 view .LVU15
+  67 0024 1388     		ldrh	r3, [r2]
+  68              		.loc 1 13 12 view .LVU16
+  69 0026 0133     		adds	r3, r3, #1
+  70 0028 9BB2     		uxth	r3, r3
+  71 002a 1380     		strh	r3, [r2]	@ movhi
+  14:Src/ringbuffer.c ****     b->tail %= RINGBUFFER_SIZE;
+  72              		.loc 1 14 5 is_stmt 1 view .LVU17
+  73              		.loc 1 14 13 is_stmt 0 view .LVU18
+  74 002c C3F30B03 		ubfx	r3, r3, #0, #12
+  75 0030 1380     		strh	r3, [r2]	@ movhi
+  15:Src/ringbuffer.c ****     return true;
+  76              		.loc 1 15 5 is_stmt 1 view .LVU19
+  77              		.loc 1 15 12 is_stmt 0 view .LVU20
+  78 0032 0120     		movs	r0, #1
+  79              	.LVL3:
+  80              	.L3:
+  16:Src/ringbuffer.c ****   } 
+  17:Src/ringbuffer.c ****   return false;
+  18:Src/ringbuffer.c **** }
+  81              		.loc 1 18 1 view .LVU21
+  82 0034 7047     		bx	lr
+  83              		.cfi_endproc
+  84              	.LFE0:
+  86              		.section	.text.RingbufferPut,"ax",%progbits
+  87              		.align	1
+  88              		.global	RingbufferPut
+  89              		.syntax unified
+  90              		.thumb
+  91              		.thumb_func
+  92              		.fpu fpv4-sp-d16
+  94              	RingbufferPut:
+  95              	.LVL4:
+  96              	.LFB1:
+  19:Src/ringbuffer.c **** 
+  20:Src/ringbuffer.c **** void RingbufferPut(RingBuffer_t *b, uint32_t const *data_element) {       
+  97              		.loc 1 20 67 is_stmt 1 view -0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 3
+
+
+  98              		.cfi_startproc
+  99              		@ args = 0, pretend = 0, frame = 0
+ 100              		@ frame_needed = 0, uses_anonymous_args = 0
+ 101              		@ link register save eliminated.
+  21:Src/ringbuffer.c ****   if(b->full) {
+ 102              		.loc 1 21 3 view .LVU23
+ 103              		.loc 1 21 7 is_stmt 0 view .LVU24
+ 104 0000 00F58043 		add	r3, r0, #16384
+ 105 0004 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 106              		.loc 1 21 5 view .LVU25
+ 107 0006 8BB9     		cbnz	r3, .L4
+  22:Src/ringbuffer.c ****     return;
+  23:Src/ringbuffer.c **** 		// b->tail++;
+  24:Src/ringbuffer.c **** 	}
+  25:Src/ringbuffer.c ****   b->data[b->head] = *data_element;
+ 108              		.loc 1 25 3 is_stmt 1 view .LVU26
+ 109              		.loc 1 25 12 is_stmt 0 view .LVU27
+ 110 0008 00F58042 		add	r2, r0, #16384
+ 111 000c 5388     		ldrh	r3, [r2, #2]
+ 112              		.loc 1 25 22 view .LVU28
+ 113 000e 0968     		ldr	r1, [r1]
+ 114              	.LVL5:
+ 115              		.loc 1 25 20 view .LVU29
+ 116 0010 40F82310 		str	r1, [r0, r3, lsl #2]
+  26:Src/ringbuffer.c **** 	b->head++;
+ 117              		.loc 1 26 2 is_stmt 1 view .LVU30
+ 118              		.loc 1 26 9 is_stmt 0 view .LVU31
+ 119 0014 0133     		adds	r3, r3, #1
+ 120 0016 9BB2     		uxth	r3, r3
+ 121 0018 5380     		strh	r3, [r2, #2]	@ movhi
+  27:Src/ringbuffer.c ****   b->head %= RINGBUFFER_SIZE;
+ 122              		.loc 1 27 3 is_stmt 1 view .LVU32
+ 123              		.loc 1 27 11 is_stmt 0 view .LVU33
+ 124 001a C3F30B03 		ubfx	r3, r3, #0, #12
+ 125 001e 5380     		strh	r3, [r2, #2]	@ movhi
+  28:Src/ringbuffer.c **** 	b->full = (b->head == b->tail);
+ 126              		.loc 1 28 2 is_stmt 1 view .LVU34
+ 127              		.loc 1 28 25 is_stmt 0 view .LVU35
+ 128 0020 1188     		ldrh	r1, [r2]
+ 129              		.loc 1 28 21 view .LVU36
+ 130 0022 8B42     		cmp	r3, r1
+ 131 0024 14BF     		ite	ne
+ 132 0026 0023     		movne	r3, #0
+ 133 0028 0123     		moveq	r3, #1
+ 134              		.loc 1 28 10 view .LVU37
+ 135 002a 9371     		strb	r3, [r2, #6]
+ 136              	.L4:
+  29:Src/ringbuffer.c **** }
+ 137              		.loc 1 29 1 view .LVU38
+ 138 002c 7047     		bx	lr
+ 139              		.cfi_endproc
+ 140              	.LFE1:
+ 142              		.section	.text.RingbufferInit,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	RingbufferInit
+ 145              		.syntax unified
+ 146              		.thumb
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 4
+
+
+ 147              		.thumb_func
+ 148              		.fpu fpv4-sp-d16
+ 150              	RingbufferInit:
+ 151              	.LVL6:
+ 152              	.LFB2:
+  30:Src/ringbuffer.c **** 
+  31:Src/ringbuffer.c **** void RingbufferInit(RingBuffer_t *b) {
+ 153              		.loc 1 31 38 is_stmt 1 view -0
+ 154              		.cfi_startproc
+ 155              		@ args = 0, pretend = 0, frame = 0
+ 156              		@ frame_needed = 0, uses_anonymous_args = 0
+ 157              		@ link register save eliminated.
+  32:Src/ringbuffer.c ****     if (b) {
+ 158              		.loc 1 32 5 view .LVU40
+ 159              		.loc 1 32 8 is_stmt 0 view .LVU41
+ 160 0000 0146     		mov	r1, r0
+ 161 0002 78B1     		cbz	r0, .L6
+  33:Src/ringbuffer.c ****         b->head = 0;
+ 162              		.loc 1 33 9 is_stmt 1 view .LVU42
+ 163              		.loc 1 33 17 is_stmt 0 view .LVU43
+ 164 0004 00F58042 		add	r2, r0, #16384
+ 165 0008 0023     		movs	r3, #0
+ 166 000a 5380     		strh	r3, [r2, #2]	@ movhi
+  34:Src/ringbuffer.c ****         b->tail = 0;
+ 167              		.loc 1 34 9 is_stmt 1 view .LVU44
+ 168              		.loc 1 34 17 is_stmt 0 view .LVU45
+ 169 000c 1380     		strh	r3, [r2]	@ movhi
+  35:Src/ringbuffer.c ****         b->max = RINGBUFFER_SIZE;
+ 170              		.loc 1 35 9 is_stmt 1 view .LVU46
+ 171              		.loc 1 35 16 is_stmt 0 view .LVU47
+ 172 000e 4FF48050 		mov	r0, #4096
+ 173              	.LVL7:
+ 174              		.loc 1 35 16 view .LVU48
+ 175 0012 9080     		strh	r0, [r2, #4]	@ movhi
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ 176              		.loc 1 36 9 is_stmt 1 view .LVU49
+ 177              	.LBB2:
+ 178              		.loc 1 36 14 view .LVU50
+ 179              	.LVL8:
+ 180              		.loc 1 36 9 is_stmt 0 view .LVU51
+ 181 0014 03E0     		b	.L8
+ 182              	.LVL9:
+ 183              	.L9:
+  37:Src/ringbuffer.c ****         {
+  38:Src/ringbuffer.c ****           b->data[i] = 0x00000000;
+ 184              		.loc 1 38 11 is_stmt 1 discriminator 3 view .LVU52
+ 185              		.loc 1 38 22 is_stmt 0 discriminator 3 view .LVU53
+ 186 0016 0022     		movs	r2, #0
+ 187 0018 41F82320 		str	r2, [r1, r3, lsl #2]
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ 188              		.loc 1 36 51 is_stmt 1 discriminator 3 view .LVU54
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ 189              		.loc 1 36 52 is_stmt 0 discriminator 3 view .LVU55
+ 190 001c 0133     		adds	r3, r3, #1
+ 191              	.LVL10:
+ 192              	.L8:
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 5
+
+
+ 193              		.loc 1 36 30 is_stmt 1 discriminator 1 view .LVU56
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ 194              		.loc 1 36 9 is_stmt 0 discriminator 1 view .LVU57
+ 195 001e B3F5805F 		cmp	r3, #4096
+ 196 0022 F8D3     		bcc	.L9
+ 197              	.LVL11:
+ 198              	.L6:
+  36:Src/ringbuffer.c ****         for (uint32_t i = 0; i < RINGBUFFER_SIZE; i++)
+ 199              		.loc 1 36 9 discriminator 1 view .LVU58
+ 200              	.LBE2:
+  39:Src/ringbuffer.c ****         }
+  40:Src/ringbuffer.c ****     }
+  41:Src/ringbuffer.c ****     return;
+  42:Src/ringbuffer.c **** }...
+ 201              		.loc 1 42 1 view .LVU59
+ 202 0024 7047     		bx	lr
+ 203              		.cfi_endproc
+ 204              	.LFE2:
+ 206              		.global	midibuffer
+ 207              		.section	.bss.midibuffer,"aw",%nobits
+ 208              		.align	2
+ 211              	midibuffer:
+ 212 0000 00000000 		.space	16392
+ 212      00000000 
+ 212      00000000 
+ 212      00000000 
+ 212      00000000 
+ 213              		.text
+ 214              	.Letext0:
+ 215              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 216              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 217              		.file 4 "Inc/ringbuffer.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ringbuffer.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:18     .text.RingbufferPop:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:26     .text.RingbufferPop:0000000000000000 RingbufferPop
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:87     .text.RingbufferPut:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:94     .text.RingbufferPut:0000000000000000 RingbufferPut
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:143    .text.RingbufferInit:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:150    .text.RingbufferInit:0000000000000000 RingbufferInit
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:211    .bss.midibuffer:0000000000000000 midibuffer
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccLMilCo.s:208    .bss.midibuffer:0000000000000000 $d
+
+NO UNDEFINED SYMBOLS

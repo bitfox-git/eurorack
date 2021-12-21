@@ -8,7 +8,7 @@
 #include "usbd_midi_if.h"
 #include "led.h"
 
-#define kFIRMWARE_VERSION 0x01
+#define kFIRMWARE_VERSION 0x02
 
 // Private Variables
 //Sysex

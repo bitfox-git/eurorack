@@ -19,7 +19,7 @@ typedef struct {
 
 } RingBuffer_t;
 
-RingBuffer_t midibuffer;
+extern RingBuffer_t midibuffer;
 
 bool RingbufferPop(RingBuffer_t *b, uint32_t *data);
 void RingbufferPut(RingBuffer_t * b, uint32_t const *data);

@@ -16,7 +16,7 @@ typedef struct {
   uint8_t id;
 } Poly_t;
 
-Poly_t poly[2];
+extern Poly_t poly[2];
 
 void Poly_Init();
 

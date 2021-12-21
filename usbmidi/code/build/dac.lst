@@ -1,0 +1,789 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"dac.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.DAC_Calibrate,"ax",%progbits
+  18              		.align	1
+  19              		.global	DAC_Calibrate
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	DAC_Calibrate:
+  27              	.LFB127:
+  28              		.file 1 "Src/dac.c"
+   1:Src/dac.c     **** #include "dac.h"
+   2:Src/dac.c     **** #include "stm32f3xx_hal.h"
+   3:Src/dac.c     **** #include "stm32f3xx_hal_spi.h"
+   4:Src/dac.c     **** #include "spi.h"
+   5:Src/dac.c     **** #include "configuration.h"
+   6:Src/dac.c     **** 
+   7:Src/dac.c     **** typedef enum CalibrationStatus{Init=0,Uncalibrated, Calibrated}; // Maybe not needed ?
+   8:Src/dac.c     **** 
+   9:Src/dac.c     **** DAC_t dac;
+  10:Src/dac.c     **** 
+  11:Src/dac.c     **** const uint8_t channellookup[4] = {
+  12:Src/dac.c     ****   0b00010000,
+  13:Src/dac.c     ****   0b00010010,
+  14:Src/dac.c     ****   0b00010100,
+  15:Src/dac.c     ****   0b00010110,
+  16:Src/dac.c     **** };
+  17:Src/dac.c     **** 
+  18:Src/dac.c     **** void DAC_Init() {
+  19:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+  20:Src/dac.c     ****   dac.status = Init;
+  21:Src/dac.c     ****   if(Config_ReadCalibrate() == false) {
+  22:Src/dac.c     ****     dac.status = Uncalibrated;
+  23:Src/dac.c     ****   } else {
+  24:Src/dac.c     ****     dac.status = Calibrated;
+  25:Src/dac.c     ****   }
+  26:Src/dac.c     **** 
+  27:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,GPIO_PIN_RESET);
+  28:Src/dac.c     ****   DAC_Calibrate();
+  29:Src/dac.c     ****   __HAL_SPI_ENABLE(&hspi2);
+  30:Src/dac.c     ****   DAC_InsertValue(0,0);
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 2
+
+
+  31:Src/dac.c     ****   DAC_InsertValue(0,1);
+  32:Src/dac.c     ****   DAC_InsertValue(0,2);
+  33:Src/dac.c     ****   DAC_InsertValue(0,3);
+  34:Src/dac.c     ****   dac.current = 0;
+  35:Src/dac.c     **** }
+  36:Src/dac.c     **** 
+  37:Src/dac.c     **** void DAC_Calibrate() {
+  29              		.loc 1 37 22 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  38:Src/dac.c     ****   uint16_t totalsteps = kDAC_CALIB_HIGH - kDAC_CALIB_LOW; 
+  34              		.loc 1 38 3 view .LVU1
+  35              	.LVL0:
+  39:Src/dac.c     ****   for (uint8_t i = 0; i < kANALOGOUTPUTS; i++) {
+  36              		.loc 1 39 3 view .LVU2
+  37              	.LBB2:
+  38              		.loc 1 39 8 view .LVU3
+  39              		.loc 1 39 16 is_stmt 0 view .LVU4
+  40 0000 0023     		movs	r3, #0
+  41              		.loc 1 39 3 view .LVU5
+  42 0002 25E0     		b	.L2
+  43              	.LVL1:
+  44              	.L3:
+  45              	.LBB3:
+  40:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  46              		.loc 1 40 5 is_stmt 1 discriminator 3 view .LVU6
+  47              		.loc 1 40 48 is_stmt 0 discriminator 3 view .LVU7
+  48 0004 144A     		ldr	r2, .L4
+  49 0006 991D     		adds	r1, r3, #6
+  50 0008 02EB8101 		add	r1, r2, r1, lsl #2
+  51 000c 91ED017A 		vldr.32	s14, [r1, #4]
+  52              		.loc 1 40 66 discriminator 3 view .LVU8
+  53 0010 03F10A01 		add	r1, r3, #10
+  54 0014 02EB8101 		add	r1, r2, r1, lsl #2
+  55 0018 D1ED017A 		vldr.32	s15, [r1, #4]
+  56              		.loc 1 40 52 discriminator 3 view .LVU9
+  57 001c 37EE677A 		vsub.f32	s14, s14, s15
+  58              		.loc 1 40 11 discriminator 3 view .LVU10
+  59 0020 9FED0E6A 		vldr.32	s12, .L4+4
+  60 0024 C6EE076A 		vdiv.f32	s13, s12, s14
+  61              	.LVL2:
+  41:Src/dac.c     ****     float tempoffset = (kDAC_CALIB_HIGH / tempscale) + dac.volthigh[i];
+  62              		.loc 1 41 5 is_stmt 1 discriminator 3 view .LVU11
+  63              		.loc 1 41 41 is_stmt 0 discriminator 3 view .LVU12
+  64 0028 9FED0D6A 		vldr.32	s12, .L4+8
+  65 002c 86EE267A 		vdiv.f32	s14, s12, s13
+  66              		.loc 1 41 11 discriminator 3 view .LVU13
+  67 0030 77EE877A 		vadd.f32	s15, s15, s14
+  68              	.LVL3:
+  42:Src/dac.c     ****     dac.caliboffset[i] = tempoffset;
+  69              		.loc 1 42 5 is_stmt 1 discriminator 3 view .LVU14
+  70              		.loc 1 42 24 is_stmt 0 discriminator 3 view .LVU15
+  71 0034 03F11201 		add	r1, r3, #18
+  72 0038 02EB8101 		add	r1, r2, r1, lsl #2
+  73 003c C1ED017A 		vstr.32	s15, [r1, #4]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 3
+
+
+  43:Src/dac.c     ****     dac.calibscale[i] = tempscale;
+  74              		.loc 1 43 5 is_stmt 1 discriminator 3 view .LVU16
+  75              		.loc 1 43 23 is_stmt 0 discriminator 3 view .LVU17
+  76 0040 03F10E01 		add	r1, r3, #14
+  77 0044 02EB8102 		add	r2, r2, r1, lsl #2
+  78 0048 C2ED016A 		vstr.32	s13, [r2, #4]
+  79              	.LBE3:
+  39:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  80              		.loc 1 39 43 is_stmt 1 discriminator 3 view .LVU18
+  39:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  81              		.loc 1 39 44 is_stmt 0 discriminator 3 view .LVU19
+  82 004c 0133     		adds	r3, r3, #1
+  83              	.LVL4:
+  39:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  84              		.loc 1 39 44 discriminator 3 view .LVU20
+  85 004e DBB2     		uxtb	r3, r3
+  86              	.LVL5:
+  87              	.L2:
+  39:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  88              		.loc 1 39 23 is_stmt 1 discriminator 1 view .LVU21
+  39:Src/dac.c     ****     float tempscale = totalsteps / (dac.voltlow[i] - dac.volthigh[i]);
+  89              		.loc 1 39 3 is_stmt 0 discriminator 1 view .LVU22
+  90 0050 032B     		cmp	r3, #3
+  91 0052 D7D9     		bls	.L3
+  92              	.LBE2:
+  44:Src/dac.c     ****   }
+  45:Src/dac.c     **** }
+  93              		.loc 1 45 1 view .LVU23
+  94 0054 7047     		bx	lr
+  95              	.L5:
+  96 0056 00BF     		.align	2
+  97              	.L4:
+  98 0058 00000000 		.word	.LANCHOR0
+  99 005c 00305D46 		.word	1180512256
+ 100 0060 000A1747 		.word	1192692224
+ 101              		.cfi_endproc
+ 102              	.LFE127:
+ 104              		.section	.text.DAC_InsertValue,"ax",%progbits
+ 105              		.align	1
+ 106              		.global	DAC_InsertValue
+ 107              		.syntax unified
+ 108              		.thumb
+ 109              		.thumb_func
+ 110              		.fpu fpv4-sp-d16
+ 112              	DAC_InsertValue:
+ 113              	.LVL6:
+ 114              	.LFB128:
+  46:Src/dac.c     **** 
+  47:Src/dac.c     **** void DAC_InsertValue(const float value, const uint8_t channel) {
+ 115              		.loc 1 47 64 is_stmt 1 view -0
+ 116              		.cfi_startproc
+ 117              		@ args = 0, pretend = 0, frame = 0
+ 118              		@ frame_needed = 0, uses_anonymous_args = 0
+ 119              		@ link register save eliminated.
+  48:Src/dac.c     ****   dac.floatvalues[channel] = value;
+ 120              		.loc 1 48 3 view .LVU25
+ 121              		.loc 1 48 28 is_stmt 0 view .LVU26
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 4
+
+
+ 122 0000 134B     		ldr	r3, .L10
+ 123 0002 821C     		adds	r2, r0, #2
+ 124 0004 03EB8202 		add	r2, r3, r2, lsl #2
+ 125 0008 82ED000A 		vstr.32	s0, [r2]
+  49:Src/dac.c     ****   int compare = (int)((dac.caliboffset[channel] - value) * dac.calibscale[channel]);
+ 126              		.loc 1 49 3 is_stmt 1 view .LVU27
+ 127              		.loc 1 49 39 is_stmt 0 view .LVU28
+ 128 000c 00F11202 		add	r2, r0, #18
+ 129 0010 03EB8202 		add	r2, r3, r2, lsl #2
+ 130 0014 D2ED017A 		vldr.32	s15, [r2, #4]
+ 131              		.loc 1 49 49 view .LVU29
+ 132 0018 37EEC00A 		vsub.f32	s0, s15, s0
+ 133              	.LVL7:
+ 134              		.loc 1 49 74 view .LVU30
+ 135 001c 00F10E02 		add	r2, r0, #14
+ 136 0020 03EB8203 		add	r3, r3, r2, lsl #2
+ 137              	.LVL8:
+ 138              		.loc 1 49 74 view .LVU31
+ 139 0024 D3ED017A 		vldr.32	s15, [r3, #4]
+ 140              		.loc 1 49 58 view .LVU32
+ 141 0028 20EE270A 		vmul.f32	s0, s0, s15
+ 142              		.loc 1 49 7 view .LVU33
+ 143 002c FDEEC07A 		vcvt.s32.f32	s15, s0
+ 144 0030 17EE903A 		vmov	r3, s15	@ int
+ 145              	.LVL9:
+  50:Src/dac.c     ****   if(compare < 0) {
+ 146              		.loc 1 50 3 is_stmt 1 view .LVU34
+ 147              		.loc 1 50 5 is_stmt 0 view .LVU35
+ 148 0034 002B     		cmp	r3, #0
+ 149 0036 05DB     		blt	.L8
+  51:Src/dac.c     ****     compare = 0;
+  52:Src/dac.c     ****   } else if (compare > 65535) {
+ 150              		.loc 1 52 10 is_stmt 1 view .LVU36
+ 151              		.loc 1 52 13 is_stmt 0 view .LVU37
+ 152 0038 B3F5803F 		cmp	r3, #65536
+ 153 003c 03DB     		blt	.L7
+  53:Src/dac.c     ****     compare = 65535;
+ 154              		.loc 1 53 13 view .LVU38
+ 155 003e 4FF6FF73 		movw	r3, #65535
+ 156              	.LVL10:
+ 157              		.loc 1 53 13 view .LVU39
+ 158 0042 00E0     		b	.L7
+ 159              	.LVL11:
+ 160              	.L8:
+  51:Src/dac.c     ****     compare = 0;
+ 161              		.loc 1 51 13 view .LVU40
+ 162 0044 0023     		movs	r3, #0
+ 163              	.LVL12:
+ 164              	.L7:
+  54:Src/dac.c     ****   }
+  55:Src/dac.c     ****   dac.values[channel] = compare;
+ 165              		.loc 1 55 3 is_stmt 1 view .LVU41
+ 166              		.loc 1 55 23 is_stmt 0 view .LVU42
+ 167 0046 024A     		ldr	r2, .L10
+ 168              	.LVL13:
+ 169              		.loc 1 55 23 view .LVU43
+ 170 0048 22F81030 		strh	r3, [r2, r0, lsl #1]	@ movhi
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 5
+
+
+  56:Src/dac.c     **** }
+ 171              		.loc 1 56 1 view .LVU44
+ 172 004c 7047     		bx	lr
+ 173              	.L11:
+ 174 004e 00BF     		.align	2
+ 175              	.L10:
+ 176 0050 00000000 		.word	.LANCHOR0
+ 177              		.cfi_endproc
+ 178              	.LFE128:
+ 180              		.section	.text.DAC_Init,"ax",%progbits
+ 181              		.align	1
+ 182              		.global	DAC_Init
+ 183              		.syntax unified
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.fpu fpv4-sp-d16
+ 188              	DAC_Init:
+ 189              	.LFB126:
+  18:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+ 190              		.loc 1 18 17 is_stmt 1 view -0
+ 191              		.cfi_startproc
+ 192              		@ args = 0, pretend = 0, frame = 0
+ 193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 194 0000 08B5     		push	{r3, lr}
+ 195              	.LCFI0:
+ 196              		.cfi_def_cfa_offset 8
+ 197              		.cfi_offset 3, -8
+ 198              		.cfi_offset 14, -4
+ 199 0002 2DED028B 		vpush.64	{d8}
+ 200              	.LCFI1:
+ 201              		.cfi_def_cfa_offset 16
+ 202              		.cfi_offset 80, -16
+ 203              		.cfi_offset 81, -12
+  19:Src/dac.c     ****   dac.status = Init;
+ 204              		.loc 1 19 3 view .LVU46
+ 205 0006 0122     		movs	r2, #1
+ 206 0008 4FF48071 		mov	r1, #256
+ 207 000c 4FF09040 		mov	r0, #1207959552
+ 208 0010 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 209              	.LVL14:
+  20:Src/dac.c     ****   if(Config_ReadCalibrate() == false) {
+ 210              		.loc 1 20 3 view .LVU47
+  20:Src/dac.c     ****   if(Config_ReadCalibrate() == false) {
+ 211              		.loc 1 20 14 is_stmt 0 view .LVU48
+ 212 0014 1B4B     		ldr	r3, .L16
+ 213 0016 0022     		movs	r2, #0
+ 214 0018 1A76     		strb	r2, [r3, #24]
+  21:Src/dac.c     ****     dac.status = Uncalibrated;
+ 215              		.loc 1 21 3 is_stmt 1 view .LVU49
+  21:Src/dac.c     ****     dac.status = Uncalibrated;
+ 216              		.loc 1 21 6 is_stmt 0 view .LVU50
+ 217 001a FFF7FEFF 		bl	Config_ReadCalibrate
+ 218              	.LVL15:
+  21:Src/dac.c     ****     dac.status = Uncalibrated;
+ 219              		.loc 1 21 5 view .LVU51
+ 220 001e 68BB     		cbnz	r0, .L13
+  22:Src/dac.c     ****   } else {
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 6
+
+
+ 221              		.loc 1 22 5 is_stmt 1 view .LVU52
+  22:Src/dac.c     ****   } else {
+ 222              		.loc 1 22 16 is_stmt 0 view .LVU53
+ 223 0020 184B     		ldr	r3, .L16
+ 224 0022 0122     		movs	r2, #1
+ 225 0024 1A76     		strb	r2, [r3, #24]
+ 226              	.L14:
+  27:Src/dac.c     ****   DAC_Calibrate();
+ 227              		.loc 1 27 3 is_stmt 1 view .LVU54
+ 228 0026 0022     		movs	r2, #0
+ 229 0028 4FF48041 		mov	r1, #16384
+ 230 002c 1648     		ldr	r0, .L16+4
+ 231 002e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 232              	.LVL16:
+  28:Src/dac.c     ****   __HAL_SPI_ENABLE(&hspi2);
+ 233              		.loc 1 28 3 view .LVU55
+ 234 0032 FFF7FEFF 		bl	DAC_Calibrate
+ 235              	.LVL17:
+  29:Src/dac.c     ****   DAC_InsertValue(0,0);
+ 236              		.loc 1 29 3 view .LVU56
+ 237 0036 154B     		ldr	r3, .L16+8
+ 238 0038 1A68     		ldr	r2, [r3]
+ 239 003a 1368     		ldr	r3, [r2]
+ 240 003c 43F04003 		orr	r3, r3, #64
+ 241 0040 1360     		str	r3, [r2]
+  30:Src/dac.c     ****   DAC_InsertValue(0,1);
+ 242              		.loc 1 30 3 view .LVU57
+ 243 0042 9FED138A 		vldr.32	s16, .L16+12
+ 244 0046 0020     		movs	r0, #0
+ 245 0048 B0EE480A 		vmov.f32	s0, s16
+ 246 004c FFF7FEFF 		bl	DAC_InsertValue
+ 247              	.LVL18:
+  31:Src/dac.c     ****   DAC_InsertValue(0,2);
+ 248              		.loc 1 31 3 view .LVU58
+ 249 0050 0120     		movs	r0, #1
+ 250 0052 B0EE480A 		vmov.f32	s0, s16
+ 251 0056 FFF7FEFF 		bl	DAC_InsertValue
+ 252              	.LVL19:
+  32:Src/dac.c     ****   DAC_InsertValue(0,3);
+ 253              		.loc 1 32 3 view .LVU59
+ 254 005a 0220     		movs	r0, #2
+ 255 005c B0EE480A 		vmov.f32	s0, s16
+ 256 0060 FFF7FEFF 		bl	DAC_InsertValue
+ 257              	.LVL20:
+  33:Src/dac.c     ****   dac.current = 0;
+ 258              		.loc 1 33 3 view .LVU60
+ 259 0064 0320     		movs	r0, #3
+ 260 0066 B0EE480A 		vmov.f32	s0, s16
+ 261 006a FFF7FEFF 		bl	DAC_InsertValue
+ 262              	.LVL21:
+  34:Src/dac.c     **** }
+ 263              		.loc 1 34 3 view .LVU61
+  34:Src/dac.c     **** }
+ 264              		.loc 1 34 15 is_stmt 0 view .LVU62
+ 265 006e 054B     		ldr	r3, .L16
+ 266 0070 0022     		movs	r2, #0
+ 267 0072 83F85C20 		strb	r2, [r3, #92]
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 7
+
+
+  35:Src/dac.c     **** 
+ 268              		.loc 1 35 1 view .LVU63
+ 269 0076 BDEC028B 		vldm	sp!, {d8}
+ 270              	.LCFI2:
+ 271              		.cfi_remember_state
+ 272              		.cfi_restore 80
+ 273              		.cfi_restore 81
+ 274              		.cfi_def_cfa_offset 8
+ 275 007a 08BD     		pop	{r3, pc}
+ 276              	.L13:
+ 277              	.LCFI3:
+ 278              		.cfi_restore_state
+  24:Src/dac.c     ****   }
+ 279              		.loc 1 24 5 is_stmt 1 view .LVU64
+  24:Src/dac.c     ****   }
+ 280              		.loc 1 24 16 is_stmt 0 view .LVU65
+ 281 007c 014B     		ldr	r3, .L16
+ 282 007e 0222     		movs	r2, #2
+ 283 0080 1A76     		strb	r2, [r3, #24]
+ 284 0082 D0E7     		b	.L14
+ 285              	.L17:
+ 286              		.align	2
+ 287              	.L16:
+ 288 0084 00000000 		.word	.LANCHOR0
+ 289 0088 00040048 		.word	1207960576
+ 290 008c 00000000 		.word	hspi2
+ 291 0090 00000000 		.word	0
+ 292              		.cfi_endproc
+ 293              	.LFE126:
+ 295              		.section	.text.DAC_GetValue,"ax",%progbits
+ 296              		.align	1
+ 297              		.global	DAC_GetValue
+ 298              		.syntax unified
+ 299              		.thumb
+ 300              		.thumb_func
+ 301              		.fpu fpv4-sp-d16
+ 303              	DAC_GetValue:
+ 304              	.LVL22:
+ 305              	.LFB129:
+  57:Src/dac.c     **** 
+  58:Src/dac.c     **** uint16_t DAC_GetValue(const float value, const uint8_t channel) {
+ 306              		.loc 1 58 65 is_stmt 1 view -0
+ 307              		.cfi_startproc
+ 308              		@ args = 0, pretend = 0, frame = 0
+ 309              		@ frame_needed = 0, uses_anonymous_args = 0
+ 310              		@ link register save eliminated.
+  59:Src/dac.c     ****   dac.floatvalues[channel] = value;
+ 311              		.loc 1 59 3 view .LVU67
+ 312              		.loc 1 59 28 is_stmt 0 view .LVU68
+ 313 0000 114B     		ldr	r3, .L22
+ 314 0002 821C     		adds	r2, r0, #2
+ 315 0004 03EB8202 		add	r2, r3, r2, lsl #2
+ 316 0008 82ED000A 		vstr.32	s0, [r2]
+  60:Src/dac.c     ****   int compare = (int)((dac.caliboffset[channel] - value) * dac.calibscale[channel]);
+ 317              		.loc 1 60 3 is_stmt 1 view .LVU69
+ 318              		.loc 1 60 39 is_stmt 0 view .LVU70
+ 319 000c 00F11202 		add	r2, r0, #18
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 8
+
+
+ 320 0010 03EB8202 		add	r2, r3, r2, lsl #2
+ 321 0014 D2ED017A 		vldr.32	s15, [r2, #4]
+ 322              		.loc 1 60 49 view .LVU71
+ 323 0018 37EEC00A 		vsub.f32	s0, s15, s0
+ 324              	.LVL23:
+ 325              		.loc 1 60 74 view .LVU72
+ 326 001c 0E30     		adds	r0, r0, #14
+ 327              	.LVL24:
+ 328              		.loc 1 60 74 view .LVU73
+ 329 001e 03EB8000 		add	r0, r3, r0, lsl #2
+ 330              	.LVL25:
+ 331              		.loc 1 60 74 view .LVU74
+ 332 0022 D0ED017A 		vldr.32	s15, [r0, #4]
+ 333              		.loc 1 60 58 view .LVU75
+ 334 0026 20EE270A 		vmul.f32	s0, s0, s15
+ 335              		.loc 1 60 7 view .LVU76
+ 336 002a FDEEC07A 		vcvt.s32.f32	s15, s0
+ 337 002e 17EE900A 		vmov	r0, s15	@ int
+ 338              	.LVL26:
+  61:Src/dac.c     ****   if(compare < 0) {
+ 339              		.loc 1 61 3 is_stmt 1 view .LVU77
+ 340              		.loc 1 61 5 is_stmt 0 view .LVU78
+ 341 0032 0028     		cmp	r0, #0
+ 342 0034 05DB     		blt	.L20
+  62:Src/dac.c     ****     compare = 0;
+  63:Src/dac.c     ****   } else if (compare > 65535) {
+ 343              		.loc 1 63 10 is_stmt 1 view .LVU79
+ 344              		.loc 1 63 13 is_stmt 0 view .LVU80
+ 345 0036 B0F5803F 		cmp	r0, #65536
+ 346 003a 03DB     		blt	.L19
+  64:Src/dac.c     ****     compare = 65535;
+ 347              		.loc 1 64 13 view .LVU81
+ 348 003c 4FF6FF70 		movw	r0, #65535
+ 349              	.LVL27:
+ 350              		.loc 1 64 13 view .LVU82
+ 351 0040 00E0     		b	.L19
+ 352              	.LVL28:
+ 353              	.L20:
+  62:Src/dac.c     ****     compare = 0;
+ 354              		.loc 1 62 13 view .LVU83
+ 355 0042 0020     		movs	r0, #0
+ 356              	.LVL29:
+ 357              	.L19:
+  65:Src/dac.c     ****   }
+  66:Src/dac.c     ****   return (uint16_t)compare;
+ 358              		.loc 1 66 3 is_stmt 1 view .LVU84
+  67:Src/dac.c     **** }
+ 359              		.loc 1 67 1 is_stmt 0 view .LVU85
+ 360 0044 80B2     		uxth	r0, r0
+ 361              	.LVL30:
+ 362              		.loc 1 67 1 view .LVU86
+ 363 0046 7047     		bx	lr
+ 364              	.L23:
+ 365              		.align	2
+ 366              	.L22:
+ 367 0048 00000000 		.word	.LANCHOR0
+ 368              		.cfi_endproc
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 9
+
+
+ 369              	.LFE129:
+ 371              		.section	.text.DAC_Sendvalue,"ax",%progbits
+ 372              		.align	1
+ 373              		.global	DAC_Sendvalue
+ 374              		.syntax unified
+ 375              		.thumb
+ 376              		.thumb_func
+ 377              		.fpu fpv4-sp-d16
+ 379              	DAC_Sendvalue:
+ 380              	.LVL31:
+ 381              	.LFB130:
+  68:Src/dac.c     **** 
+  69:Src/dac.c     **** void DAC_Sendvalue(const uint16_t word, const uint8_t channel) {
+ 382              		.loc 1 69 64 is_stmt 1 view -0
+ 383              		.cfi_startproc
+ 384              		@ args = 0, pretend = 0, frame = 0
+ 385              		@ frame_needed = 0, uses_anonymous_args = 0
+ 386              		.loc 1 69 64 is_stmt 0 view .LVU88
+ 387 0000 38B5     		push	{r3, r4, r5, lr}
+ 388              	.LCFI4:
+ 389              		.cfi_def_cfa_offset 16
+ 390              		.cfi_offset 3, -16
+ 391              		.cfi_offset 4, -12
+ 392              		.cfi_offset 5, -8
+ 393              		.cfi_offset 14, -4
+ 394 0002 0446     		mov	r4, r0
+ 395 0004 0D46     		mov	r5, r1
+  70:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+ 396              		.loc 1 70 3 is_stmt 1 view .LVU89
+ 397 0006 0122     		movs	r2, #1
+ 398 0008 4FF48071 		mov	r1, #256
+ 399              	.LVL32:
+ 400              		.loc 1 70 3 is_stmt 0 view .LVU90
+ 401 000c 4FF09040 		mov	r0, #1207959552
+ 402              	.LVL33:
+ 403              		.loc 1 70 3 view .LVU91
+ 404 0010 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 405              	.LVL34:
+  71:Src/dac.c     ****   uint16_t part1 = channellookup[channel] << 8 | word >> 8;
+ 406              		.loc 1 71 3 is_stmt 1 view .LVU92
+ 407              		.loc 1 71 33 is_stmt 0 view .LVU93
+ 408 0014 084B     		ldr	r3, .L26
+ 409 0016 5B5D     		ldrb	r3, [r3, r5]	@ zero_extendqisi2
+ 410              		.loc 1 71 48 view .LVU94
+ 411 0018 250A     		lsrs	r5, r4, #8
+ 412              		.loc 1 71 12 view .LVU95
+ 413 001a 45EA0325 		orr	r5, r5, r3, lsl #8
+ 414              	.LVL35:
+  72:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_RESET);
+ 415              		.loc 1 72 3 is_stmt 1 view .LVU96
+ 416 001e 0022     		movs	r2, #0
+ 417 0020 4FF48071 		mov	r1, #256
+ 418 0024 4FF09040 		mov	r0, #1207959552
+ 419 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 420              	.LVL36:
+  73:Src/dac.c     ****   hspi2.Instance->DR = part1;
+ 421              		.loc 1 73 3 view .LVU97
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 10
+
+
+ 422              		.loc 1 73 8 is_stmt 0 view .LVU98
+ 423 002c 034B     		ldr	r3, .L26+4
+ 424 002e 1B68     		ldr	r3, [r3]
+ 425              		.loc 1 73 22 view .LVU99
+ 426 0030 DD60     		str	r5, [r3, #12]
+  74:Src/dac.c     ****   hspi2.Instance->DR = word << 8;
+ 427              		.loc 1 74 3 is_stmt 1 view .LVU100
+ 428              		.loc 1 74 29 is_stmt 0 view .LVU101
+ 429 0032 2402     		lsls	r4, r4, #8
+ 430              		.loc 1 74 22 view .LVU102
+ 431 0034 DC60     		str	r4, [r3, #12]
+  75:Src/dac.c     **** }
+ 432              		.loc 1 75 1 view .LVU103
+ 433 0036 38BD     		pop	{r3, r4, r5, pc}
+ 434              	.LVL37:
+ 435              	.L27:
+ 436              		.loc 1 75 1 view .LVU104
+ 437              		.align	2
+ 438              	.L26:
+ 439 0038 00000000 		.word	.LANCHOR1
+ 440 003c 00000000 		.word	hspi2
+ 441              		.cfi_endproc
+ 442              	.LFE130:
+ 444              		.section	.text.DAC_Send,"ax",%progbits
+ 445              		.align	1
+ 446              		.global	DAC_Send
+ 447              		.syntax unified
+ 448              		.thumb
+ 449              		.thumb_func
+ 450              		.fpu fpv4-sp-d16
+ 452              	DAC_Send:
+ 453              	.LFB131:
+  76:Src/dac.c     **** 
+  77:Src/dac.c     **** void DAC_Send() {
+ 454              		.loc 1 77 17 is_stmt 1 view -0
+ 455              		.cfi_startproc
+ 456              		@ args = 0, pretend = 0, frame = 0
+ 457              		@ frame_needed = 0, uses_anonymous_args = 0
+ 458 0000 38B5     		push	{r3, r4, r5, lr}
+ 459              	.LCFI5:
+ 460              		.cfi_def_cfa_offset 16
+ 461              		.cfi_offset 3, -16
+ 462              		.cfi_offset 4, -12
+ 463              		.cfi_offset 5, -8
+ 464              		.cfi_offset 14, -4
+  78:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+ 465              		.loc 1 78 3 view .LVU106
+ 466 0002 0122     		movs	r2, #1
+ 467 0004 4FF48071 		mov	r1, #256
+ 468 0008 4FF09040 		mov	r0, #1207959552
+ 469 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 470              	.LVL38:
+  79:Src/dac.c     ****   uint16_t word = dac.values[dac.current];
+ 471              		.loc 1 79 3 view .LVU107
+ 472              		.loc 1 79 33 is_stmt 0 view .LVU108
+ 473 0010 0B4A     		ldr	r2, .L30
+ 474 0012 92F85C30 		ldrb	r3, [r2, #92]	@ zero_extendqisi2
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 11
+
+
+ 475              		.loc 1 79 12 view .LVU109
+ 476 0016 32F81340 		ldrh	r4, [r2, r3, lsl #1]
+ 477              	.LVL39:
+  80:Src/dac.c     ****   uint16_t part1 = channellookup[dac.current] << 8 | word >> 8;
+ 478              		.loc 1 80 3 is_stmt 1 view .LVU110
+ 479              		.loc 1 80 33 is_stmt 0 view .LVU111
+ 480 001a 0A4A     		ldr	r2, .L30+4
+ 481 001c D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 482              		.loc 1 80 52 view .LVU112
+ 483 001e 250A     		lsrs	r5, r4, #8
+ 484              		.loc 1 80 12 view .LVU113
+ 485 0020 45EA0325 		orr	r5, r5, r3, lsl #8
+ 486              	.LVL40:
+  81:Src/dac.c     ****   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_RESET);
+ 487              		.loc 1 81 3 is_stmt 1 view .LVU114
+ 488 0024 0022     		movs	r2, #0
+ 489 0026 4FF48071 		mov	r1, #256
+ 490 002a 4FF09040 		mov	r0, #1207959552
+ 491 002e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 492              	.LVL41:
+  82:Src/dac.c     ****   hspi2.Instance->DR = part1;
+ 493              		.loc 1 82 3 view .LVU115
+ 494              		.loc 1 82 8 is_stmt 0 view .LVU116
+ 495 0032 054B     		ldr	r3, .L30+8
+ 496 0034 1B68     		ldr	r3, [r3]
+ 497              		.loc 1 82 22 view .LVU117
+ 498 0036 DD60     		str	r5, [r3, #12]
+  83:Src/dac.c     ****   hspi2.Instance->DR = word << 8;
+ 499              		.loc 1 83 3 is_stmt 1 view .LVU118
+ 500              		.loc 1 83 29 is_stmt 0 view .LVU119
+ 501 0038 2402     		lsls	r4, r4, #8
+ 502              	.LVL42:
+ 503              		.loc 1 83 22 view .LVU120
+ 504 003a DC60     		str	r4, [r3, #12]
+  84:Src/dac.c     **** }
+ 505              		.loc 1 84 1 view .LVU121
+ 506 003c 38BD     		pop	{r3, r4, r5, pc}
+ 507              	.LVL43:
+ 508              	.L31:
+ 509              		.loc 1 84 1 view .LVU122
+ 510 003e 00BF     		.align	2
+ 511              	.L30:
+ 512 0040 00000000 		.word	.LANCHOR0
+ 513 0044 00000000 		.word	.LANCHOR1
+ 514 0048 00000000 		.word	hspi2
+ 515              		.cfi_endproc
+ 516              	.LFE131:
+ 518              		.section	.text.DAC_Refresh,"ax",%progbits
+ 519              		.align	1
+ 520              		.global	DAC_Refresh
+ 521              		.syntax unified
+ 522              		.thumb
+ 523              		.thumb_func
+ 524              		.fpu fpv4-sp-d16
+ 526              	DAC_Refresh:
+ 527              	.LFB132:
+  85:Src/dac.c     **** 
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 12
+
+
+  86:Src/dac.c     **** void DAC_Refresh() {
+ 528              		.loc 1 86 20 is_stmt 1 view -0
+ 529              		.cfi_startproc
+ 530              		@ args = 0, pretend = 0, frame = 0
+ 531              		@ frame_needed = 0, uses_anonymous_args = 0
+ 532 0000 10B5     		push	{r4, lr}
+ 533              	.LCFI6:
+ 534              		.cfi_def_cfa_offset 8
+ 535              		.cfi_offset 4, -8
+ 536              		.cfi_offset 14, -4
+  87:Src/dac.c     ****   DAC_Calibrate();
+ 537              		.loc 1 87 3 view .LVU124
+ 538 0002 FFF7FEFF 		bl	DAC_Calibrate
+ 539              	.LVL44:
+  88:Src/dac.c     ****   for (size_t i = 0; i < 4; i++) {
+ 540              		.loc 1 88 3 view .LVU125
+ 541              	.LBB4:
+ 542              		.loc 1 88 8 view .LVU126
+ 543              		.loc 1 88 15 is_stmt 0 view .LVU127
+ 544 0006 0024     		movs	r4, #0
+ 545              		.loc 1 88 3 view .LVU128
+ 546 0008 09E0     		b	.L33
+ 547              	.LVL45:
+ 548              	.L34:
+  89:Src/dac.c     ****     DAC_InsertValue(dac.floatvalues[i],i);
+ 549              		.loc 1 89 5 is_stmt 1 discriminator 3 view .LVU129
+ 550 000a A21C     		adds	r2, r4, #2
+ 551 000c 054B     		ldr	r3, .L36
+ 552 000e 03EB8203 		add	r3, r3, r2, lsl #2
+ 553 0012 E0B2     		uxtb	r0, r4
+ 554 0014 93ED000A 		vldr.32	s0, [r3]
+ 555 0018 FFF7FEFF 		bl	DAC_InsertValue
+ 556              	.LVL46:
+  88:Src/dac.c     ****   for (size_t i = 0; i < 4; i++) {
+ 557              		.loc 1 88 29 discriminator 3 view .LVU130
+  88:Src/dac.c     ****   for (size_t i = 0; i < 4; i++) {
+ 558              		.loc 1 88 30 is_stmt 0 discriminator 3 view .LVU131
+ 559 001c 0134     		adds	r4, r4, #1
+ 560              	.LVL47:
+ 561              	.L33:
+  88:Src/dac.c     ****   for (size_t i = 0; i < 4; i++) {
+ 562              		.loc 1 88 22 is_stmt 1 discriminator 1 view .LVU132
+  88:Src/dac.c     ****   for (size_t i = 0; i < 4; i++) {
+ 563              		.loc 1 88 3 is_stmt 0 discriminator 1 view .LVU133
+ 564 001e 032C     		cmp	r4, #3
+ 565 0020 F3D9     		bls	.L34
+ 566              	.LBE4:
+  90:Src/dac.c     ****   }
+  91:Src/dac.c     **** }
+ 567              		.loc 1 91 1 view .LVU134
+ 568 0022 10BD     		pop	{r4, pc}
+ 569              	.LVL48:
+ 570              	.L37:
+ 571              		.loc 1 91 1 view .LVU135
+ 572              		.align	2
+ 573              	.L36:
+ 574 0024 00000000 		.word	.LANCHOR0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 13
+
+
+ 575              		.cfi_endproc
+ 576              	.LFE132:
+ 578              		.global	channellookup
+ 579              		.global	dac
+ 580              		.section	.bss.dac,"aw",%nobits
+ 581              		.align	2
+ 582              		.set	.LANCHOR0,. + 0
+ 585              	dac:
+ 586 0000 00000000 		.space	96
+ 586      00000000 
+ 586      00000000 
+ 586      00000000 
+ 586      00000000 
+ 587              		.section	.rodata.channellookup,"a"
+ 588              		.align	2
+ 589              		.set	.LANCHOR1,. + 0
+ 592              	channellookup:
+ 593 0000 10121416 		.ascii	"\020\022\024\026"
+ 594              		.text
+ 595              	.Letext0:
+ 596              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 597              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 598              		.file 4 "Inc/dac.h"
+ 599              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+ 600              		.file 6 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 601              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 602              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+ 603              		.file 9 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 604              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_spi.h"
+ 605              		.file 11 "Inc/spi.h"
+ 606              		.file 12 "Inc/configuration.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 dac.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:18     .text.DAC_Calibrate:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:26     .text.DAC_Calibrate:0000000000000000 DAC_Calibrate
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:98     .text.DAC_Calibrate:0000000000000058 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:105    .text.DAC_InsertValue:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:112    .text.DAC_InsertValue:0000000000000000 DAC_InsertValue
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:176    .text.DAC_InsertValue:0000000000000050 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:181    .text.DAC_Init:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:188    .text.DAC_Init:0000000000000000 DAC_Init
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:288    .text.DAC_Init:0000000000000084 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:296    .text.DAC_GetValue:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:303    .text.DAC_GetValue:0000000000000000 DAC_GetValue
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:367    .text.DAC_GetValue:0000000000000048 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:372    .text.DAC_Sendvalue:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:379    .text.DAC_Sendvalue:0000000000000000 DAC_Sendvalue
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:439    .text.DAC_Sendvalue:0000000000000038 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:445    .text.DAC_Send:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:452    .text.DAC_Send:0000000000000000 DAC_Send
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:512    .text.DAC_Send:0000000000000040 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:519    .text.DAC_Refresh:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:526    .text.DAC_Refresh:0000000000000000 DAC_Refresh
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:574    .text.DAC_Refresh:0000000000000024 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:592    .rodata.channellookup:0000000000000000 channellookup
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:585    .bss.dac:0000000000000000 dac
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:581    .bss.dac:0000000000000000 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccleYQf7.s:588    .rodata.channellookup:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+Config_ReadCalibrate
+hspi2

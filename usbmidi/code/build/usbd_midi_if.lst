@@ -1,0 +1,335 @@
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"usbd_midi_if.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.MIDI_DataTx,"ax",%progbits
+  18              		.align	1
+  19              		.global	MIDI_DataTx
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	MIDI_DataTx:
+  27              	.LVL0:
+  28              	.LFB127:
+  29              		.file 1 "Src/usbd_midi_if.c"
+   1:Src/usbd_midi_if.c **** /**
+   2:Src/usbd_midi_if.c ****   ******************************************************************************
+   3:Src/usbd_midi_if.c ****   * @file           : usbd_midi_if.c
+   4:Src/usbd_midi_if.c ****   * @brief          :
+   5:Src/usbd_midi_if.c ****   ******************************************************************************
+   6:Src/usbd_midi_if.c **** 
+   7:Src/usbd_midi_if.c ****     (CC at)2016 by D.F.Mac. @TripArts Music
+   8:Src/usbd_midi_if.c **** 
+   9:Src/usbd_midi_if.c **** */
+  10:Src/usbd_midi_if.c **** 
+  11:Src/usbd_midi_if.c **** /* Includes ------------------------------------------------------------------*/
+  12:Src/usbd_midi_if.c **** #include "usbd_midi_if.h"
+  13:Src/usbd_midi_if.c **** #include "stm32f3xx_hal.h"
+  14:Src/usbd_midi_if.c **** 
+  15:Src/usbd_midi_if.c **** // basic midi rx/tx functions
+  16:Src/usbd_midi_if.c **** static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length);
+  17:Src/usbd_midi_if.c **** uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length);
+  18:Src/usbd_midi_if.c **** 
+  19:Src/usbd_midi_if.c **** 
+  20:Src/usbd_midi_if.c **** USBD_MIDI_ItfTypeDef USBD_Interface_fops_FS =
+  21:Src/usbd_midi_if.c **** {
+  22:Src/usbd_midi_if.c ****   MIDI_DataRx,
+  23:Src/usbd_midi_if.c ****   MIDI_DataTx
+  24:Src/usbd_midi_if.c **** };
+  25:Src/usbd_midi_if.c **** 
+  26:Src/usbd_midi_if.c **** static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length){
+  27:Src/usbd_midi_if.c ****   uint16_t cnt;
+  28:Src/usbd_midi_if.c ****   uint16_t msgs = length / 4;
+  29:Src/usbd_midi_if.c ****   uint16_t chk = length % 4;
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 2
+
+
+  30:Src/usbd_midi_if.c ****   if(chk == 0){
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+  32:Src/usbd_midi_if.c ****       RingbufferPut(&midibuffer,((uint32_t *)msg)+cnt);
+  33:Src/usbd_midi_if.c ****     }
+  34:Src/usbd_midi_if.c ****   }
+  35:Src/usbd_midi_if.c ****   return 0;
+  36:Src/usbd_midi_if.c **** }
+  37:Src/usbd_midi_if.c **** 
+  38:Src/usbd_midi_if.c **** uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length){
+  30              		.loc 1 38 52 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  39:Src/usbd_midi_if.c ****   if(length == 4) {
+  35              		.loc 1 39 3 view .LVU1
+  36              		.loc 1 39 5 is_stmt 0 view .LVU2
+  37 0000 0429     		cmp	r1, #4
+  38 0002 17D0     		beq	.L6
+  40:Src/usbd_midi_if.c ****     uint32_t i = 0;
+  41:Src/usbd_midi_if.c ****     while (i < length) {
+  42:Src/usbd_midi_if.c ****       APP_Rx_Buffer[APP_Rx_ptr_in] = *(msg + i);
+  43:Src/usbd_midi_if.c ****       APP_Rx_ptr_in++;
+  44:Src/usbd_midi_if.c ****       i++;
+  45:Src/usbd_midi_if.c ****       if (APP_Rx_ptr_in == APP_RX_DATA_SIZE) {
+  46:Src/usbd_midi_if.c ****         APP_Rx_ptr_in = 0;
+  47:Src/usbd_midi_if.c ****       }
+  48:Src/usbd_midi_if.c ****     }
+  49:Src/usbd_midi_if.c ****     return USBD_OK;
+  50:Src/usbd_midi_if.c ****   }
+  51:Src/usbd_midi_if.c ****   else {
+  52:Src/usbd_midi_if.c ****     return USBD_FAIL;
+  39              		.loc 1 52 12 view .LVU3
+  40 0004 0220     		movs	r0, #2
+  41              	.LVL1:
+  42              		.loc 1 52 12 view .LVU4
+  43 0006 7047     		bx	lr
+  44              	.LVL2:
+  45              	.L2:
+  46              	.LCFI0:
+  47              		.cfi_def_cfa_offset 8
+  48              		.cfi_offset 4, -8
+  49              		.cfi_offset 5, -4
+  50              	.LBB2:
+  41:Src/usbd_midi_if.c ****       APP_Rx_Buffer[APP_Rx_ptr_in] = *(msg + i);
+  51              		.loc 1 41 11 is_stmt 1 view .LVU5
+  52 0008 9142     		cmp	r1, r2
+  53 000a 10D9     		bls	.L12
+  54              	.L5:
+  42:Src/usbd_midi_if.c ****       APP_Rx_ptr_in++;
+  55              		.loc 1 42 7 view .LVU6
+  42:Src/usbd_midi_if.c ****       APP_Rx_ptr_in++;
+  56              		.loc 1 42 20 is_stmt 0 view .LVU7
+  57 000c 0D4C     		ldr	r4, .L14
+  58 000e 2368     		ldr	r3, [r4]
+  42:Src/usbd_midi_if.c ****       APP_Rx_ptr_in++;
+  59              		.loc 1 42 38 view .LVU8
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 3
+
+
+  60 0010 10F802C0 		ldrb	ip, [r0, r2]	@ zero_extendqisi2
+  42:Src/usbd_midi_if.c ****       APP_Rx_ptr_in++;
+  61              		.loc 1 42 36 view .LVU9
+  62 0014 0C4D     		ldr	r5, .L14+4
+  63 0016 05F803C0 		strb	ip, [r5, r3]
+  43:Src/usbd_midi_if.c ****       i++;
+  64              		.loc 1 43 7 is_stmt 1 view .LVU10
+  43:Src/usbd_midi_if.c ****       i++;
+  65              		.loc 1 43 20 is_stmt 0 view .LVU11
+  66 001a 0133     		adds	r3, r3, #1
+  67 001c 2360     		str	r3, [r4]
+  44:Src/usbd_midi_if.c ****       if (APP_Rx_ptr_in == APP_RX_DATA_SIZE) {
+  68              		.loc 1 44 7 is_stmt 1 view .LVU12
+  44:Src/usbd_midi_if.c ****       if (APP_Rx_ptr_in == APP_RX_DATA_SIZE) {
+  69              		.loc 1 44 8 is_stmt 0 view .LVU13
+  70 001e 0132     		adds	r2, r2, #1
+  71              	.LVL3:
+  45:Src/usbd_midi_if.c ****         APP_Rx_ptr_in = 0;
+  72              		.loc 1 45 7 is_stmt 1 view .LVU14
+  45:Src/usbd_midi_if.c ****         APP_Rx_ptr_in = 0;
+  73              		.loc 1 45 10 is_stmt 0 view .LVU15
+  74 0020 B3F5807F 		cmp	r3, #256
+  75 0024 F0D1     		bne	.L2
+  46:Src/usbd_midi_if.c ****       }
+  76              		.loc 1 46 9 is_stmt 1 view .LVU16
+  46:Src/usbd_midi_if.c ****       }
+  77              		.loc 1 46 23 is_stmt 0 view .LVU17
+  78 0026 2346     		mov	r3, r4
+  79 0028 0024     		movs	r4, #0
+  80 002a 1C60     		str	r4, [r3]
+  81 002c ECE7     		b	.L2
+  82              	.L12:
+  49:Src/usbd_midi_if.c ****   }
+  83              		.loc 1 49 12 view .LVU18
+  84 002e 0020     		movs	r0, #0
+  85              	.LVL4:
+  49:Src/usbd_midi_if.c ****   }
+  86              		.loc 1 49 12 view .LVU19
+  87              	.LBE2:
+  53:Src/usbd_midi_if.c ****   }
+  54:Src/usbd_midi_if.c **** }...
+  88              		.loc 1 54 1 view .LVU20
+  89 0030 30BC     		pop	{r4, r5}
+  90              	.LCFI1:
+  91              		.cfi_restore 5
+  92              		.cfi_restore 4
+  93              		.cfi_def_cfa_offset 0
+  94 0032 7047     		bx	lr
+  95              	.LVL5:
+  96              	.L6:
+  97              	.LBB3:
+  40:Src/usbd_midi_if.c ****     uint32_t i = 0;
+  98              		.loc 1 40 14 view .LVU21
+  99 0034 0022     		movs	r2, #0
+ 100              	.LVL6:
+  41:Src/usbd_midi_if.c ****     while (i < length) {
+ 101              		.loc 1 41 11 is_stmt 1 view .LVU22
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 4
+
+
+ 102 0036 9142     		cmp	r1, r2
+ 103 0038 01D9     		bls	.L13
+ 104              	.LBE3:
+  38:Src/usbd_midi_if.c **** uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length){
+ 105              		.loc 1 38 52 is_stmt 0 view .LVU23
+ 106 003a 30B4     		push	{r4, r5}
+ 107              	.LCFI2:
+ 108              		.cfi_def_cfa_offset 8
+ 109              		.cfi_offset 4, -8
+ 110              		.cfi_offset 5, -4
+ 111 003c E6E7     		b	.L5
+ 112              	.L13:
+ 113              	.LCFI3:
+ 114              		.cfi_def_cfa_offset 0
+ 115              		.cfi_restore 4
+ 116              		.cfi_restore 5
+ 117              	.LBB4:
+  49:Src/usbd_midi_if.c ****     return USBD_OK;
+ 118              		.loc 1 49 12 view .LVU24
+ 119 003e 0020     		movs	r0, #0
+ 120              	.LVL7:
+  49:Src/usbd_midi_if.c ****     return USBD_OK;
+ 121              		.loc 1 49 12 view .LVU25
+ 122              	.LBE4:
+ 123              		.loc 1 54 1 view .LVU26
+ 124 0040 7047     		bx	lr
+ 125              	.L15:
+ 126 0042 00BF     		.align	2
+ 127              	.L14:
+ 128 0044 00000000 		.word	APP_Rx_ptr_in
+ 129 0048 00000000 		.word	APP_Rx_Buffer
+ 130              		.cfi_endproc
+ 131              	.LFE127:
+ 133              		.section	.text.MIDI_DataRx,"ax",%progbits
+ 134              		.align	1
+ 135              		.syntax unified
+ 136              		.thumb
+ 137              		.thumb_func
+ 138              		.fpu fpv4-sp-d16
+ 140              	MIDI_DataRx:
+ 141              	.LVL8:
+ 142              	.LFB126:
+  26:Src/usbd_midi_if.c **** static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length){
+ 143              		.loc 1 26 59 is_stmt 1 view -0
+ 144              		.cfi_startproc
+ 145              		@ args = 0, pretend = 0, frame = 0
+ 146              		@ frame_needed = 0, uses_anonymous_args = 0
+  26:Src/usbd_midi_if.c **** static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length){
+ 147              		.loc 1 26 59 is_stmt 0 view .LVU28
+ 148 0000 70B5     		push	{r4, r5, r6, lr}
+ 149              	.LCFI4:
+ 150              		.cfi_def_cfa_offset 16
+ 151              		.cfi_offset 4, -16
+ 152              		.cfi_offset 5, -12
+ 153              		.cfi_offset 6, -8
+ 154              		.cfi_offset 14, -4
+ 155 0002 0546     		mov	r5, r0
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 5
+
+
+  27:Src/usbd_midi_if.c ****   uint16_t cnt;
+ 156              		.loc 1 27 3 is_stmt 1 view .LVU29
+  28:Src/usbd_midi_if.c ****   uint16_t msgs = length / 4;
+ 157              		.loc 1 28 3 view .LVU30
+  28:Src/usbd_midi_if.c ****   uint16_t msgs = length / 4;
+ 158              		.loc 1 28 12 is_stmt 0 view .LVU31
+ 159 0004 8E08     		lsrs	r6, r1, #2
+ 160              	.LVL9:
+  29:Src/usbd_midi_if.c ****   uint16_t chk = length % 4;
+ 161              		.loc 1 29 3 is_stmt 1 view .LVU32
+  30:Src/usbd_midi_if.c ****   if(chk == 0){
+ 162              		.loc 1 30 3 view .LVU33
+  30:Src/usbd_midi_if.c ****   if(chk == 0){
+ 163              		.loc 1 30 5 is_stmt 0 view .LVU34
+ 164 0006 11F00304 		ands	r4, r1, #3
+ 165 000a 08D0     		beq	.L17
+ 166              	.LVL10:
+ 167              	.L18:
+  35:Src/usbd_midi_if.c ****   return 0;
+ 168              		.loc 1 35 3 is_stmt 1 view .LVU35
+  36:Src/usbd_midi_if.c **** }
+ 169              		.loc 1 36 1 is_stmt 0 view .LVU36
+ 170 000c 0020     		movs	r0, #0
+ 171 000e 70BD     		pop	{r4, r5, r6, pc}
+ 172              	.LVL11:
+ 173              	.L19:
+  32:Src/usbd_midi_if.c ****       RingbufferPut(&midibuffer,((uint32_t *)msg)+cnt);
+ 174              		.loc 1 32 7 is_stmt 1 discriminator 3 view .LVU37
+ 175 0010 05EB8401 		add	r1, r5, r4, lsl #2
+ 176 0014 0348     		ldr	r0, .L21
+ 177 0016 FFF7FEFF 		bl	RingbufferPut
+ 178              	.LVL12:
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+ 179              		.loc 1 31 28 discriminator 3 view .LVU38
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+ 180              		.loc 1 31 32 is_stmt 0 discriminator 3 view .LVU39
+ 181 001a 0134     		adds	r4, r4, #1
+ 182              	.LVL13:
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+ 183              		.loc 1 31 32 discriminator 3 view .LVU40
+ 184 001c A4B2     		uxth	r4, r4
+ 185              	.LVL14:
+ 186              	.L17:
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+ 187              		.loc 1 31 17 is_stmt 1 discriminator 1 view .LVU41
+  31:Src/usbd_midi_if.c ****     for(cnt = 0;cnt < msgs;cnt ++){
+ 188              		.loc 1 31 5 is_stmt 0 discriminator 1 view .LVU42
+ 189 001e B442     		cmp	r4, r6
+ 190 0020 F6D3     		bcc	.L19
+ 191 0022 F3E7     		b	.L18
+ 192              	.L22:
+ 193              		.align	2
+ 194              	.L21:
+ 195 0024 00000000 		.word	midibuffer
+ 196              		.cfi_endproc
+ 197              	.LFE126:
+ 199              		.global	USBD_Interface_fops_FS
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 6
+
+
+ 200              		.section	.data.USBD_Interface_fops_FS,"aw"
+ 201              		.align	2
+ 204              	USBD_Interface_fops_FS:
+ 205 0000 00000000 		.word	MIDI_DataRx
+ 206 0004 00000000 		.word	MIDI_DataTx
+ 207              		.text
+ 208              	.Letext0:
+ 209              		.file 2 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 210              		.file 3 "/usr/local/Caskroom/gcc-arm-embedded/10-2020-q4-major/gcc-arm-none-eabi-10-2020-q4-major/
+ 211              		.file 4 "Middlewares/USBMIDI/Inc/usbd_midi.h"
+ 212              		.file 5 "Inc/ringbuffer.h"
+ 213              		.file 6 "Inc/usbd_midi_if.h"
+ 214              		.file 7 "Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ARM GAS  /var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 usbd_midi_if.c
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:18     .text.MIDI_DataTx:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:26     .text.MIDI_DataTx:0000000000000000 MIDI_DataTx
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:128    .text.MIDI_DataTx:0000000000000044 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:134    .text.MIDI_DataRx:0000000000000000 $t
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:140    .text.MIDI_DataRx:0000000000000000 MIDI_DataRx
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:195    .text.MIDI_DataRx:0000000000000024 $d
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:204    .data.USBD_Interface_fops_FS:0000000000000000 USBD_Interface_fops_FS
+/var/folders/80/65lm4rm97rv_n74c85vt01040000gn/T//ccow3rmz.s:201    .data.USBD_Interface_fops_FS:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+APP_Rx_ptr_in
+APP_Rx_Buffer
+RingbufferPut
+midibuffer

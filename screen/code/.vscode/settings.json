@@ -21,6 +21,7 @@
       "stm32f373xc.h": "c",
       "arm_math.h": "c",
       "array": "c",
-      "pitch.h": "c"
+      "pitch.h": "c",
+      "ssd1306.h": "c"
     }
 }

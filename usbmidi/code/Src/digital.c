@@ -3,6 +3,10 @@
 #include "analog.h"
 
 
+Digital_t digital[kDIGITAL_AMOUNT];
+
+
+
 void Digital_Init() {
   digital[0].gpiopin = GPIO_PIN_3;
   digital[0].id = 0;
@@ -12,6 +16,11 @@ void Digital_Init() {
   digital[2].id = 2;
   digital[3].gpiopin = GPIO_PIN_1;
   digital[3].id = 3;
+  for (size_t i = 0; i < kDIGITAL_AMOUNT; i++)
+  {
+    Digital_Reset(&digital[i]);
+  }
+  
 }
 
 void Digital_Reset(Digital_t *dig) {
