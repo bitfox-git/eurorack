@@ -76,6 +76,13 @@ typedef struct {
 
 typedef struct kiss_fft_state* kiss_fft_cfg;
 
+typedef struct {
+    int nfft;
+    int inverse;
+    int factors[12];
+    kiss_fft_cpx *twiddles;
+}kiss_fft_state;
+
 /* 
  *  kiss_fft_alloc
  *  
@@ -133,6 +140,9 @@ void kiss_fft_cleanup(void);
  * Returns the smallest integer k, such that k>=n and k has only "fast" factors (2,3,5)
  */
 int kiss_fft_next_fast_size(int n);
+
+
+void kf_factor(int n,int * facbuf);
 
 /* for real ffts, we need an even size */
 #define kiss_fftr_next_fast_size_real(n) \

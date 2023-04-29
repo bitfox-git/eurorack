@@ -47,8 +47,8 @@
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
-TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
+TIM_HandleTypeDef htim19;
 
 /* TIM2 init function */
 void MX_TIM2_Init(void)
@@ -169,44 +169,15 @@ void MX_TIM4_Init(void)
   }
 
 }
-/* TIM13 init function */
-void MX_TIM13_Init(void)
-{
-  TIM_OC_InitTypeDef sConfigOC = {0};
-
-  htim13.Instance = TIM13;
-  htim13.Init.Prescaler = 0;
-  htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim13.Init.Period = 2249;
-  htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim13) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_Init(&htim13) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim13, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
 /* TIM14 init function */
 void MX_TIM14_Init(void)
 {
   TIM_OC_InitTypeDef sConfigOC = {0};
 
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 0;
+  htim14.Init.Prescaler = 71;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim14.Init.Period = 0;
+  htim14.Init.Period = 3999;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
@@ -222,6 +193,46 @@ void MX_TIM14_Init(void)
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_OC_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+/* TIM19 init function */
+void MX_TIM19_Init(void)
+{
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  htim19.Instance = TIM19;
+  htim19.Init.Prescaler = 0;
+  htim19.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim19.Init.Period = 2249;
+  htim19.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim19.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim19) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim19, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 1;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim19, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim19, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim19, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -252,6 +263,17 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
   /* USER CODE BEGIN TIM3_MspInit 1 */
 
   /* USER CODE END TIM3_MspInit 1 */
+  }
+  else if(tim_pwmHandle->Instance==TIM19)
+  {
+  /* USER CODE BEGIN TIM19_MspInit 0 */
+
+  /* USER CODE END TIM19_MspInit 0 */
+    /* TIM19 clock enable */
+    __HAL_RCC_TIM19_CLK_ENABLE();
+  /* USER CODE BEGIN TIM19_MspInit 1 */
+
+  /* USER CODE END TIM19_MspInit 1 */
   }
 }
 
@@ -288,24 +310,17 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* tim_encoderHandle)
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM13)
-  {
-  /* USER CODE BEGIN TIM13_MspInit 0 */
-
-  /* USER CODE END TIM13_MspInit 0 */
-    /* TIM13 clock enable */
-    __HAL_RCC_TIM13_CLK_ENABLE();
-  /* USER CODE BEGIN TIM13_MspInit 1 */
-
-  /* USER CODE END TIM13_MspInit 1 */
-  }
-  else if(tim_baseHandle->Instance==TIM14)
+  if(tim_baseHandle->Instance==TIM14)
   {
   /* USER CODE BEGIN TIM14_MspInit 0 */
 
   /* USER CODE END TIM14_MspInit 0 */
     /* TIM14 clock enable */
     __HAL_RCC_TIM14_CLK_ENABLE();
+
+    /* TIM14 interrupt Init */
+    HAL_NVIC_SetPriority(TIM14_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM14_IRQn);
   /* USER CODE BEGIN TIM14_MspInit 1 */
 
   /* USER CODE END TIM14_MspInit 1 */
@@ -404,6 +419,17 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* tim_pwmHandle)
 
   /* USER CODE END TIM3_MspDeInit 1 */
   }
+  else if(tim_pwmHandle->Instance==TIM19)
+  {
+  /* USER CODE BEGIN TIM19_MspDeInit 0 */
+
+  /* USER CODE END TIM19_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_TIM19_CLK_DISABLE();
+  /* USER CODE BEGIN TIM19_MspDeInit 1 */
+
+  /* USER CODE END TIM19_MspDeInit 1 */
+  }
 }
 
 void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* tim_encoderHandle)
@@ -432,24 +458,16 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* tim_encoderHandle)
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM13)
-  {
-  /* USER CODE BEGIN TIM13_MspDeInit 0 */
-
-  /* USER CODE END TIM13_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_TIM13_CLK_DISABLE();
-  /* USER CODE BEGIN TIM13_MspDeInit 1 */
-
-  /* USER CODE END TIM13_MspDeInit 1 */
-  }
-  else if(tim_baseHandle->Instance==TIM14)
+  if(tim_baseHandle->Instance==TIM14)
   {
   /* USER CODE BEGIN TIM14_MspDeInit 0 */
 
   /* USER CODE END TIM14_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM14_CLK_DISABLE();
+
+    /* TIM14 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(TIM14_IRQn);
   /* USER CODE BEGIN TIM14_MspDeInit 1 */
 
   /* USER CODE END TIM14_MspDeInit 1 */

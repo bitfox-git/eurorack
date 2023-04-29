@@ -2,7 +2,8 @@
 #define LED_H_
 
 
-void Led_Update();
+void Led_Init();
+void Led_ChannelUpdate();
 
 
 #endif // LED_H_

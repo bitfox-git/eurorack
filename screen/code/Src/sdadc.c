@@ -76,7 +76,7 @@ void MX_SDADC1_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc1, SDADC_EXT_TRIG_TIM13_CC1, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK)
+  if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc1, SDADC_EXT_TRIG_TIM19_CC2, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK)
   {
     Error_Handler();
   }
@@ -119,7 +119,8 @@ void MX_SDADC2_Init(void)
   hsdadc2.Init.FastConversionMode = SDADC_FAST_CONV_ENABLE;
   hsdadc2.Init.SlowClockMode = SDADC_SLOW_CLOCK_DISABLE;
   hsdadc2.Init.ReferenceVoltage = SDADC_VREF_VDDA;
-  hsdadc2.InjectedTrigger = SDADC_SYNCHRONOUS_TRIGGER;
+  hsdadc2.InjectedTrigger = SDADC_EXTERNAL_TRIGGER;
+  hsdadc2.ExtTriggerEdge = SDADC_EXT_TRIG_RISING_EDGE;
   if (HAL_SDADC_Init(&hsdadc2) != HAL_OK)
   {
     Error_Handler();
@@ -130,7 +131,11 @@ void MX_SDADC2_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_SDADC_SelectInjectedTrigger(&hsdadc2, SDADC_SYNCHRONOUS_TRIGGER) != HAL_OK)
+  if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc2, SDADC_EXT_TRIG_TIM19_CC3, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_SDADC_SelectInjectedTrigger(&hsdadc2, SDADC_EXTERNAL_TRIGGER) != HAL_OK)
   {
     Error_Handler();
   }
@@ -169,7 +174,8 @@ void MX_SDADC3_Init(void)
   hsdadc3.Init.FastConversionMode = SDADC_FAST_CONV_ENABLE;
   hsdadc3.Init.SlowClockMode = SDADC_SLOW_CLOCK_DISABLE;
   hsdadc3.Init.ReferenceVoltage = SDADC_VREF_VDDA;
-  hsdadc3.InjectedTrigger = SDADC_SYNCHRONOUS_TRIGGER;
+  hsdadc3.InjectedTrigger = SDADC_EXTERNAL_TRIGGER;
+  hsdadc3.ExtTriggerEdge = SDADC_EXT_TRIG_RISING_EDGE;
   if (HAL_SDADC_Init(&hsdadc3) != HAL_OK)
   {
     Error_Handler();
@@ -180,7 +186,11 @@ void MX_SDADC3_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_SDADC_SelectInjectedTrigger(&hsdadc3, SDADC_SYNCHRONOUS_TRIGGER) != HAL_OK)
+  if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc3, SDADC_EXT_TRIG_TIM19_CC4, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_SDADC_SelectInjectedTrigger(&hsdadc3, SDADC_EXTERNAL_TRIGGER) != HAL_OK)
   {
     Error_Handler();
   }

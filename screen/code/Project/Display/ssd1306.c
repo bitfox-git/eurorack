@@ -8,6 +8,13 @@ SSD1306_t SSD1306;
 
 #if defined(SSD1306_USE_I2C)
 
+uint8_t ssd1306_GetX() {
+    return SSD1306.CurrentX;
+}
+uint8_t ssd1306_GetY() {
+    return SSD1306.CurrentY;
+}
+
 void ssd1306_Reset(void) {
 	/* for I2C - do nothing */
 }
@@ -142,6 +149,17 @@ void ssd1306_Init(void) {
     SSD1306.Initialized = 1;
 }
 
+void ssd1306_FillPart(uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2, SSD1306_COLOR color) {
+    for (uint8_t x = x1; x < x2; x++)
+    {
+        for (size_t y = y1; y < y2; y++)
+        {
+        SSD1306_Buffer[x + (y*SSD1306_WIDTH)] = (color == Black) ? 0x00 : 0xFF;
+            
+        }
+    }
+}
+
 // Fill the whole screen with the given color
 void ssd1306_Fill(SSD1306_COLOR color) {
     /* Set memory */
@@ -225,6 +243,48 @@ char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
     return ch;
 }
 
+char ssd1306_WriteDoubleChar(char ch, FontDef Font, SSD1306_COLOR color) {
+        uint32_t i, b, j;
+    
+    // Check if character is valid
+    if (ch < 32 || ch > 126)
+        return 0;
+    
+    // Check remaining space on current line
+    if (SSD1306_WIDTH < (SSD1306.CurrentX + Font.width) ||
+        SSD1306_HEIGHT < (SSD1306.CurrentY + Font.height))
+    {
+        SSD1306.CurrentY += Font.height;
+        SSD1306.CurrentX = 2;
+
+    }
+    
+    // Use the font to write
+    for(i = 0; i < Font.height; i++) {
+        b = Font.data[(ch - 32) * Font.height + i];
+        for(j = 0; j < Font.width; j++) {
+            if((b << j) & 0x8000)  {
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2), (SSD1306.CurrentY + (i*2)), (SSD1306_COLOR) color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2)+1, (SSD1306.CurrentY + (i*2)), (SSD1306_COLOR) color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2), (SSD1306.CurrentY + (i*2)+1), (SSD1306_COLOR) color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2)+1, (SSD1306.CurrentY + (i*2)+1), (SSD1306_COLOR) color);
+            } else {
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2), (SSD1306.CurrentY + (i*2)), (SSD1306_COLOR) !color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2)+1, (SSD1306.CurrentY + (i*2)), (SSD1306_COLOR) !color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2), (SSD1306.CurrentY + (i*2)+1), (SSD1306_COLOR) !color);
+                ssd1306_DrawPixel(SSD1306.CurrentX + (j*2)+1, (SSD1306.CurrentY + (i*2)+1), (SSD1306_COLOR) !color);
+            }
+        }
+    }
+    
+    // The current space is now taken
+    SSD1306.CurrentX += Font.width*2;
+    
+    // Return written char for validation
+    return ch;
+}
+
+
 // Write full string to screenbuffer
 char ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color,int x,int y) {
   ssd1306_SetCursor(x,y);
@@ -295,4 +355,57 @@ void ssd1306_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, SSD130
 			uCol += incy;
 		}
 	}
+}
+
+void ssd1306_DrawLinePulse(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint8_t pulsewidth, SSD1306_COLOR color)
+{
+	uint16_t t;
+	int xerr = 0, yerr = 0, delta_x, delta_y, distance;
+	int incx, incy, uRow, uCol;
+
+	delta_x = x2 - x1;
+	delta_y = y2 - y1;
+
+	uRow = x1;
+	uCol = y1;
+
+	if (delta_x > 0)
+		incx = 1;
+	else if (delta_x == 0)
+		incx = 0;
+	else {
+		incx = -1;
+		delta_x = -delta_x;
+	}
+
+	if (delta_y > 0)
+		incy = 1;
+	else if (delta_y == 0)
+		incy = 0;
+	else {
+		incy = -1;
+		delta_y = -delta_x;
+	}
+	if (delta_x > delta_y)
+		distance = delta_x;
+	else
+		distance = delta_y;
+
+
+	for (t = 0; t <= distance; t++) {
+		ssd1306_DrawPixel(uRow, uCol, color);
+		xerr += delta_x;
+		yerr += delta_y;
+		if (xerr > distance) {
+			xerr -= distance;
+			uRow += incx;
+		}
+		if (yerr > distance) {
+			yerr -= distance;
+			uCol += incy;
+		}
+        if(t % pulsewidth == 0) {
+            color = (color==White) ? Black : White;
+        }
+    }
 }

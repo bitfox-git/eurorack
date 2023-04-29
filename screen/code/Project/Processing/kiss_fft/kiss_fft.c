@@ -298,8 +298,7 @@ void kf_work(
 /*  facbuf is populated by p1,m1,p2,m2, ...
     where 
     p[i] * m[i] = m[i-1]
-    m0 = n                  */
-static 
+    m0 = n                  */ 
 void kf_factor(int n,int * facbuf)
 {
     int p=4;

@@ -95,12 +95,17 @@ typedef struct {
 // Procedure definitions
 void ssd1306_Init(void);
 void ssd1306_Fill(SSD1306_COLOR color);
+void ssd1306_FillPart(uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2, SSD1306_COLOR color);
 void ssd1306_UpdateScreen(void);
 void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
 void ssd1306_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, SSD1306_COLOR color);
+void ssd1306_DrawLinePulse(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint8_t pulsewidth, SSD1306_COLOR color);
 char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color);
+char ssd1306_WriteDoubleChar(char ch, FontDef Font, SSD1306_COLOR color);
 char ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color,int x, int y);
 void ssd1306_SetCursor(uint8_t x, uint8_t y);
+uint8_t ssd1306_GetX();
+uint8_t ssd1306_GetY();
 
 // Low-level procedures
 void ssd1306_Reset(void);

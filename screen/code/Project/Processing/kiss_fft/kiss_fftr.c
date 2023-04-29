@@ -26,10 +26,10 @@ kiss_fftr_cfg kiss_fftr_alloc(int nfft,int inverse_fft,void * mem,size_t * lenme
     kiss_fftr_cfg st = NULL;
     size_t subsize = 0, memneeded;
 
-    // if (nfft & 1) {
-    //     fprintf(stderr,"Real FFT optimization must be even.\n");
-    //     return NULL;
-    // }
+    if (nfft & 1) {
+        fprintf(stderr,"Real FFT optimization must be even.\n");
+        return NULL;
+    }
     nfft >>= 1;
 
     kiss_fft_alloc (nfft, inverse_fft, NULL, &subsize);

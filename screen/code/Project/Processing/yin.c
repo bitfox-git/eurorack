@@ -4,13 +4,19 @@
 #include <stdbool.h>
 #include "ssd1306.h"
 
+
+
+#include "fft.h"
+
+// #include "kiss_fftr.h"
+
 // #include "kiss_fft.h"
 // #include "_kiss_fft_guts.h"
 // #include "kiss_fftr.h"
 
 // #include "audiodata.h"
 
-Yin yinobject;
+Yin_t yinobject;
 
 /* ------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------- PRIVATE FUNCTIONS
@@ -23,7 +29,7 @@ Yin yinobject;
  * This is the Yin algorithms tweak on autocorellation. Read http://audition.ens.fr/adc/pdf/2002_JASA_YIN.pdf
  * for more details on what is in here and why it's done this way.
  */
-void Yin_difference(Yin *yin, float* buffer){
+void Yin_difference(Yin_t *yin, float* buffer){
 	int16_t i;
 	int16_t tau;
 	float delta;
@@ -49,7 +55,7 @@ void Yin_difference(Yin *yin, float* buffer){
  * This goes through the Yin autocorellation values and finds out roughly where shift is which 
  * produced the smallest difference
  */
-void Yin_cumulativeMeanNormalizedDifference(Yin *yin){
+void Yin_cumulativeMeanNormalizedDifference(Yin_t *yin){
 	int16_t tau;
 	float runningSum = 0;
 	yin->yinBuffer[0] = 1;
@@ -67,7 +73,7 @@ void Yin_cumulativeMeanNormalizedDifference(Yin *yin){
  * Step 3: Search through the normalised cumulative mean array and find values that are over the threshold
  * @return Shift (tau) which caused the best approximate autocorellation. -1 if no suitable value is found over the threshold.
  */
-int16_t Yin_absoluteThreshold(Yin *yin){
+int16_t Yin_absoluteThreshold(Yin_t *yin){
 	int16_t tau;
 
 	/* Search through the array of cumulative mean values, and look for ones that are over the threshold 
@@ -110,7 +116,7 @@ int16_t Yin_absoluteThreshold(Yin *yin){
  * As we only autocorellated using integer shifts we should check that there isn't a better fractional 
  * shift value.
  */
-float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
+float Yin_parabolicInterpolation(Yin_t *yin, int16_t tauEstimate) {
 	float betterTau;
 	int16_t x0;
 	int16_t x2;
@@ -176,7 +182,7 @@ float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
  * @param  buffer Buffer of samples to analyse
  * @return        Fundamental frequency of the signal in Hz. Returns -1 if pitch can't be found
  */
-float Yin_getPitch(float* buffer, uint16_t bufferSize, float threshold, bool fft){
+float Yin_getPitch(float* buffer, uint16_t bufferSize, float threshold, bool fft, int division){
 
   if(bufferSize > MAXIMUM_SAMPLESIZE) {
     return -1;
@@ -192,7 +198,6 @@ float Yin_getPitch(float* buffer, uint16_t bufferSize, float threshold, bool fft
 	
 	/* Step 1: Calculates the squared difference of the signal with a shifted version of itself. */
   Yin_difference(&yinobject, buffer);
-  
   /* Step 2: Calculate the cumulative mean on the normalised difference calculated in step 1 */
 	Yin_cumulativeMeanNormalizedDifference(&yinobject);
 	
@@ -201,7 +206,7 @@ float Yin_getPitch(float* buffer, uint16_t bufferSize, float threshold, bool fft
 	
 	/* Step 5: Interpolate the shift value (tau) to improve the pitch estimate. */
 	if(tauEstimate != -1){
-		pitchInHertz = YIN_SAMPLING_RATE / Yin_parabolicInterpolation(&yinobject, tauEstimate);
+		pitchInHertz = YIN_SAMPLING_RATE / Yin_parabolicInterpolation(&yinobject, tauEstimate) / division;
 	}
 	
 	return pitchInHertz;

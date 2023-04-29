@@ -29,21 +29,19 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "stm32f3xx_hal_sdadc.h"
-#include "ssd1306.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f373xc.h"
 
-#include "yin.h"
-#include "stdio.h"
-#include "math.h"
+#include "acquisition.h"
+#include "configuration.h"
+#include "led.h"
+#include "process.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,12 +68,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-float audiobuffer[MAXIMUM_SAMPLESIZE];
-uint32_t dmainput[MAXIMUM_SAMPLESIZE];
-// kiss_fft_cpx testInput[testsize];
-// kiss_fft_cpx testOutput[testsize];
-uint8_t floatindex;
-bool ready;
+
 /* USER CODE END 0 */
 
 /**
@@ -114,148 +107,28 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-  MX_TIM13_Init();
   MX_TIM14_Init();
+  MX_TIM19_Init();
+
+
   /* USER CODE BEGIN 2 */
-  ssd1306_Init();
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
-  // __HAL_TIM_ENABLE(&htim13);
-  __HAL_TIM_ENABLE(&htim4);
-  HAL_TIM_PWM_Start_IT(&htim13,TIM_CHANNEL_1);
+  __HAL_TIM_ENABLE(&htim4); // enc
 
-  // HAL_SDADC_ConfigChannel(&hsdadc2,SDADC_CHANNEL_6,SDADC_CONTINUOUS_CONV_ON);
-  // HAL_SDADC_ConfigChannel(&hsdadc3,SDADC_CHANNEL_6,SDADC_CONTINUOUS_CONV_ON);
-
-  ready = false;
-
-  HAL_SDADC_CalibrationStart(&hsdadc1,SDADC_CALIBRATION_SEQ_1);
-  HAL_SDADC_PollForCalibEvent(&hsdadc1,HAL_MAX_DELAY);
-  // HAL_SDADC_SelectInjectedExtTrigger(&hsdadc1,)
-  // HAL_SDADC_InjectedConfigChannel
-  // HAL_SDADC_ConfigChannel(&hsdadc1,SDADC_CHANNEL_6,SDADC_CONTINUOUS_CONV_ON);
-  // HAL_SDADC_SelectRegularTrigger(&hsdadc1,SDADC_SOFTWARE_TRIGGER);
-  HAL_SDADC_InjectedStart_DMA(&hsdadc1, &dmainput,MAXIMUM_SAMPLESIZE*2);
-
-  // uint8_t data = 0;
-  // ssd1306_Fill(Black);
-  // ssd1306_UpdateScreen();
-  // float randommem[4098];
-
-  // float dcx = 0;
-  // float dcy = 0;
-
-
-  // HAL_SDADC_Start(&hsdadc1);
-  // HAL_SDADC_PollForConversion(&hsdadc1, HAL_MAX_DELAY);
-  // HAL_SDADC_Start_IT()
+  // FFT_Init();
+  Led_Init();
+  Config_Init(); // CONFIG BEFORE ACQUISITION
+  
+  Acquisition_Init();
+  
+  Display_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(ready == true) {
-      for (size_t i = 0; i < MAXIMUM_SAMPLESIZE; i++)
-      {
-        // audiobuffer[i] = (1/(-32768.0f*2))*((signed short)(dmainput[i]>>16)) ;
-        audiobuffer[i] = (1/(-32768.0f*2))*((signed short)(dmainput[i]>>16)) ;
-      }
-      
-      ssd1306_Fill(Black);
-
-      // for (size_t i = 0; i < 128; i++)
-      // {
-      //   ssd1306_DrawPixel(i,audiobuffer[i]*32+32,White);
-      // }
-      // ssd1306_UpdateScreen();
-      // HAL_Delay(200);
-      // ssd1306_Fill(Black);
-      
-      uint32_t inittime = HAL_GetTick();
-      float convert = Yin_getPitch(&audiobuffer,MAXIMUM_SAMPLESIZE,0.15,false);
-      uint32_t endtime = HAL_GetTick();
-
-
-
-      // ssd1306_Fill(Black);
-      char charconv[20];
-      gcvt(convert, 5, charconv);
-      ssd1306_WriteString(charconv, Font_7x10, White,0,0);
-    
-      // convert = Yin_getProbability();
-      // gcvt(convert, 5, charconv);
-      // ssd1306_WriteString(charconv, Font_7x10, White,0,21);
-
-      volatile int totalcent = log2f(convert/440.0f)*12000.0f;
-      
-      volatile int notecent = (((totalcent+500) % 12000) + 12000) % 12000;
-
-
-
-      // itoa(centlookup,charconv,10);
-      char notenamelookup[12][2] = {"A ","Bb","B ","C ","Db","D ","Eb","E ","F ","Gb","G ","Ab"};
-      ssd1306_SetCursor(0,50);
-      ssd1306_WriteChar(notenamelookup[notecent/1000][0], Font_7x10, White);
-      ssd1306_WriteChar(notenamelookup[notecent/1000][1], Font_7x10, White);
-
-      ssd1306_UpdateScreen();
-      ready = false;
-      // HAL_Delay(200);
-      HAL_SDADC_InjectedStart_DMA(&hsdadc1, &dmainput,MAXIMUM_SAMPLESIZE*2);
-    }
-
-
-
-    // for (int i = 0; i < MAXIMUM_SAMPLESIZE; i++)
-    // {
-    //   HAL_SDADC_Start(&hsdadc1);
-    //   HAL_SDADC_PollForConversion(&hsdadc1,HAL_MAX_DELAY);
-    //   int number = (signed short)HAL_SDADC_GetValue(&hsdadc1);
-    //   float outputfloat = number / 32768.0f;
-
-    //   //DC BLOCKER
-    //   float x = outputfloat;
-    //   outputfloat = dcy = dcy * 0.995 + x - dcx;
-    //   dcx = x;
-
-    //   audiobuffer[i] = outputfloat;
-    // }
-
-    
-
-    // // Hardware Test code "_"
-
-    // ssd1306_Fill(Black);
-    // if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == GPIO_PIN_SET) {
-    // }
-    // if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
-    // }
-    // if(HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_9) == GPIO_PIN_SET) {
-    // }
-
-    // data++;
-    // __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,data);
-    // __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,data);
-    // __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,data);
-    // __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,data);
-    // __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,data);
-    // __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_2,data);
-    // __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_4,data);
-
-
-
-
-
-    
-
+    Process();
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -311,27 +184,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef *hsdadc) {
-  ready =true;
-  HAL_SDADC_InjectedStop_DMA(&hsdadc1);   
-}
-
-void HAL_SDADC_ConvCpltCallback(SDADC_HandleTypeDef *hsdadc) {
-  // testInput[floatindex] = HAL_SDADC_GetValue(hsdadc);
-  // ready = true;
-  // HAL_SDADC_Start_IT(hsdadc);
-}
-
-void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
-{
-  /* Prevent unused argument(s) compilation warning */
-  if(htim == &htim13) {
-    ready = false;
-  }
-  /* NOTE : This function Should not be modified, when the callback is needed,
-            the HAL_TIM_TriggerCallback could be implemented in the user file
-   */
-}
 
 /* USER CODE END 4 */
 
